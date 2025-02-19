@@ -6,7 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/components/useColorScheme';
+import { useColorScheme } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -23,7 +23,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    //SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
 
@@ -33,6 +33,7 @@ export default function RootLayout() {
   }, [error]);
 
   useEffect(() => {
+    //hide splash screen when fonts have loaded
     if (loaded) {
       SplashScreen.hideAsync();
     }
@@ -48,6 +49,21 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
+  /* DefaultTheme: Theme = {
+    dark: false,
+    colors: {
+      primary: 'rgb(0, 122, 255)',
+      background: 'rgb(242, 242, 242)',
+      card: 'rgb(255, 255, 255)',
+      text: 'rgb(28, 28, 30)',
+      border: 'rgb(216, 216, 216)',
+      notification: 'rgb(255, 59, 48)',
+    },
+    fonts,
+  };
+
+  
+ */
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
