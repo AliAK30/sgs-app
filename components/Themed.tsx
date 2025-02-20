@@ -3,7 +3,7 @@
  * https://docs.expo.io/guides/color-schemes/
  */
 
-import { Text as DefaultText, View as DefaultView } from 'react-native';
+import { Text as DefaultText, View as DefaultView, TextInput as DefaultTextInput, ScrollView as DefaultScrollView } from 'react-native';
 
 /* import Colors from '@/constants/Colors';
 import { useColorScheme } from './useColorScheme';
@@ -51,3 +51,12 @@ export const Text = (Props: DefaultText['props']) => {
 export const View = (Props: DefaultView['props']) => {
   return <DefaultView {...Props}/>
 }
+
+export const TextInput = (Props: DefaultTextInput['props']) => {
+  return <DefaultTextInput {...Props}/>
+}
+
+export const ScrollView = (Props: DefaultScrollView['props']) => {
+  return <DefaultScrollView {...Props}/>
+}
+

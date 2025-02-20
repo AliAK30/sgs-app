@@ -5,6 +5,7 @@
 #build
 android/
 ios/
+dist/
 
 # dependencies
 node_modules/
