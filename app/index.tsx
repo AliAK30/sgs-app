@@ -4,6 +4,14 @@ import { Image, useImage } from "expo-image";
 import { Link } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
+const quickemailverification = require('quickemailverification').client(process.env.EXPO_PUBLIC_API_KEY).quickemailverification();
+
+
+/* quickemailverification.sandbox("valid@example.com", function (err, response) { 
+  // Print response object
+  console.log(response.body);
+}); */
+
 const imgSource = require("@/assets/images/edumatch.png");
 
 export default function Index() {
