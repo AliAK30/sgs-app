@@ -2,11 +2,13 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   useFonts,
   Inter_400Regular,
-  Inter_600SemiBold
+  Inter_600SemiBold,
+  Inter_500Medium,
 } from "@expo-google-fonts/inter";
 
 import {
-Poppins_700Bold
+Poppins_700Bold,
+Poppins_600SemiBold,
 } from "@expo-google-fonts/poppins"
 import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -33,7 +35,7 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
 
   const [loaded, error] = useFonts({
-    Inter_400Regular, Inter_600SemiBold, Poppins_700Bold
+    Inter_400Regular, Inter_600SemiBold, Poppins_700Bold, Poppins_600SemiBold, Inter_500Medium
   });
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.

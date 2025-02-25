@@ -4,13 +4,7 @@ import { Image, useImage } from "expo-image";
 import { Link } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-const quickemailverification = require('quickemailverification').client(process.env.EXPO_PUBLIC_API_KEY).quickemailverification();
 
-
-/* quickemailverification.sandbox("valid@example.com", function (err, response) { 
-  // Print response object
-  console.log(response.body);
-}); */
 
 const imgSource = require("@/assets/images/edumatch.png");
 
@@ -20,6 +14,7 @@ export default function Index() {
     maxWidth: 800,
     onError(error, retry) {
       console.error("Loading failed:", error.message);
+      retry();
     },
   });
   console.log(width, height)
@@ -43,61 +38,52 @@ export default function Index() {
         source={imgSource}
         contentFit="contain"
       />
-      <Text style={[styles.heading, {fontSize: height*0.045}]}>Welcome</Text>
-      <Text style={[styles.paragraph, {fontSize:height*0.024}]}>
+      <Text style={[styles.heading, {fontSize: height*0.040}]}>Welcome</Text>
+      <Text style={[styles.paragraph, {fontSize:height*0.020}]}>
         Enter your name and email address to continue
       </Text>
       <View style={styles.inputView}>
-        <Text style={[styles.inputLabel, {fontSize:height*0.021}]}>First name</Text>
+        <Text style={[styles.inputLabel, {fontSize:height*0.018}]}>First name</Text>
         <TextInput
-          style={[styles.input, {fontSize: height*0.021}]}
+          style={[styles.input, {fontSize: height*0.018}]}
           placeholder="John"
           placeholderTextColor="rgba(0, 0, 0, 0.30)"
           inputMode="text"
         />
-        <Text style={[styles.inputLabel, {fontSize:height*0.021}]}>Last name</Text>
+        <Text style={[styles.inputLabel, {fontSize:height*0.018}]}>Last name</Text>
         <TextInput
-          style={[styles.input, {fontSize: height*0.021}]}
+          style={[styles.input, {fontSize: height*0.018}]}
           placeholder="Doe"
           placeholderTextColor="rgba(0, 0, 0, 0.30)"
           inputMode="text"
         />
-        <Text style={[styles.inputLabel, {fontSize:height*0.021}]}>Email</Text>
+        <Text style={[styles.inputLabel, {fontSize:height*0.018}]}>Email</Text>
         <TextInput
-          style={[styles.input, {fontSize: height*0.021}]}
+          style={[styles.input, {fontSize: height*0.018}]}
           placeholder="abc@gmail.com"
           placeholderTextColor="rgba(0, 0, 0, 0.30)"
           inputMode="email"
         />
+        <Link href='/sections' asChild>
         <Pressable style={styles.button}>
           <Text
             style={{
               fontFamily: "Inter_600SemiBold",
               color: "#ffffff",
-              fontSize:height*0.024,
+              fontSize:height*0.020,
               textAlign: "center",
             }}
           >
             CONTINUE
           </Text>
         </Pressable>
+        </Link>
       </View>
-      {/* <Link href="/(tabs)" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link> */}
     </View>
   );
 }
 
-const bsObj = {
+const obj = {
   offsetX: 0,
   offsetY: 4,
   blurRadius: 4,
@@ -161,7 +147,7 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     backgroundColor: "#539df3",
-    boxShadow: [bsObj],
+    boxShadow: [obj],
     borderRadius: 10,
     paddingVertical: "3%",
     marginTop: "10%",
