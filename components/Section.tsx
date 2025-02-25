@@ -27,7 +27,7 @@ export default function Section({
       locations={[0, 1]}
       start={{ x: -0.40, y: 0 }}
     />
-        <View style={{width: "90%", paddingBottom: "3%", }}>
+        <View style={{width: "90%", paddingBottom: height*0.01223, }}>
       <Text style={styles.heading}>
         Section {section}
       </Text>
