@@ -1,4 +1,3 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import {
   useFonts,
   Inter_400Regular,
@@ -16,8 +15,10 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { View} from '@/components/Themed';
 import UnsafeArea  from '@/components/UnsafeArea'
-import { StyleSheet, Platform} from 'react-native';
+import { StyleSheet, Dimensions} from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+
+export const { width, height } = Dimensions.get("window");
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -26,7 +27,7 @@ export {
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: 'index',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

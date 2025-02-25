@@ -1,6 +1,7 @@
 import { View, Text } from "@/components/Themed";
-import { Pressable, StyleSheet, useWindowDimensions } from "react-native";
+import { StyleSheet, } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { height } from "../app/_layout";
 
 type Props = {
   section: number;
@@ -15,18 +16,19 @@ export default function Section({
   gradient2,
   questionsCompleted,
 }: Props) {
-  const { height, width } = useWindowDimensions();
+  
 
   return (
+    <View style={styles.container}>
     <LinearGradient
       // Background Linear Gradient
-      style={styles.container}
+      style={styles.background}
       colors={[gradient1, gradient2]}
       locations={[0, 1]}
       start={{ x: -0.40, y: 0 }}
-    >
+    />
         <View style={{width: "90%", paddingBottom: "3%", }}>
-      <Text style={[styles.heading, { fontSize: height * 0.020 }]}>
+      <Text style={styles.heading}>
         Section {section}
       </Text>
       <View style={styles.progressContainer}>
@@ -42,60 +44,60 @@ export default function Section({
         ]}
       >
         <Text
-          style={{ fontFamily: "Inter_500Medium", fontSize: height * 0.016 }}
+          style={{ fontFamily: "Inter_500Medium", fontSize: height * 0.01468 }}
         >
           {questionsCompleted < 10 && "0"}
           {questionsCompleted}/11
         </Text>
       </View>
       </View>
-    </LinearGradient>
+    
+    </View>
   );
 }
 
 
-const bsObj = {
-    offsetX: 0,
-    offsetY: 20,
-    blurRadius: 25,
-    spread: 0,
-    color: "rgba(28, 28, 34, 0.15)",
-    inset: false,
-};
-
 const styles = StyleSheet.create({
   container: {
-    marginVertical: "3%",
-    borderRadius: 20,
+    marginVertical: height*0.0122,
     alignItems: "center",
-    boxShadow:[bsObj]
+    boxShadow: "0px 20px 25px 0px rgba(28, 28, 34, 0.15)",
+    borderRadius: 20,
+  },
+
+  background: {
+    height: "100%",
+    width: "100%",
+    position: "absolute",
+    borderRadius: 20,
   },
 
   heading: {
     fontFamily: "Poppins_600SemiBold",
     color: "#4D3E3E",
     letterSpacing: -0.3,
-    marginVertical: "4%",
+    marginVertical: height*0.0146,
     alignSelf: "center",
+    fontSize: height * 0.0196,
   },
 
   progressContainer: {
-    marginBottom: "5%",
+    marginBottom: height*0.0183,
     borderRadius: 31,
     backgroundColor: "white",
   },
 
   progress: {
     backgroundColor: "#71E9AF",
-    height: 4,
+    height: height*0.0048,
     borderRadius: 31,
   },
 
   count: {
     alignSelf: "flex-end",
     borderRadius: 29,
-    paddingVertical: "1%",
-    paddingHorizontal: "7%",
+    paddingVertical: height*0.0036,
+    paddingHorizontal: height*0.0257,
   },
 });
 

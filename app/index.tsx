@@ -1,15 +1,17 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { StyleSheet, Pressable, useWindowDimensions } from "react-native";
+import {
+  StyleSheet,
+  Pressable,
+} from "react-native";
 import { Image, useImage } from "expo-image";
 import { Link } from "expo-router";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
-
+import {height } from "./_layout"
 
 
 const imgSource = require("@/assets/images/edumatch.png");
 
 export default function Index() {
-  const { height, width } = useWindowDimensions();
+  
   const image = useImage(imgSource, {
     maxWidth: 800,
     onError(error, retry) {
@@ -17,122 +19,127 @@ export default function Index() {
       retry();
     },
   });
-  console.log(width, height)
+  //console.log(width, height);
+
   if (!image) {
     return <Text>Image is loading...</Text>;
   }
 
 
   return (
-    <View
-      style={[
-        styles.container,
-        { width: width < 480 ? 0.92 * width : 0.5 * width },
-      ]}
-    >
+    <View style={styles.container}>
       <Image
         style={{
-          width: height < 700 ? image.width * 0.7 : image.width,
-          height: height < 700 ? image.width * 0.7 : image.width,
+          width: image.width * (height/817),
+          height: image.height * (height/817),
         }}
         source={imgSource}
         contentFit="contain"
       />
-      <Text style={[styles.heading, {fontSize: height*0.040}]}>Welcome</Text>
-      <Text style={[styles.paragraph, {fontSize:height*0.020}]}>
+      <Text style={[styles.heading,]}>
+        Welcome
+      </Text>
+      <Text style={[styles.paragraph, ]}>
         Enter your name and email address to continue
       </Text>
       <View style={styles.inputView}>
-        <Text style={[styles.inputLabel, {fontSize:height*0.018}]}>First name</Text>
+        <Text style={[styles.inputLabel, ]}>
+          First name
+        </Text>
         <TextInput
-          style={[styles.input, {fontSize: height*0.018}]}
+          style={[styles.input, ]}
           placeholder="John"
           placeholderTextColor="rgba(0, 0, 0, 0.30)"
           inputMode="text"
         />
-        <Text style={[styles.inputLabel, {fontSize:height*0.018}]}>Last name</Text>
+        <Text style={[styles.inputLabel, ]}>
+          Last name
+        </Text>
         <TextInput
-          style={[styles.input, {fontSize: height*0.018}]}
+          style={[styles.input, ]}
           placeholder="Doe"
           placeholderTextColor="rgba(0, 0, 0, 0.30)"
           inputMode="text"
         />
-        <Text style={[styles.inputLabel, {fontSize:height*0.018}]}>Email</Text>
+        <Text style={[styles.inputLabel, ]}>
+          Email
+        </Text>
         <TextInput
-          style={[styles.input, {fontSize: height*0.018}]}
+          style={[styles.input, ]}
           placeholder="abc@gmail.com"
           placeholderTextColor="rgba(0, 0, 0, 0.30)"
           inputMode="email"
         />
-        <Link href='/sections' asChild>
-        <Pressable style={styles.button}>
-          <Text
-            style={{
-              fontFamily: "Inter_600SemiBold",
-              color: "#ffffff",
-              fontSize:height*0.020,
-              textAlign: "center",
-            }}
-          >
-            CONTINUE
-          </Text>
-        </Pressable>
+        <Link href="/sections" asChild>
+          <Pressable style={styles.button}>
+            <Text
+              style={{
+                fontFamily: "Inter_600SemiBold",
+                color: "#ffffff",
+                fontSize: height * 0.0196,
+                textAlign: "center",
+              }}
+            >
+              CONTINUE
+            </Text>
+          </Pressable>
         </Link>
       </View>
     </View>
   );
 }
 
-const obj = {
+/* const obj = {
   offsetX: 0,
   offsetY: 4,
   blurRadius: 4,
   spread: 0,
   color: "rgba(0, 0, 0, 0.25)",
   inset: false,
-};
+}; */
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: "92%",
     backgroundColor: "rgba(173, 216, 230, 0.25)",
-
-    marginVertical: "3%",
+    overflow: "scroll",
     borderRadius: 24,
     alignItems: "center",
+    paddingHorizontal: height*0.024,
   },
 
   heading: {
     fontFamily: "Poppins_700Bold",
     color: "#565555",
-    fontSize: 30,
+    fontSize: height * 0.0367
   },
 
   paragraph: {
     fontFamily: "Inter_400Regular",
-    fontSize: 16,
+    fontSize: height * 0.0196,
     color: "rgba(0, 0, 0, 0.70)",
     textAlign: "center",
-    marginTop:"2%",
+    marginTop: height*0.00734,
   },
 
   inputView: {
-    width: "100%",
-    alignItems: "flex-start",
+    alignSelf: "stretch",
     //backgroundColor: 'white',
-    paddingHorizontal: "6%",
-    rowGap: 6,
-    marginTop: "10%",
+    //paddingHorizontal: "6%",
+    rowGap: height*0.00734,
+    marginTop: height*0.0428,
   },
 
   input: {
     backgroundColor: "#ffffff",
     borderRadius: 10,
-    width: "100%",
+    //width: "100%",
     fontFamily: "Inter_400Regular",
-    fontSize: 16,
+    fontSize: height * 0.0196,
     color: "rgba(0, 0, 0, 1)",
-    padding: "3%",
+    paddingHorizontal: height*0.0171,
+    paddingVertical: height*0.0110,
     borderColor: "#D8DADC",
     borderStyle: "solid",
     borderWidth: 1,
@@ -140,16 +147,16 @@ const styles = StyleSheet.create({
 
   inputLabel: {
     fontFamily: "Inter_400Regular",
-    fontSize: 14,
+    fontSize: height * 0.0171,
     color: "rgba(0, 0, 0, 0.70)",
   },
 
   button: {
-    width: "100%",
+    //width: "100%",
     backgroundColor: "#539df3",
-    boxShadow: [obj],
+    boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
     borderRadius: 10,
-    paddingVertical: "3%",
+    paddingVertical: height*0.0208,
     marginTop: "10%",
   },
 });

@@ -1,3 +1,5 @@
+export const optionsColor = "rgba(31, 36, 41, 0.05)"
+
 type Question = {
     question: string;
     number: number;
@@ -6,7 +8,7 @@ type Question = {
     b: string;
     containerColor: string;
     gradientColorStart: string;
-    sectionColor: string;
+    gradientColorEnd: string;
 }
 
 export const questions : Array<Question> = [
@@ -18,7 +20,7 @@ export const questions : Array<Question> = [
         b: "Think about algorithm's overall processes 🌐",
         containerColor: "#E9E6F9",
         gradientColorStart: "#9D86FB",
-        sectionColor: "#DBD2FF",
+        gradientColorEnd: "#DBD2FF",
     },
     {
         question: "I would try to learn algorithms through by:",
@@ -26,9 +28,9 @@ export const questions : Array<Question> = [
         section: 1,
         a: "Learning it for more examples through changing the values",
         b: "Learning on some more cases through changing the scenarios",
-        containerColor: "#E9E6F9",
-        gradientColorStart: "d",
-        sectionColor: "#DBD2FF",
+        containerColor: "#E8E9F8",
+        gradientColorStart: "#8086FF",
+        gradientColorEnd: "#D8DAFD",
     },
     {
         question: "When I think about yesterday's Algorithms class:",
@@ -36,9 +38,9 @@ export const questions : Array<Question> = [
         section: 1,
         a: "I got a whole picture of Algorithm in my mind 🖼️",
         b: "I only got Words Of Algorithm like Text 💬",
-        containerColor: "#E9E6F9",
-        gradientColorStart: "d",
-        sectionColor: "#DBD2FF",
+        containerColor: "#E7ECF8",
+        gradientColorStart: "#79A7FF",
+        gradientColorEnd: "#D5E2FB",
     },
     {
         question: "When I learn about Algorithms:",
@@ -46,9 +48,9 @@ export const questions : Array<Question> = [
         section: 1,
         a: "I understand that this is a Bubble sort but I'm unable to understand its entire working 📉",
         b: "I understand its entire working but I am unable to understand that this is a Bubble Sort 🔵",
-        containerColor: "#E9E6F9",
-        gradientColorStart: "d",
-        sectionColor: "#DBD2FF",
+        containerColor: "#E6EFF7",
+        gradientColorStart: "#68C4FE",
+        gradientColorEnd: "#D2EAF9",
     },
     {
         question: "When I am learning new algorithms:",
@@ -56,11 +58,11 @@ export const questions : Array<Question> = [
         section: 1,
         a: "I can talk about it with my colleagues",
         b: "I can think about that algorithms 💭",
-        containerColor: "#E9E6F9",
-        gradientColorStart: "d",
-        sectionColor: "#DBD2FF",
+        containerColor: "#E5F2F7",
+        gradientColorStart: "#7FE9F9",
+        gradientColorEnd: "#CFF2F7",
     },
 ]
 
-export const optionsColor = "rgba(31, 36, 41, 0.05)"
+
 
