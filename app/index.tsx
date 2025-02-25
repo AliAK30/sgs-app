@@ -157,6 +157,6 @@ const styles = StyleSheet.create({
     boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
     borderRadius: 10,
     paddingVertical: height*0.0208,
-    marginTop: "10%",
+    marginTop: height*0.04161,
   },
 });
