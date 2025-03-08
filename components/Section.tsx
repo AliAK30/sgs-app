@@ -2,6 +2,9 @@ import { View, Text } from "@/components/Themed";
 import { StyleSheet, } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { height } from "../app/_layout";
+import { Pressable } from "react-native";
+import { useRouter } from "expo-router";
+import { useSurveyStore } from "@/hooks/useStore";
 
 type Props = {
   section: number;
@@ -16,10 +19,19 @@ export default function Section({
   gradient2,
   questionsCompleted,
 }: Props) {
+
+  const router = useRouter();
+  const setSelectedSection = useSurveyStore(state=>state.setSelectedSection) 
+
+  const onPress = () => {
+    setSelectedSection(section);
+    router.navigate("/survey");
+  }
   
 
   return (
-    <View style={styles.container}>
+    
+    <Pressable style={styles.container} onPress={onPress}>
     <LinearGradient
       // Background Linear Gradient
       style={styles.background}
@@ -52,7 +64,8 @@ export default function Section({
       </View>
       </View>
     
-    </View>
+    </Pressable>
+    
   );
 }
 

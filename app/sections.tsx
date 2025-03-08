@@ -1,13 +1,49 @@
 import { Text, View } from "@/components/Themed";
 import { Pressable, StyleSheet } from "react-native";
-import { Link } from "expo-router";
-import { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Section from "@/components/Section";
-import { height, width } from "./_layout";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { height } from "./_layout";
+import { useEffect } from "react";
+import { useSurveyStore } from "@/hooks/useStore";
 
 export default function Sections() {
+  const {
+    section1Count,
+    setSection1Count,
+    section2Count,
+    setSection2Count,
+    section3Count,
+    setSection3Count,
+    section4Count,
+    setSection4Count,
+  } = useSurveyStore(state => state);
+
+  //section1/2/3/4 keys in localstorage tracks the number of questions user has answered in each section
+
+  const initializeQuestionsCount = async (key: string) => {
+    try {
+      const result: string | null = await AsyncStorage.getItem(key);
+      if (result) {
+        if (key === "section1") setSection1Count(Number(result));
+        else if (key === "section2") setSection2Count(Number(result));
+        else if (key === "section3") setSection3Count(Number(result));
+        else if (key === "section4") setSection4Count(Number(result));
+      }
+      return;
+    } catch (e: any) {
+      console.log(e.message);
+    }
+  };
+
+  useEffect(() => {
+    initializeQuestionsCount("section1");
+    initializeQuestionsCount("section2");
+    initializeQuestionsCount("section3");
+    initializeQuestionsCount("section4");
+  }, []);
+
   return (
     <LinearGradient
       // Background Linear Gradient
@@ -15,15 +51,10 @@ export default function Sections() {
       locations={[0.27, 1]}
       style={styles.container}
     >
-      <Link href="/" asChild>
-        <Pressable style={styles.close}>
-          <Ionicons
-            name="close-outline"
-            size={height * 0.038}
-            color="#565555"
-          />
-        </Pressable>
-      </Link>
+      <Pressable style={styles.close}>
+        <Ionicons name="close-outline" size={height * 0.034} color="#565555" />
+      </Pressable>
+
       <View style={styles.main}>
         <Text style={styles.heading}>Questions</Text>
         <Text style={styles.paragraph}>
@@ -34,25 +65,26 @@ export default function Sections() {
             section={1}
             gradient1="rgba(221, 246, 255, 0.8)"
             gradient2="rgba(234, 255, 239, 0.8)"
-            questionsCompleted={3}
+            questionsCompleted={section1Count}
           />
+
           <Section
             section={2}
             gradient1="rgba(255, 242, 219, 0.8)"
             gradient2="rgba(255, 219, 247, 0.8)"
-            questionsCompleted={5}
+            questionsCompleted={section2Count}
           />
           <Section
             section={3}
             gradient1="rgba(221, 254, 255, 0.8)"
             gradient2="rgba(255, 234, 234, 0.8)"
-            questionsCompleted={1}
+            questionsCompleted={section3Count}
           />
           <Section
             section={4}
             gradient1="rgba(255, 251, 221, 0.8)"
             gradient2="rgba(255, 219, 219, 0.8)"
-            questionsCompleted={11}
+            questionsCompleted={section4Count}
           />
         </View>
       </View>
@@ -67,7 +99,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     paddingHorizontal: height * 0.024,
-    overflow: "scroll",
   },
 
   close: {
@@ -79,7 +110,7 @@ const styles = StyleSheet.create({
   },
 
   main: {
-    paddingLeft: height*0.00734,
+    paddingLeft: height * 0.00734,
   },
 
   heading: {
