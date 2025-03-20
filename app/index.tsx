@@ -9,7 +9,7 @@ export default function Index() {
 
   const {user} = useUser();
 
-  //if(user?.isSurveyCompleted) return (<Redirect href="/statistics"/>)
+  if(user?.isSurveyCompleted) return (<Redirect href="/statistics"/>)
 
   if(user) return (<Redirect href="/sections"/>)
 

@@ -18,6 +18,8 @@ import { useRouter } from "expo-router";
 import { useUser} from "@/contexts/UserContext";
 import axios from "axios";
 
+import { Redirect } from "expo-router";
+
 const animationSource = require("@/assets/images/hand.json");
 
 //USE OF WITHAUTH TO PROTECT ROUTE
@@ -166,6 +168,10 @@ export default function Survey() {
       setIsSubmitting(false);
     }
   };
+
+  if(selectedSection===5) {
+    return (<Redirect href="/sections"/>)
+  }
 
   return (
     <View
