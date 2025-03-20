@@ -86,7 +86,7 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isValid, isSubmitting, },
   } = useForm({
-    mode: "onBlur",
+    mode: "onSubmit",
     resolver: yupResolver(schema),
     defaultValues: {
       first_name: "",
@@ -113,7 +113,7 @@ export default function Login() {
       data.role = "student";
       if(isConnected)
       {
-        console.log(data)
+        
         const res: any = await axios.post(`${url}/student/register`,data, {timeout:1000*15})
        
         
@@ -278,7 +278,7 @@ export default function Login() {
 
         <Pressable
           style={styles.button}
-          disabled={!isValid}
+       
           onPress={handleSubmit(onSubmit)}
         >
           {isSubmitting ? <ActivityIndicator size="small" color="white"/> : <Text
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    //width: "100%",
+    
     backgroundColor: "#539df3",
     boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
     borderRadius: 10,

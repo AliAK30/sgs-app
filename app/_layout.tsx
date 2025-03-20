@@ -8,9 +8,10 @@ import {
 import {
   Poppins_700Bold,
   Poppins_600SemiBold,
+  Poppins_400Regular
 } from "@expo-google-fonts/poppins";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Slot } from "expo-router";
+import { Slot, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useRef, useState } from "react";
 import "react-native-reanimated";
@@ -21,7 +22,7 @@ import { StatusBar } from "expo-status-bar";
 import { UserContext, User } from "@/contexts/UserContext";
 import Loader from "@/components/Loader";
 
-export const { width, height } = Dimensions.get("window");
+export const { width, height } = Dimensions.get("screen");
 
 // Expo Router uses Error Boundaries to catch errors in the navigation tree.
 export {
@@ -43,11 +44,13 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Poppins_700Bold,
     Poppins_600SemiBold,
+    Poppins_400Regular,
     Inter_500Medium,
   });
 
   const [user, setUser] = useState<User | null>(null);
   const [done, setDone] = useState<boolean>(false);
+  const router = useRouter();
 
   //we will pass this as a prop on the choose "admin" or student login screen
   //const [role, setRole] = useState<string>("");
@@ -92,6 +95,12 @@ export default function RootLayout() {
     token.current = tokenToSet;
   };
 
+  const clear = () => {
+    token.current = null;
+    setUser(null);
+    router.replace("/login");
+  }
+
   if (!loaded || !done) {
     return <Loader size="large" color="blue" />;
   }
@@ -103,6 +112,7 @@ export default function RootLayout() {
         token,
         done,
         setUserAndToken,
+        clear,
       }}
     >
       <View style={styles.container}>

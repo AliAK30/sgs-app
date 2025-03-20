@@ -3,12 +3,32 @@ import { Pressable, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Section from "@/components/Section";
+import Loader from "@/components/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { height } from "./_layout";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSurveyStore } from "@/hooks/useStore";
+import useAnswers from "@/hooks/useAnswers";
+import { useUser } from "@/contexts/UserContext";
+
+
+const getAnswers = async () => {
+  try {
+    let tempAnswers = await AsyncStorage.getItem("answers");
+    if (tempAnswers) {
+      return JSON.parse(tempAnswers);
+    }
+    else
+    {
+      return new Array(44).fill({q: 0, answer: ''})
+    }
+  } catch (e: any) {
+    return e.message;
+  } 
+};
 
 export default function Sections() {
+  
   const {
     section1Count,
     setSection1Count,
@@ -18,32 +38,40 @@ export default function Sections() {
     setSection3Count,
     section4Count,
     setSection4Count,
-  } = useSurveyStore(state => state);
+    selectedSection,
+  } = useSurveyStore((state) => state);
 
-  //section1/2/3/4 keys in localstorage tracks the number of questions user has answered in each section
-
-  const initializeQuestionsCount = async (key: string) => {
-    try {
-      const result: string | null = await AsyncStorage.getItem(key);
-      if (result) {
-        if (key === "section1") setSection1Count(Number(result));
-        else if (key === "section2") setSection2Count(Number(result));
-        else if (key === "section3") setSection3Count(Number(result));
-        else if (key === "section4") setSection4Count(Number(result));
-      }
-      return;
-    } catch (e: any) {
-      console.log(e.message);
-    }
-  };
+  const [loaded, setLoaded] = useState<boolean>(false)
+  const { answers, getQuestionsCount } = useAnswers();
+  const {clear} = useUser();
 
   useEffect(() => {
-    initializeQuestionsCount("section1");
-    initializeQuestionsCount("section2");
-    initializeQuestionsCount("section3");
-    initializeQuestionsCount("section4");
-  }, []);
+    //console.log(`loaded: ${loaded}`);
+    if (loaded) {
+      if(selectedSection === 1 || selectedSection || 5) setSection1Count(getQuestionsCount(1));
+      if(selectedSection === 2 || selectedSection || 5) setSection2Count(getQuestionsCount(2));
+      if(selectedSection === 3 || selectedSection || 5) setSection3Count(getQuestionsCount(3));
+      if(selectedSection === 4 || selectedSection || 5) setSection4Count(getQuestionsCount(4));
+    }
+  }, [loaded, answers]);
 
+  const initialize = async () => {
+    const val = await getAnswers();
+    answers.current = val;
+    setLoaded(true);
+  }
+
+  useEffect(()=> {initialize()}, [])
+
+  if (!loaded) {
+    return <Loader size="large" color="blue" />;
+  }
+
+  const logout = async () => {
+    await AsyncStorage.multiRemove(["user", "token", "answers"], clear)
+  }
+
+  
   return (
     <LinearGradient
       // Background Linear Gradient
@@ -51,7 +79,7 @@ export default function Sections() {
       locations={[0.27, 1]}
       style={styles.container}
     >
-      <Pressable style={styles.close}>
+      <Pressable style={styles.close} onPress={logout}>
         <Ionicons name="close-outline" size={height * 0.034} color="#565555" />
       </Pressable>
 
@@ -125,3 +153,4 @@ const styles = StyleSheet.create({
     fontSize: height * 0.0196,
   },
 });
+
