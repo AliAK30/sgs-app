@@ -15,6 +15,8 @@ export default function DimensionInfo({ score, dimension, goBack }: Props) {
   return (
     <View>
       <View style={styles.header}>
+        
+        <Text style={styles.heading}>{dimension} Learner</Text>
         <Pressable onPress={goBack} style={styles.button}>
           <FontAwesome6
             name="arrow-left"
@@ -22,9 +24,8 @@ export default function DimensionInfo({ score, dimension, goBack }: Props) {
             size={height * 0.02937}
           />
         </Pressable>
-        <Text style={styles.heading}>{dimension} Learner</Text>
       </View>
-      <Text style={[styles.mainTexts1, { textAlign: "center" }]}>
+      <Text style={[styles.mainTexts1, { textAlign: "center", marginTop: height*0.009 }]}>
         {score} / 11
       </Text>
 
@@ -84,8 +85,9 @@ const styles = StyleSheet.create({
     fontSize: height * 0.02447,
     color: "#333F50",
     textAlign: "center",
-    width: "77%",
+    position:"absolute",
+    width: "100%",
     //borderWidth: 1,
-    marginBottom: height * 0.009,
+    //paddingBottom: height * 0.009,
   },
 });
