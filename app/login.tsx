@@ -117,7 +117,7 @@ export default function Login() {
         const res: any = await axios.post(`${url}/student/register`,data, {timeout:1000*15})
        
         
-        await openAlert("success", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
+        await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
         setUserAndToken(res.data.user, res.data.token);
         router.replace("/sections");
         
@@ -125,7 +125,7 @@ export default function Login() {
       }
       else
       {
-        openAlert("fail", "No Internet Connection!");
+        openAlert("fail", "Failed!", "No Internet Connection!");
         return;
       }
       
@@ -137,11 +137,11 @@ export default function Login() {
         switch(e.code)
         {
           case "ECONNABORTED":
-            openAlert("fail", "Request TImed out\nPlease try again later!");
+            openAlert("fail", "Failed!", "Request TImed out\nPlease try again later!");
             return;
 
           case "ERR_NETWORK":
-            openAlert("fail", "Server is not Responding\nPlease try again later!");
+            openAlert("fail", "Failed!", "Server is not Responding\nPlease try again later!");
             return;
         }
       }
@@ -152,15 +152,15 @@ export default function Login() {
         switch(e.response.data.code)
         {
           case 'INVALID_EMAIL':
-            openAlert("fail", e.response.data.message);
+            openAlert("fail", "Failed!",e.response.data.message);
             return;
 
           case 'DUPLICATE_EMAIL':
-            openAlert("info", e.response.data.message);
+            openAlert("info", "Already Registered!", e.response.data.message);
             return;
 
           case 'VALIDATION_ERROR':
-            openAlert("fail", e.response.data.message);
+            openAlert("fail", "Failed!",e.response.data.message);
             return;
         }
         
@@ -168,7 +168,7 @@ export default function Login() {
 
       if(e.status === 500)
       {
-        openAlert("fail", e.message);
+        openAlert("fail", "Failed!", e.message);
         return;
       }
 

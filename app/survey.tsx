@@ -125,6 +125,7 @@ export default function Survey() {
         );
         await openAlert(
           "success",
+          "Submission Successful!",
           `Thanks for submitting! You will now see your learning style`
         );
         router.replace("/statistics");
@@ -132,19 +133,20 @@ export default function Survey() {
 
 
       } else {
-        openAlert("fail", "No Internet Connection!");
+        openAlert("fail", "Failed!", "No Internet Connection!");
         return;
       }
     } catch (e: any) {
       if (!e.status) {
         switch (e.code) {
           case "ECONNABORTED":
-            openAlert("fail", "Request TImed out\nPlease try again later!");
+            openAlert("fail", "Failed!", "Request TImed out\nPlease try again later!");
             return;
 
           case "ERR_NETWORK":
             openAlert(
               "fail",
+              "Failed!",
               "Server is not Responding\nPlease try again later!"
             );
             return;
@@ -155,13 +157,13 @@ export default function Survey() {
         switch (e.response.data.code) {
 
           case "VALIDATION_ERROR":
-            openAlert("fail", e.response.data.message);
+            openAlert("fail", "Failed!", e.response.data.message);
             return;
         }
       }
 
       if (e.status === 500) {
-        openAlert("fail", e.message);
+        openAlert("fail", "Failed!", e.message);
         return;
       }
     } finally {
