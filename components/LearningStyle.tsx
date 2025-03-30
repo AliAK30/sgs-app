@@ -1,14 +1,14 @@
 import { RadarChart } from "react-native-gifted-charts";
 import { height } from "@/app/_layout";
 import { User, LearningStyle } from "@/contexts/UserContext";
-import Svg, { Text as SvgText, TextAnchor, AlignmentBaseline, Rect, G } from "react-native-svg";
 import { View, Text } from "./Themed";
-import {StyleSheet } from "react-native";
+import {StyleSheet, Pressable } from "react-native";
 import { useState } from "react";
 import DimensionInfo from "@/components/DimensionInfo";
 type Props = {
   user: User | null;
 };
+
 
 //used for static labels
 export type Label =
@@ -37,15 +37,15 @@ const chartSize = height * 0.27;
 const labelsContainer = chartSize * 1.5;
 const center = labelsContainer / 2;
 const radius = center * 0.8;
-const labelsPositionXOffset = [-2, 13, 0, -15, 2, -12, 0, 4];
-const labelsPositionYOffset = [8, 19, 22, 19, 8, 0, -11, 0];
+const bh = 817;
+const labelsPositionXOffset = [3, 16, 0, -15, 5, -19, 6, 9].map((a)=>a/bh*height);
+const labelsPositionYOffset = [-18, 2, 1, 2, -18, -30, -38, -30].map((a)=>a/bh*height);
 
 
 export default function LearningStyleComponent({ user }: Props) {
 
 
-  const [dimensionInfoVisible, setdimensionInfoVisible] =
-    useState<boolean>(false);
+  const [dimensionInfoVisible, setdimensionInfoVisible] = useState<boolean>(false);
   const [dimensionIndex, setDimensionIndex] = useState<number>(-1);
   const dataArray = getData(user?.learning_style);
   const noOfSections = 6;
@@ -71,10 +71,10 @@ export default function LearningStyleComponent({ user }: Props) {
 
 
   return (
-    <View>
+    <View style={{flex:1, alignItems:'center', }}>
       
       <Text style={styles.lsHeading}>Your Learning Style</Text>
-      <View style={{ paddingTop: height * 0.047 }}>
+      <View style={{ paddingTop: height*0.060, paddingHorizontal: height*0.1138}}>
         <RadarChart
           noOfSections={noOfSections}
           hideAsterLines
@@ -86,62 +86,36 @@ export default function LearningStyleComponent({ user }: Props) {
           chartSize={chartSize}
           polygonConfig={polygonConfig}
         />
-      </View>
-
-      <View style={{ position: "absolute", width: "100%", alignItems: "center", }}>
-
-        <Svg width={labelsContainer} height={labelsContainer}>
-          {figmaLabels.map((category, index) => {
+        {figmaLabels.map((category, index) => {
+          
             const angle = index * angleStep;
 
-            // Offsets for label position
-            const labelXOffset = labelsPositionXOffset[index];
-            const labelYOffset = labelsPositionYOffset[index];
-
             let { x, y } = polarToCartesian(angle, maxValue); 
-            x += labelXOffset;
-            y += labelYOffset;
 
-            const text = `${category} (${dataArray[index]})`;
-            //rectangle dimensions and (x, y) coordinates calculation
-            const rectWidth = estimateTextWidth(text, labelConfig.fontSize) + 8;
-            const rectHeight = height * 0.029;
-            const rectX = x - rectWidth / 2;
-            const rectY = y - rectHeight / 2;
+            // Offsets for label position
+            x += labelsPositionXOffset[index];
+            y += labelsPositionYOffset[index];
 
             return (
-              <G
+              <Pressable
                 key={`label-${index}`}
+                style={{
+                  position: "absolute",
+                  backgroundColor: "#EBD7C9",
+                  borderRadius: 10.5,
+                  top: y,
+                  left: x,
+                  paddingVertical: height*0.006,
+                  paddingHorizontal: height*0.011,
+                  boxShadow: "0px 2px 5.5px -1px rgba(0, 0, 0, 0.15), 0px 7px 6.4px 1px rgba(244, 162, 97, 0.38) inset", 
+                }}
                 onPress={() => showDimensionInfo(index)}
+                hitSlop={10}
               >
-                <Rect
-                  width={rectWidth}
-                  height={rectHeight}
-                  x={rectX}
-                  y={rectY}
-                  rx={9}
-                  fill="#EBD7C9"
-                />
-                <SvgText
-                  x={x}
-                  y={y}
-                  fontSize={labelConfig.fontSize}
-                  fontFamily={labelConfig.fontFamily}
-                  fill={labelConfig.stroke}
-                  textAnchor={
-                    (labelConfig.textAnchor as TextAnchor) ?? "middle"
-                  }
-                  alignmentBaseline={
-                    (labelConfig.alignmentBaseline as AlignmentBaseline) ??
-                    "middle"
-                  }
-                >
-                  {text}
-                </SvgText>
-              </G>
+                <Text style={styles.labels}>{category} <Text style={[styles.labels, {fontFamily: "Poppins_400Regular"}]}>{`(${dataArray[index]})`}</Text></Text>
+              </Pressable>
             );
           })}
-        </Svg>
       </View>
     </View>
   );
@@ -154,6 +128,13 @@ const styles = StyleSheet.create({
     color: "#333F50",
     textAlign: "center",
   },
+
+  labels: {
+    fontSize: 0.012 * height,
+    fontFamily: "Poppins_600SemiBold",
+    color: "#333F50",
+    textAlign: "center",
+  }
 });
 
 
@@ -162,14 +143,6 @@ const gridConfig = {
   strokeWidth: 2,
   opacity: 0,
   gradientOpacity: 0,
-};
-
-const labelConfig = {
-  fontSize: 0.012 * height,
-  fontFamily: "Poppins_600SemiBold",
-  stroke: "#333F50",
-  textAnchor: "middle",
-  alignmentBaseline: "middle",
 };
 
 

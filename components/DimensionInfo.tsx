@@ -17,7 +17,7 @@ export default function DimensionInfo({ score, dimension, goBack }: Props) {
       <View style={styles.header}>
         
         <Text style={styles.heading}>{dimension} Learner</Text>
-        <Pressable onPress={goBack} style={styles.button}>
+        <Pressable onPress={goBack} style={styles.button} hitSlop={6}>
           <FontAwesome6
             name="arrow-left"
             color="#333F50"
