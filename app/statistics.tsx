@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   },
 
   learningStyle: {
-    height: height * 0.4247,
+    minHeight: height * 0.4247,
     backgroundColor: "rgba(230, 236, 245, 0.96)",
     borderRadius: 20,
     paddingVertical: height * 0.024,

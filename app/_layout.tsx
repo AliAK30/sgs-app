@@ -22,7 +22,15 @@ import { StatusBar } from "expo-status-bar";
 import { UserContext, User } from "@/contexts/UserContext";
 import Loader from "@/components/Loader";
 
-export const { width, height } = Dimensions.get("screen");
+export const  { width, height } = Dimensions.get("screen");
+
+/* if(width>height){
+  let temp = height;
+  height = width;
+  width = temp;
+}
+
+export {width, height}; */
 
 // Expo Router uses Error Boundaries to catch errors in the navigation tree.
 export {

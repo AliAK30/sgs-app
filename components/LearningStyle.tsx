@@ -1,8 +1,8 @@
 import { RadarChart } from "react-native-gifted-charts";
-import { height } from "@/app/_layout";
+import { height, width } from "@/app/_layout";
 import { User, LearningStyle } from "@/contexts/UserContext";
 import { View, Text } from "./Themed";
-import {StyleSheet, Pressable } from "react-native";
+import {StyleSheet, Pressable, } from "react-native";
 import { useState } from "react";
 import DimensionInfo from "@/components/DimensionInfo";
 type Props = {
@@ -33,13 +33,14 @@ const figmaLabels: Array<Label> = [
 ];
 
 const maxValue = 12;
-const chartSize = height * 0.27;
+const chartSize = width * 0.5354;
 const labelsContainer = chartSize * 1.5;
 const center = labelsContainer / 2;
 const radius = center * 0.8;
-const bh = 817;
-const labelsPositionXOffset = [3, 16, 0, -15, 5, -19, 6, 9].map((a)=>a/bh*height);
-const labelsPositionYOffset = [-18, 2, 1, 2, -18, -30, -38, -30].map((a)=>a/bh*height);
+const bw = 412; //base figma screen width
+const bh = 817; //base figma screen height
+const labelsPositionXOffset = [3, 16, 0, -15, 5, -19, 6, 9].map((a)=>a/bw*width);
+const labelsPositionYOffset = [-18, 2, 1, 2, -18, -30, -42, -30].map((a)=>a/bw*width);
 
 
 export default function LearningStyleComponent({ user }: Props) {
@@ -71,10 +72,10 @@ export default function LearningStyleComponent({ user }: Props) {
 
 
   return (
-    <View style={{flex:1, alignItems:'center', }}>
+    <View style={{alignItems:"center"}}>
       
       <Text style={styles.lsHeading}>Your Learning Style</Text>
-      <View style={{ paddingTop: height*0.060, paddingHorizontal: height*0.1138}}>
+      <View style={styles.lsContainer}>
         <RadarChart
           noOfSections={noOfSections}
           hideAsterLines
@@ -87,7 +88,7 @@ export default function LearningStyleComponent({ user }: Props) {
           polygonConfig={polygonConfig}
         />
         {figmaLabels.map((category, index) => {
-          
+
             const angle = index * angleStep;
 
             let { x, y } = polarToCartesian(angle, maxValue); 
@@ -105,8 +106,8 @@ export default function LearningStyleComponent({ user }: Props) {
                   borderRadius: 10.5,
                   top: y,
                   left: x,
-                  paddingVertical: height*0.006,
-                  paddingHorizontal: height*0.011,
+                  paddingVertical: width*0.0118,
+                  paddingHorizontal: width*0.0218,
                   boxShadow: "0px 2px 5.5px -1px rgba(0, 0, 0, 0.15), 0px 7px 6.4px 1px rgba(244, 162, 97, 0.38) inset", 
                 }}
                 onPress={() => showDimensionInfo(index)}
@@ -127,14 +128,21 @@ const styles = StyleSheet.create({
     fontSize: height * 0.02447,
     color: "#333F50",
     textAlign: "center",
+    
   },
 
   labels: {
-    fontSize: 0.012 * height,
+    fontSize: 0.0237 * width,
     fontFamily: "Poppins_600SemiBold",
     color: "#333F50",
     textAlign: "center",
-  }
+  },
+
+  lsContainer: { 
+    paddingTop: width*0.1116,
+    paddingHorizontal: width*0.2257, 
+    paddingBottom: width*0.05
+  },
 });
 
 
@@ -189,10 +197,7 @@ const getData = (learning_style: LearningStyle | undefined) => {
 const polarToCartesian = (angle: number, value: number) => {
   const radians = (Math.PI / 180) * angle;
   return {
-    x: center + radius * (value / maxValue) * Math.cos(radians),
-    y: center - radius * (value / maxValue) * Math.sin(radians),
+    x: center + radius * (value / maxValue) * Math.cos(radians) - (bw/width),
+    y: center - radius * (value / maxValue) * Math.sin(radians)- (bh/height),
   };
 };
-
-const estimateTextWidth = (text: string, fontSize: number) =>
-  text.length * (fontSize * 0.6);
