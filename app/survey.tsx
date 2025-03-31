@@ -15,7 +15,7 @@ import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useRouter } from "expo-router";
-import { useUser} from "@/contexts/UserContext";
+import { useUserStore } from "@/hooks/useStore";
 import axios from "axios";
 
 import { Redirect } from "expo-router";
@@ -33,7 +33,7 @@ export default function Survey() {
   const { isConnected } = useNetInfo();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { token, user, setUserAndToken } = useUser();
+  const { token, user, setUserAndTokenAsync } = useUserStore();
 
   //startQuestion is 0 indexing so from 0 to 10
   const startQuestion = getStartQuestion();
@@ -112,14 +112,14 @@ export default function Survey() {
         await axios.patch(`${url}/student/update/questions`, answers.current, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token.current}`,
+            Authorization: `Bearer ${token}`,
           },
           timeout: 1000 * 15,
         });
         const res: any = await axios.get(
           `${url}/student/identify/learningstyle`,
           {
-            headers: { Authorization: `Bearer ${token.current}` },
+            headers: { Authorization: `Bearer ${token}` },
             timeout: 1000 * 35,
           }
         );
@@ -129,7 +129,7 @@ export default function Survey() {
           `Thanks for submitting! You will now see your learning style`
         );
         router.replace("/statistics");
-        if (token.current)setUserAndToken(res.data.student, token.current);
+        if (token)setUserAndTokenAsync(res.data.student, token);
 
 
       } else {

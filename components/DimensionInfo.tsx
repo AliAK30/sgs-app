@@ -3,7 +3,7 @@ import { StyleSheet, Pressable } from "react-native";
 import { height } from "@/app/_layout";
 import { FontAwesome6 } from "@expo/vector-icons";
 import details from "@/constants/Details";
-import { Label } from "./LearningStyle";
+import { Label } from "@/types";
 
 type Props = {
   score: number;

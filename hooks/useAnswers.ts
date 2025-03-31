@@ -1,7 +1,4 @@
-export type Answer = {
-  q: number;
-  answer: string;
-};
+import { Answer } from "@/types";
 
 type AnswerRef = {
   current: Array<Answer> | undefined;

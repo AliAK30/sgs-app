@@ -1,11 +1,11 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet } from "react-native";
 import { height } from "./_layout";
-import { useUser } from "@/contexts/UserContext";
+import { useUserStore } from "@/hooks/useStore";
 import LearningStyleComponent from "@/components/LearningStyle";
 
 export default function Statistics() {
-  const { user } = useUser();
+  const { user } = useUserStore();
 
   return (
     <View style={styles.container}>

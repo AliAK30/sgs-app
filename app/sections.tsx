@@ -9,7 +9,8 @@ import { height } from "./_layout";
 import { useEffect, useState } from "react";
 import { useSurveyStore } from "@/hooks/useStore";
 import useAnswers from "@/hooks/useAnswers";
-import { useUser } from "@/contexts/UserContext";
+import { useUserStore } from "@/hooks/useStore";
+import { useRouter } from "expo-router";
 
 
 const getAnswers = async () => {
@@ -43,7 +44,8 @@ export default function Sections() {
 
   const [loaded, setLoaded] = useState<boolean>(false)
   const { answers, getQuestionsCount } = useAnswers();
-  const {clear} = useUser();
+  const {clear} = useUserStore();
+  const router = useRouter();
 
   useEffect(() => {
     //console.log(`loaded: ${loaded}`);
@@ -69,6 +71,7 @@ export default function Sections() {
 
   const logout = async () => {
     await AsyncStorage.multiRemove(["user", "token", "answers"], clear)
+    router.replace("/login");
   }
 
   

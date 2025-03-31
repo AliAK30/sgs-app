@@ -1,4 +1,6 @@
-;import { create } from "zustand";
+import { create } from "zustand";
+import { User } from "@/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type SurveyState = {
   section1Count: number;
@@ -56,3 +58,42 @@ export const useSurveyStore = create<SurveyState>()((set, get) => ({
     }
   },
 }));
+
+
+type UserState = {
+  user: User | null;
+  token: string | null;
+  setUser: (user: User|null) => void;
+  setToken: (token:string|null) => void;
+  isUserLoaded: boolean;
+  setIsUserLoaded: (load: boolean) => void;
+  setUserAndTokenAsync: (userToSet: User, tokenToSet: string) => Promise<void>;
+  clear: () => void;
+};
+
+export const useUserStore = create<UserState>()((set, get) => ({
+
+  user: null,
+  token: null,
+  setUser: (user) => set(() => ({ user: user })),
+  setToken: (token) => set(() => ({ token: token })),
+  isUserLoaded: false,
+  setIsUserLoaded: (load) => set(() => ({ isUserLoaded: load })),
+  setUserAndTokenAsync: async (userToSet: User, tokenToSet: string)  => {
+
+    const { setUser, setToken } = get();
+
+    await AsyncStorage.setItem("user", JSON.stringify(userToSet));
+    await AsyncStorage.setItem("token", tokenToSet);
+    setUser(userToSet);
+    setToken(tokenToSet);
+  },
+  clear: () => {
+    const { setUser, setToken } = get();
+    setToken(null);
+    setUser(null);
+    
+  }
+
+
+}))

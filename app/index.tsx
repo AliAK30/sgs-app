@@ -1,4 +1,4 @@
-import { useUser } from "@/contexts/UserContext";
+import { useUserStore } from "@/hooks/useStore";
 import { Redirect } from "expo-router";
 
 
@@ -7,7 +7,7 @@ import { Redirect } from "expo-router";
 
 export default function Index() {
 
-  const {user} = useUser();
+  const {user} = useUserStore();
 
   //if(user?.isSurveyCompleted) return (<Redirect href="/statistics"/>)
 

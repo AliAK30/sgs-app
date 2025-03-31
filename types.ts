@@ -1,6 +1,19 @@
-import { createContext, useContext } from "react";
-import { Answer } from "@/hooks/useAnswers";
 
+export type Answer = {
+  q: number;
+  answer: string;
+};
+
+//used for static labels
+export type Label =
+  | "Verbal"
+  | "Global"
+  | "Reflective"
+  | "Sensing"
+  | "Visual"
+  | "Sequential"
+  | "Active"
+  | "Intuitive";
 
 export type LearningStyle = {
   dim1: { name: string, score: number };
@@ -27,24 +40,13 @@ export type User = {
   picture?: string;
   newUser?: boolean;
   isSurveyCompleted?: boolean;
-  privacy: { //0 means only me, 1 means friends only, 2 means everyone for privacy
+  privacy?: { //0 means only me, 1 means friends only, 2 means everyone for privacy
     picture: number, 
     email: number,
     phone_number: number,
     gpa: number,
     learning_style: number,
   };
+  push_notifications?: boolean;
 
 };
-
-type UserContextType = {
-  user: User | null;
-  token: React.MutableRefObject<string | null>;
-  done: boolean;
-  setUserAndToken: (userToSet: User, tokenToSet: string) => Promise<void>;
-  clear: () => void;
-};
-
-export const UserContext = createContext<UserContextType>({} as UserContextType);
-
-export const useUser = () => useContext(UserContext);

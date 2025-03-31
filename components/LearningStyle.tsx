@@ -1,25 +1,16 @@
 import { RadarChart } from "react-native-gifted-charts";
 import { height, width } from "@/app/_layout";
-import { User, LearningStyle } from "@/contexts/UserContext";
+import { User, LearningStyle } from "@/types";
 import { View, Text } from "./Themed";
 import {StyleSheet, Pressable, } from "react-native";
 import { useState } from "react";
 import DimensionInfo from "@/components/DimensionInfo";
+import { Label } from "@/types";
+
 type Props = {
   user: User | null;
 };
 
-
-//used for static labels
-export type Label =
-  | "Verbal"
-  | "Global"
-  | "Reflective"
-  | "Sensing"
-  | "Visual"
-  | "Sequential"
-  | "Active"
-  | "Intuitive";
 
 const figmaLabels: Array<Label> = [
   "Verbal",

@@ -12,7 +12,7 @@ import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-import { useUser } from "@/contexts/UserContext";
+import { useUserStore } from "@/hooks/useStore";
 
 
 
@@ -79,7 +79,7 @@ export default function Login() {
   const {openAlert, Alert} = useAlert();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
-  const {setUserAndToken, user } = useUser();
+  const {setUserAndTokenAsync, user } = useUserStore();
 
   const {
     control,
@@ -118,7 +118,7 @@ export default function Login() {
        
         
         await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
-        setUserAndToken(res.data.user, res.data.token);
+        setUserAndTokenAsync(res.data.user, res.data.token);
         router.replace("/sections");
         
 
