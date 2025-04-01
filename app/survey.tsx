@@ -17,6 +17,7 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import { useRouter } from "expo-router";
 import { useUserStore } from "@/hooks/useStore";
 import axios from "axios";
+import Back from "@/components/Back";
 
 import { Redirect } from "expo-router";
 
@@ -187,9 +188,7 @@ export default function Survey() {
     >
       <Alert />
       <Link href="/sections" asChild>
-        <Pressable style={styles.close}>
-          <Ionicons name="chevron-back" size={height * 0.034} color="#565555" />
-        </Pressable>
+        <Back/>
       </Link>
 
       <Text style={styles.heading}>Section {selectedSection}</Text>
@@ -331,19 +330,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: height * 0.024,
   },
 
-  close: {
-    borderRadius: 10,
-    borderColor: "#565555",
-    borderWidth: 1,
-    marginVertical: height * 0.0257,
-    alignSelf: "flex-start",
-  },
 
   heading: {
     fontFamily: "Poppins_700Bold",
     color: "#4D3E3E",
     fontSize: height * 0.0244,
     paddingLeft: height * 0.009,
+    marginTop: height * 0.0257
   },
 
   questionContainer: {

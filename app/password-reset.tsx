@@ -3,12 +3,9 @@ import {
   StyleSheet,
   Pressable,
   ActivityIndicator,
-  ScrollView,
 } from "react-native";
-import { Image, useImage } from "expo-image";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
 import { Redirect, useRouter, Link } from "expo-router";
-import { height, OS } from "./_layout";
+import { height } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -17,10 +14,10 @@ import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-import { useUserStore } from "@/hooks/useStore";
 import { useState } from "react";
+import Back from "@/components/Back";
+import { LinearGradient } from "expo-linear-gradient";
 
-const imgSource = require("@/assets/images/edumatch.png");
 
 const schema = yup
   .object()
@@ -30,32 +27,13 @@ const schema = yup
       .required("Email is required")
       .matches(
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please enter a valid email"
-      ),
-    password: yup.string().required("Password is required"),
+        "Please enter a valid email")
   })
   .required("Please fill all the above fields");
 
 type User = yup.InferType<typeof schema>;
 
 const failedColor = "rgb(255, 0, 0)";
-
-const MyLoader = ({ w, h }: any) => (
-  <ContentLoader
-    speed={2}
-    width={w}
-    height={h}
-    //viewBox={`0 0 ${229* (height / 817)} ${218* (height / 817)}`}
-    backgroundColor="#ffffff"
-    foregroundColor="#ecebeb"
-  >
-    <Circle cx={w / 2.6} cy={h / 2} r={w / 7} />
-    <Circle cx={w / 2.6} cy={h / 4} r={w / 7} />
-    <Circle cx={w / 1.65} cy={h / 4} r={w / 7} />
-    <Circle cx={w / 1.65} cy={h / 2} r={w / 7} />
-    <Rect x={w / 5.4} y={h / 1.39} width={w * 0.6} height={h * 0.15} />
-  </ContentLoader>
-);
 
 const WarnIcon = () => {
   return (
@@ -68,25 +46,11 @@ const WarnIcon = () => {
   );
 };
 
-const EyeIcon = ({name, onTap}: any) => {
-  return (
-    <Pressable onPress={onTap} hitSlop={10} style={{ position: "absolute", right: 8, top:8 }}>
-    <Ionicons
-      name={name}
-      color="black"
-      size={height * 0.02447}
-      
-    />
-    </Pressable>
-  );
-}
-
 export default function Login() {
   const { openAlert, Alert } = useAlert();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
-  const { setUserAndTokenAsync, user } = useUserStore();
-  const [showPassword, setShowPassword] = useState<boolean>(false)
+  
 
   const {
     control,
@@ -97,17 +61,9 @@ export default function Login() {
     resolver: yupResolver(schema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  const image = useImage(imgSource, {
-    maxWidth: 800,
-    onError(error, retry) {
-      console.error("Loading failed:", error.message);
-      retry();
-    },
-  });
 
   const onSubmit: SubmitHandler<User> = async (data) => {
     try {
@@ -117,8 +73,8 @@ export default function Login() {
         });
 
         //await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
-        setUserAndTokenAsync(res.data.user, res.data.token);
-        router.replace("/sections");
+        
+        //router.replace("/sections");
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
@@ -159,27 +115,23 @@ export default function Login() {
     }
   };
 
-  //if(!user)
+  
   return (
-    <ScrollView
+    <LinearGradient
       style={styles.container}
-      automaticallyAdjustKeyboardInsets={true}
-      keyboardDismissMode="none"
-      contentContainerStyle={{ alignItems: "center" }}
+      colors={["#ADD8E6", "#EAF5F8"]}
+      locations={[0.27, 1]}
+      
     >
       <Alert />
-      {!image ? (
-        <MyLoader w={229 * (height / 817)} h={218 * (height / 817)} />
-      ) : (
-        <Image
-          source={image}
-          style={{
-            width: (image.width * height) / 817,
-            height: (image.height * height) / 817,
-          }}
-        />
-      )}
-      <Text style={styles.heading}>Log in</Text>
+
+      <Link href="/login" asChild>
+        <Back/>
+    </Link>
+      
+      <Text style={styles.heading}>Forgot Password?</Text>
+
+      <Text style={styles.paragraph}>Don't worry! It happens. Please enter the email associated with your account.</Text>
 
       <View style={styles.inputView}>
         <Text style={[styles.inputLabel]}>Email address</Text>
@@ -209,33 +161,6 @@ export default function Login() {
         />
         
 
-        <Text style={[styles.inputLabel]}>Password</Text>
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ justifyContent: "center" }}>
-              <TextInput
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                style={[
-                  styles.input,
-                  { borderColor: errors.password ? failedColor : "#D8DADC" },
-                ]}
-                inputMode="text"
-                secureTextEntry={!showPassword}
-              />
-              {errors.password && <WarnIcon />}
-              {errors.password && (
-          <Text style={styles.inputError}>{errors.password.message}</Text>
-        )}
-              {!errors.password && (showPassword ? <EyeIcon name="eye-outline" onTap={()=>setShowPassword(!showPassword)}/>: <EyeIcon name="eye-off-outline" onTap={()=>setShowPassword(!showPassword)}/>)}
-            </View>
-          )}
-        />
-        
-
         <Pressable
           style={[
             styles.button,
@@ -254,35 +179,16 @@ export default function Login() {
                 textAlign: "center",
               }}
             >
-              LOGIN
+              RESET PASSWORD
             </Text>
           )}
         </Pressable>
       </View>
 
-      <Link href="/password-reset">
-        <Text style={[styles.inputLabel, { textDecorationLine: "underline" }]}>
-          Forgot Password?
-        </Text>
-      </Link>
 
-      <Text style={[styles.inputLabel, {marginTop:height*0.20}]}>
-        Don't have an account?{" "}
-        <Text
-          style={{
-            fontFamily: "Inter_600SemiBold",
-            color: "#007BFF",
-            textDecorationLine: "underline",
-          }}
-        >
-          {" "}
-          Sign up
-        </Text>
-      </Text>
-    </ScrollView>
+    </LinearGradient>
   );
 
-  return <Redirect href="/sections" />;
 }
 
 
@@ -299,7 +205,17 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     color: "#565555",
     fontSize: height * 0.0367,
-    alignSelf: "flex-start",
+    alignSelf: "center",
+    marginTop: height*0.05,
+    
+  },
+
+  paragraph: {
+    fontFamily: "Inter_400Regular",
+    fontSize: height * 0.0196,
+    color: "rgba(0, 0, 0, 0.70)",
+    marginTop: height * 0.00734,
+    textAlign:"center"
   },
 
   inputView: {

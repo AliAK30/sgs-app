@@ -23,6 +23,8 @@ import Loader from "@/components/Loader";
 import { useUserStore } from "@/hooks/useStore";
 
 export const { width, height } = Dimensions.get("screen");
+export const base_height = 817
+export const base_width = 412
 
 /* if(width>height){
   let temp = height;

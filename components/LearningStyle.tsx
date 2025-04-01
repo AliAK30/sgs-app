@@ -1,5 +1,5 @@
 import { RadarChart } from "react-native-gifted-charts";
-import { height, width } from "@/app/_layout";
+import { height, width, base_height, base_width } from "@/app/_layout";
 import { User, LearningStyle } from "@/types";
 import { View, Text } from "./Themed";
 import {StyleSheet, Pressable, } from "react-native";
@@ -28,8 +28,8 @@ const chartSize = width * 0.5354;
 const labelsContainer = chartSize * 1.5;
 const center = labelsContainer / 2;
 const radius = center * 0.8;
-const bw = 412; //base figma screen width
-const bh = 817; //base figma screen height
+const bw = base_width; //base figma screen width
+const bh = base_height; //base figma screen height
 const labelsPositionXOffset = [3, 16, 0, -15, 5, -19, 6, 9].map((a)=>a/bw*width);
 const labelsPositionYOffset = [-18, 2, 1, 2, -18, -30, -42, -30].map((a)=>a/bw*width);
 
