@@ -57,7 +57,7 @@ const MyLoader = ({ w, h }: any) => (
   </ContentLoader>
 );
 
-const WarnIcon = () => {
+export const WarnIcon = () => {
   return (
     <Ionicons
       name="warning-outline"
@@ -68,7 +68,7 @@ const WarnIcon = () => {
   );
 };
 
-const EyeIcon = ({name, onTap}: any) => {
+export const EyeIcon = ({name, onTap}: any) => {
   return (
     <Pressable onPress={onTap} hitSlop={10} style={{ position: "absolute", right: 8, top:8 }}>
     <Ionicons

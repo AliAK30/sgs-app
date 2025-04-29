@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet, Dimensions, Platform } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Loader from "@/components/Loader";
 import { useUserStore } from "@/hooks/useStore";
@@ -25,6 +25,7 @@ import { useUserStore } from "@/hooks/useStore";
 export const { width, height } = Dimensions.get("screen");
 export const base_height = 817
 export const base_width = 412
+export const {OS} = Platform
 
 /* if(width>height){
   let temp = height;

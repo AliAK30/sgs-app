@@ -1,56 +1,69 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import {
-  StyleSheet,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { Redirect, useRouter, Link } from "expo-router";
 import { height } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useState, useEffect, useRef } from "react";
 import * as yup from "yup";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
+import { useBanner } from "@/hooks/useBanner";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-import { useState } from "react";
+//import { useState } from "react";
 import Back from "@/components/Back";
 import { LinearGradient } from "expo-linear-gradient";
+import OTPInput from "@/components/OTPInput";
+import { EyeIcon, WarnIcon } from "./login";
 
+const schema = yup.object().shape({
+  email: yup
+    .string()
+    .required("Email is required")
+    .matches(
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      "Please enter a valid email"
+    ),
+});
 
-const schema = yup
-  .object()
-  .shape({
-    email: yup
-      .string()
-      .required("Email is required")
-      .matches(
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        "Please enter a valid email")
-  })
-  .required("Please fill all the above fields");
+const passwordSchema = yup.object().shape({
+  password: yup
+    .string()
+    .required("Password is required")
+    .matches(
+      /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?=.{8,})/,
+      "Password must contain at least 8 characters including at least 1 special character, and at least 1 digit"
+    ),
+  confirmPassword: yup
+    .string()
+    .required("Please re-enter Password")
+    .oneOf([yup.ref("password")], "Passwords must match"),
+});
+
 
 type User = yup.InferType<typeof schema>;
+type PasswordSchema = yup.InferType<typeof passwordSchema>
 
 const failedColor = "rgb(255, 0, 0)";
 
-const WarnIcon = () => {
-  return (
-    <Ionicons
-      name="warning-outline"
-      color="red"
-      size={height * 0.02447}
-      style={{ position: "absolute", right: 8, top:8 }}
-    />
-  );
-};
+const initialTime = 10 * 60; //10 minutes
 
-export default function Login() {
+export default function PasswordReset() {
   const { openAlert, Alert } = useAlert();
+  const { openBanner, Banner } = useBanner();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
-  
+  const [email, setEmail] = useState<string>("");
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [displayTime, setDisplayTime] = useState<number>(initialTime);
+  const [updateDisplay, setUpdateDisplay] = useState<Boolean>(true);
+  const timerRef = useRef<number>(initialTime);
+  const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
+  const otpVerfied = useRef<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const {
     control,
@@ -64,16 +77,64 @@ export default function Login() {
     },
   });
 
+  const passForm = useForm({
+    mode: "onSubmit",
+    resolver: yupResolver(passwordSchema),
+    defaultValues: {
+      password: "",
+    },
+  });
 
-  const onSubmit: SubmitHandler<User> = async (data) => {
+  // Format time as MM:SS
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  // Handle countdown timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
+    if (isTimerActive) {
+      interval = setInterval(() => {
+        timerRef.current -= 1;
+
+        // Only update state if we want to trigger re-renders
+        if (updateDisplay) {
+          setDisplayTime(timerRef.current);
+        }
+
+        if (timerRef.current <= 0) {
+          setIsTimerActive(false);
+          if (interval) clearInterval(interval);
+        }
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isTimerActive, updateDisplay]);
+
+  const sendOTP: SubmitHandler<User> = async (data) => {
     try {
       if (isConnected) {
-        const res: any = await axios.post(`${url}/student/login`, data, {
-          timeout: 1000 * 15,
-        });
-
+        //add the role because api expects it
+        const newData = { ...data, role: "student" };
+        const res: any = await axios.post(
+          `${url}/student/otp/generate`,
+          newData,
+          {
+            timeout: 1000 * 15,
+          }
+        );
+        setEmail(data.email);
+        setIsTimerActive(true);
         //await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
-        
+
         //router.replace("/sections");
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
@@ -100,9 +161,9 @@ export default function Login() {
         }
       }
 
-      if (e.status === 401) {
+      if (e.status >= 400 && e.status < 500) {
         switch (e.response.data.code) {
-          case "UNAUTHORIZED":
+          case "ACCOUNT_NOT_EXISTS":
             openAlert("fail", "Failed!", e.response.data.message);
             return;
         }
@@ -115,29 +176,226 @@ export default function Login() {
     }
   };
 
-  
-  return (
-    <LinearGradient
-      style={styles.container}
-      colors={["#ADD8E6", "#EAF5F8"]}
-      locations={[0.27, 1]}
-      
-    >
-      <Alert />
+  const sendOTPAgain = async () => {
+    try {
+      if (isConnected) {
+        const res: any = await axios.post(
+          `${url}/student/otp/generate`,
+          { email: email, role: "student" },
+          {
+            timeout: 1000 * 15,
+          }
+        );
 
-      <Link href="/login" asChild>
-        <Back/>
-    </Link>
-      
-      <Text style={styles.heading}>Forgot Password?</Text>
+        setUpdateDisplay(false);
+        setTimeout(() => {
+          timerRef.current = initialTime;
+          setIsTimerActive(true);
+          setUpdateDisplay(true);
+        }, 2500);
+        openBanner("success", "new OTP sent successfully!");
 
-      <Text style={styles.paragraph}>Don't worry! It happens. Please enter the email associated with your account.</Text>
+        //router.replace("/sections");
+      } else {
+        openBanner("fail", "No Internet Connection!");
+        return;
+      }
+    } catch (e: any) {
+      if (!e.status) {
+        switch (e.code) {
+          case "ECONNABORTED":
+            openBanner("fail", "Request TImed out\nPlease try again later!");
+            return;
 
-      <View style={styles.inputView}>
-        <Text style={[styles.inputLabel]}>Email address</Text>
+          case "ERR_NETWORK":
+            openBanner(
+              "fail",
+              "Server is not Responding\nPlease try again later!"
+            );
+            return;
+        }
+      }
+
+      if (e.status >= 400 && e.status < 500) {
+        switch (e.response.data.code) {
+          case "ACCOUNT_NOT_EXISTS":
+            openBanner("fail", e.response.data.message);
+            return;
+        }
+      }
+
+      if (e.status === 500) {
+        openBanner("fail", e.message);
+        return;
+      }
+    }
+  };
+
+  const OTPToString = (): string => {
+    let otpString: string = "";
+
+    for (let i of otp) {
+      otpString += i;
+    }
+    return otpString;
+  };
+
+  const verifyOTP = async () => {
+    try {
+      if (isConnected) {
+        setIsVerifying(true);
+        const otpString = OTPToString();
+
+        const res: any = await axios.post(
+          `${url}/student/otp/verify`,
+          { email: email, otp: otpString },
+          {
+            timeout: 1000 * 15,
+          }
+        );
+
+        otpVerfied.current = true;
+        setIsTimerActive(false);
+        setUpdateDisplay(false);
+        setIsVerifying(false);
+       
+      } else {
+        openAlert("fail", "Failed!", "No Internet Connection!");
+        return;
+      }
+    } catch (e: any) {
+      //pause the re renders caused by updating timer
+      setUpdateDisplay(false);
+
+      if (!e.status) {
+        switch (e.code) {
+          case "ECONNABORTED":
+            await openAlert(
+              "fail",
+              "Failed!",
+              "Request TImed out\nPlease try again later!"
+            );
+            return;
+
+          case "ERR_NETWORK":
+            await openAlert(
+              "fail",
+              "Failed!",
+              "Server is not Responding\nPlease try again later!"
+            );
+            return;
+        }
+      }
+
+      if (e.status >= 400 && e.status < 500) {
+        switch (e.response.data.code) {
+          case "OTP_INVALID":
+            await openAlert("fail", "Failed!", e.response.data.message);
+            return;
+
+          case "OTP_EXPIRED":
+            await openAlert("fail", "Failed!", e.response.data.message);
+            return;
+        }
+      }
+
+      if (e.status === 500) {
+        await openAlert("fail", "Failed!", e.message);
+        return;
+      }
+    } finally {
+      setIsVerifying(false);
+      //resume the re renders caused by updating timer
+      if(!otpVerfied.current) setUpdateDisplay(true);
+    }
+  };
+
+  const resetPassword: SubmitHandler<PasswordSchema> = async (data) => {
+    
+    try {
+      if (isConnected) {
+        
+        const newData = { email: email, new_password: data.password, otp: OTPToString() };
+        const res: any = await axios.post(
+          `${url}/student/password/reset`,
+          newData,
+          {
+            timeout: 1000 * 15,
+          }
+        );
+        
+        await openAlert("success", "Password Reset Successful!", `Lets get back into the App!`);
+
+        router.replace("/login");
+      } else {
+        openAlert("fail", "Failed!", "No Internet Connection!");
+        return;
+      }
+    } catch (e: any) {
+      if (!e.status) {
+        switch (e.code) {
+          case "ECONNABORTED":
+            openAlert(
+              "fail",
+              "Failed!",
+              "Request TImed out\nPlease try again later!"
+            );
+            return;
+
+          case "ERR_NETWORK":
+            openAlert(
+              "fail",
+              "Failed!",
+              "Server is not Responding\nPlease try again later!"
+            );
+            return;
+        }
+      }
+
+      if (e.status >= 400 && e.status < 500) {
+        switch (e.response.data.code) {
+          case "OTP_INVALID":
+            await openAlert("fail", "Failed!", e.response.data.message);
+            return;
+
+          case "OTP_EXPIRED":
+            await openAlert("fail", "Failed!", e.response.data.message);
+            router.replace('/password-reset')
+            return;
+        }
+      }
+
+      if (e.status === 500) {
+        openAlert("fail", "Failed!", e.message);
+        return;
+      }
+    }
+  }
+
+  if (otpVerfied.current) {
+    return (
+      <LinearGradient
+        style={styles.container}
+        colors={["#ADD8E6", "#EAF5F8"]}
+        locations={[0.27, 1]}
+      >
+        <Alert />
+        <Banner />
+
+        <Link href="/login" asChild>
+          <Back />
+        </Link>
+
+        <Text style={styles.heading}>Reset Password</Text>
+
+        <Text style={[styles.paragraph, {marginBottom: height*0.03}]}>
+          Please type something you would remember
+        </Text>
+
+        <Text style={[styles.inputLabel, {paddingBottom: height*0.005}]}>New Password</Text>
         <Controller
-          control={control}
-          name="email"
+          control={passForm.control}
+          name="password"
           render={({ field: { onChange, onBlur, value } }) => (
             <View style={{ justifyContent: "center" }}>
               <TextInput
@@ -146,29 +404,93 @@ export default function Login() {
                 onBlur={onBlur}
                 style={[
                   styles.input,
-                  { borderColor: errors.email ? failedColor : "#D8DADC" },
+                  {
+                    borderColor: passForm.formState.errors.password
+                      ? failedColor
+                      : "#D8DADC",
+                     
+                  },
                 ]}
-                placeholder="abc@gmail.com"
-                placeholderTextColor="rgba(0, 0, 0, 0.30)"
                 inputMode="text"
+                secureTextEntry={!showPassword}
               />
-              {errors.email && <WarnIcon />}
-              {errors.email && (
-          <Text style={styles.inputError}>{errors.email.message}</Text>
-        )}
+              
+              {passForm.formState.errors.password && (
+                <Text style={styles.inputError}>
+                  {passForm.formState.errors.password.message}
+                </Text>
+              )}
+              
+                {(showPassword ? (
+                  <EyeIcon
+                    name="eye-outline"
+                    onTap={() => setShowPassword(!showPassword)}
+                  />
+                ) : (
+                  <EyeIcon
+                    name="eye-off-outline"
+                    onTap={() => setShowPassword(!showPassword)}
+                  />
+                ))}
             </View>
           )}
         />
-        
+
+<Text style={[styles.inputLabel, {paddingBottom: height*0.005,  paddingTop: height*0.025}]}>Confirm New Password</Text>
+        <Controller
+          control={passForm.control}
+          name="confirmPassword"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <View style={{ justifyContent: "center" }}>
+              <TextInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                style={[
+                  styles.input,
+                  {
+                    borderColor: passForm.formState.errors.confirmPassword
+                      ? failedColor
+                      : "#D8DADC",
+                  },
+                ]}
+                inputMode="text"
+                secureTextEntry={!showPassword}
+              />
+              
+              {passForm.formState.errors.confirmPassword && (
+                <Text style={styles.inputError}>
+                  {passForm.formState.errors.confirmPassword.message}
+                </Text>
+              )}
+              
+                {(showPassword ? (
+                  <EyeIcon
+                    name="eye-outline"
+                    onTap={() => setShowPassword(!showPassword)}
+                  />
+                ) : (
+                  <EyeIcon
+                    name="eye-off-outline"
+                    onTap={() => setShowPassword(!showPassword)}
+                  />
+                ))}
+            </View>
+          )}
+        />
 
         <Pressable
           style={[
             styles.button,
-            { backgroundColor: isValid ? "#007BFF" : "rgba(0, 0, 0, 0.4)" },
+            {
+              backgroundColor: passForm.formState.isValid
+                ? "#007BFF"
+                : "rgba(0, 0, 0, 0.4)",
+            },
           ]}
-          onPress={handleSubmit(onSubmit)}
+          onPress={passForm.handleSubmit(resetPassword)}
         >
-          {isSubmitting ? (
+          {passForm.formState.isSubmitting ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
             <Text
@@ -179,18 +501,169 @@ export default function Login() {
                 textAlign: "center",
               }}
             >
-              RESET PASSWORD
+              RESET
             </Text>
           )}
         </Pressable>
-      </View>
+      </LinearGradient>
+    );
+  } else
+    return (
+      <LinearGradient
+        style={styles.container}
+        colors={["#ADD8E6", "#EAF5F8"]}
+        locations={[0.27, 1]}
+      >
+        <Alert />
+        <Banner />
 
+        <Link href="/login" asChild>
+          <Back />
+        </Link>
 
-    </LinearGradient>
-  );
+        <Text style={styles.heading}>Forgot Password?</Text>
 
+        <Text style={styles.paragraph}>
+          {email === ""
+            ? "Don't worry! It happens. Please enter the email associated with your account."
+            : `We have sent a six digit OTP to ${email}`}
+        </Text>
+
+        {email === "" ? (
+          <View style={styles.inputView}>
+            <Text style={[styles.inputLabel]}>Email address</Text>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={{ justifyContent: "center" }}>
+                  <TextInput
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    style={[
+                      styles.input,
+                      { borderColor: errors.email ? failedColor : "#D8DADC" },
+                    ]}
+                    placeholder="abc@gmail.com"
+                    placeholderTextColor="rgba(0, 0, 0, 0.30)"
+                    inputMode="text"
+                  />
+                  {errors.email && <WarnIcon />}
+                  {errors.email && (
+                    <Text style={styles.inputError}>
+                      {errors.email.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+
+            <Pressable
+              style={[
+                styles.button,
+                { backgroundColor: isValid ? "#007BFF" : "rgba(0, 0, 0, 0.4)" },
+              ]}
+              onPress={handleSubmit(sendOTP)}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text
+                  style={{
+                    fontFamily: "Inter_600SemiBold",
+                    color: "#ffffff",
+                    fontSize: height * 0.0196,
+                    textAlign: "center",
+                  }}
+                >
+                  RESET PASSWORD
+                </Text>
+              )}
+            </Pressable>
+          </View>
+        ) : (
+          <View style={{ justifyContent: "space-evenly" }}>
+            <OTPInput otp={otp} setOTP={setOtp} />
+
+            {isTimerActive ? (
+              <Text
+                style={{
+                  color: "rgba(0, 0, 0, 0.7)",
+                  fontFamily: "Inter_400Regular",
+                  fontSize: height * 0.015,
+                  textAlign: "center",
+                }}
+              >
+                Send code again in {formatTime(displayTime)}
+              </Text>
+            ) : (
+              <Pressable onPress={sendOTPAgain}>
+                <Text
+                  style={{
+                    color: "rgba(0, 0, 0, 0.9)",
+                    fontFamily: "Inter_600SemiBold",
+                    fontSize: height * 0.015,
+                    textDecorationLine: "underline",
+                    textAlign: "center",
+                  }}
+                >
+                  Resend code
+                </Text>
+              </Pressable>
+            )}
+
+            <Pressable
+              style={[
+                styles.button,
+                {
+                  backgroundColor:
+                    OTPToString().length === 6
+                      ? "#007BFF"
+                      : "rgba(0, 0, 0, 0.4)",
+                },
+              ]}
+              onPress={verifyOTP}
+            >
+              {isVerifying ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text
+                  style={{
+                    fontFamily: "Inter_600SemiBold",
+                    color: "#ffffff",
+                    fontSize: height * 0.0196,
+                    textAlign: "center",
+                  }}
+                >
+                  VERIFY
+                </Text>
+              )}
+            </Pressable>
+          </View>
+        )}
+
+        <Text
+          style={[
+            styles.inputLabel,
+            { marginTop: height * 0.43, textAlign: "center" },
+          ]}
+        >
+          Remember password?{" "}
+          <Text
+            style={{
+              fontFamily: "Inter_600SemiBold",
+              color: "#007BFF",
+              textDecorationLine: "underline",
+            }}
+          >
+            {" "}
+            Log in
+          </Text>
+        </Text>
+      </LinearGradient>
+    );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -206,8 +679,7 @@ const styles = StyleSheet.create({
     color: "#565555",
     fontSize: height * 0.0367,
     alignSelf: "center",
-    marginTop: height*0.05,
-    
+    marginTop: height * 0.05,
   },
 
   paragraph: {
@@ -215,7 +687,7 @@ const styles = StyleSheet.create({
     fontSize: height * 0.0196,
     color: "rgba(0, 0, 0, 0.70)",
     marginTop: height * 0.00734,
-    textAlign:"center"
+    textAlign: "center",
   },
 
   inputView: {
@@ -237,15 +709,15 @@ const styles = StyleSheet.create({
     paddingVertical: height * 0.011,
     borderStyle: "solid",
     borderWidth: 1,
-    marginBottom: height*0.019
+    marginBottom: height * 0.019,
   },
 
   inputError: {
     fontFamily: "Inter_400Regular",
     fontSize: height * 0.015,
     color: "rgb(255, 0, 0)",
-    position: 'absolute',
-    top:"80%"
+    position: "absolute",
+    top: "80%",
   },
 
   inputLabel: {

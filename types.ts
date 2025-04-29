@@ -24,13 +24,13 @@ export type LearningStyle = {
 }
 
 export type User = {
-  _id: string;
-  first_name: string;
-  last_name: string;
-  uni_name: string;
-  uni_id: string;
-  email: string;
-  role: string;
+  _id?: string;
+  first_name?: string;
+  last_name?: string;
+  uni_name?: string;
+  uni_id?: string;
+  email?: string;
+  role?: string;
   questions?: Array<Answer>;
   gpa?: number;
   dob?: Date;
