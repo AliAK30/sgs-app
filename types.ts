@@ -50,3 +50,11 @@ export type User = {
   push_notifications?: boolean;
 
 };
+
+export type University = {
+  _id: string;
+  name: string;
+  campus: string;
+  city: string;
+  country: string;
+}

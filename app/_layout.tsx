@@ -18,14 +18,22 @@ import "react-native-reanimated";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
-import { StatusBar } from "expo-status-bar";
+import { StatusBar,  } from "expo-status-bar";
 import Loader from "@/components/Loader";
 import { useUserStore } from "@/hooks/useStore";
+import * as NavigationBar from "expo-navigation-bar"
 
-export const { width, height } = Dimensions.get("screen");
+
+
+const dims = Dimensions.get("screen");
+export const height = dims.height;
+export const width = dims.width
+export const fontScale = dims.fontScale;
 export const base_height = 817
 export const base_width = 412
 export const {OS} = Platform
+
+
 
 /* if(width>height){
   let temp = height;
@@ -70,6 +78,16 @@ export default function RootLayout() {
   //const [role, setRole] = useState<string>("");
 
   useEffect(() => {
+    if (OS === "android") {
+      // Hides navigation bar in android
+      //NavigationBar.setVisibilityAsync("hidden"); 
+      // Keeps it hidden unless swiped
+      NavigationBar.setBehaviorAsync("overlay-swipe"); 
+      NavigationBar.addVisibilityListener(({ visibility }) => {
+        if(visibility==='visible') setTimeout(()=>NavigationBar.setVisibilityAsync("hidden"), 2000);
+      });
+      
+    }
     initialize();
 
     return () => {
@@ -94,6 +112,8 @@ export default function RootLayout() {
       if (newUser) {
         setToken(await AsyncStorage.getItem("token"));
         setUser(JSON.parse(newUser));
+      } else {
+        setUser({role: 'student'});
       }
     } catch (e: any) {
       console.log(e.message);
@@ -119,6 +139,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    alignItems: "center",
+    
   },
 });

@@ -1,24 +1,28 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { StyleSheet, Pressable, ActivityIndicator } from "react-native";
-import { Redirect, useRouter, Link } from "expo-router";
+import {
+  StyleSheet,
+  Pressable,
+  ActivityIndicator,
+  ScrollView,
+} from "react-native";
+import { useRouter, Link } from "expo-router";
 import { height } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState, useEffect, useRef } from "react";
 import * as yup from "yup";
-import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
 import { useBanner } from "@/hooks/useBanner";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-//import { useState } from "react";
 import Back from "@/components/Back";
 import { LinearGradient } from "expo-linear-gradient";
 import OTPInput from "@/components/OTPInput";
-import { EyeIcon, WarnIcon } from "./login";
+import { EyeIcon, WarnIcon } from "@/components/Icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const schema = yup.object().shape({
+const emailSchema = yup.object().shape({
   email: yup
     .string()
     .required("Email is required")
@@ -42,15 +46,16 @@ const passwordSchema = yup.object().shape({
     .oneOf([yup.ref("password")], "Passwords must match"),
 });
 
-
-type User = yup.InferType<typeof schema>;
-type PasswordSchema = yup.InferType<typeof passwordSchema>
+type EmailSchema = yup.InferType<typeof emailSchema>;
+type PasswordSchema = yup.InferType<typeof passwordSchema>;
 
 const failedColor = "rgb(255, 0, 0)";
 
-const initialTime = 10 * 60; //10 minutes
+const initialTime = 10 * 60; //10 minutes for otp expiration
 
 export default function PasswordReset() {
+
+  const insets = useSafeAreaInsets();
   const { openAlert, Alert } = useAlert();
   const { openBanner, Banner } = useBanner();
   const { type, isConnected } = useNetInfo();
@@ -71,7 +76,7 @@ export default function PasswordReset() {
     formState: { errors, isValid, isSubmitting },
   } = useForm({
     mode: "onSubmit",
-    resolver: yupResolver(schema),
+    resolver: yupResolver(emailSchema),
     defaultValues: {
       email: "",
     },
@@ -119,23 +124,31 @@ export default function PasswordReset() {
     };
   }, [isTimerActive, updateDisplay]);
 
-  const sendOTP: SubmitHandler<User> = async (data) => {
-    try {
-      if (isConnected) {
-        //add the role because api expects it
-        const newData = { ...data, role: "student" };
-        const res: any = await axios.post(
-          `${url}/student/otp/generate`,
-          newData,
-          {
-            timeout: 1000 * 15,
-          }
-        );
-        setEmail(data.email);
-        setIsTimerActive(true);
-        //await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
+  const sendOTP: SubmitHandler<EmailSchema> = async (data) => {
 
-        //router.replace("/sections");
+    
+    try {
+      
+      if (isConnected) {
+        if(email === "")
+        {
+          //add the role because api expects it
+          const newData = { ...data, role: "student" };
+          const res: any = await axios.post(
+            `${url}/student/otp/generate`,
+            newData,
+            {
+              timeout: 1000 * 15,
+            }
+          );
+          setEmail(data.email);
+          setIsTimerActive(true);
+        } else if (email === "backed")
+        {
+          setEmail(data.email);
+        }
+        
+        
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
@@ -258,7 +271,6 @@ export default function PasswordReset() {
         setIsTimerActive(false);
         setUpdateDisplay(false);
         setIsVerifying(false);
-       
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
@@ -306,16 +318,18 @@ export default function PasswordReset() {
     } finally {
       setIsVerifying(false);
       //resume the re renders caused by updating timer
-      if(!otpVerfied.current) setUpdateDisplay(true);
+      if (!otpVerfied.current) setUpdateDisplay(true);
     }
   };
 
   const resetPassword: SubmitHandler<PasswordSchema> = async (data) => {
-    
     try {
       if (isConnected) {
-        
-        const newData = { email: email, new_password: data.password, otp: OTPToString() };
+        const newData = {
+          email: email,
+          new_password: data.password,
+          otp: OTPToString(),
+        };
         const res: any = await axios.post(
           `${url}/student/password/reset`,
           newData,
@@ -323,8 +337,12 @@ export default function PasswordReset() {
             timeout: 1000 * 15,
           }
         );
-        
-        await openAlert("success", "Password Reset Successful!", `Lets get back into the App!`);
+
+        await openAlert(
+          "success",
+          "Password Reset Successful!",
+          `Lets get back into the App!`
+        );
 
         router.replace("/login");
       } else {
@@ -360,7 +378,7 @@ export default function PasswordReset() {
 
           case "OTP_EXPIRED":
             await openAlert("fail", "Failed!", e.response.data.message);
-            router.replace('/password-reset')
+            router.replace("/password-reset");
             return;
         }
       }
@@ -370,145 +388,198 @@ export default function PasswordReset() {
         return;
       }
     }
+  };
+
+  const handleBack = () => {
+    if(email != "")
+    {
+      if(otpVerfied.current)
+      {
+        otpVerfied.current = false;
+        setUpdateDisplay(!updateDisplay); //to trigger state change
+      } else {
+        setEmail("backed")
+      }
+
+    } else {
+      router.replace('/login');
+    }
   }
 
   if (otpVerfied.current) {
     return (
-      <LinearGradient
-        style={styles.container}
-        colors={["#ADD8E6", "#EAF5F8"]}
-        locations={[0.27, 1]}
+      <ScrollView
+      automaticallyAdjustKeyboardInsets={true}
+      keyboardDismissMode="none"
+      contentContainerStyle={{alignItems:'center', height:height-(insets.top+insets.bottom)}}
       >
-        <Alert />
-        <Banner />
-
-        <Link href="/login" asChild>
-          <Back />
-        </Link>
-
-        <Text style={styles.heading}>Reset Password</Text>
-
-        <Text style={[styles.paragraph, {marginBottom: height*0.03}]}>
-          Please type something you would remember
-        </Text>
-
-        <Text style={[styles.inputLabel, {paddingBottom: height*0.005}]}>New Password</Text>
-        <Controller
-          control={passForm.control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ justifyContent: "center" }}>
-              <TextInput
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                style={[
-                  styles.input,
-                  {
-                    borderColor: passForm.formState.errors.password
-                      ? failedColor
-                      : "#D8DADC",
-                     
-                  },
-                ]}
-                inputMode="text"
-                secureTextEntry={!showPassword}
-              />
-              
-              {passForm.formState.errors.password && (
-                <Text style={styles.inputError}>
-                  {passForm.formState.errors.password.message}
-                </Text>
-              )}
-              
-                {(showPassword ? (
-                  <EyeIcon
-                    name="eye-outline"
-                    onTap={() => setShowPassword(!showPassword)}
-                  />
-                ) : (
-                  <EyeIcon
-                    name="eye-off-outline"
-                    onTap={() => setShowPassword(!showPassword)}
-                  />
-                ))}
-            </View>
-          )}
-        />
-
-<Text style={[styles.inputLabel, {paddingBottom: height*0.005,  paddingTop: height*0.025}]}>Confirm New Password</Text>
-        <Controller
-          control={passForm.control}
-          name="confirmPassword"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ justifyContent: "center" }}>
-              <TextInput
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                style={[
-                  styles.input,
-                  {
-                    borderColor: passForm.formState.errors.confirmPassword
-                      ? failedColor
-                      : "#D8DADC",
-                  },
-                ]}
-                inputMode="text"
-                secureTextEntry={!showPassword}
-              />
-              
-              {passForm.formState.errors.confirmPassword && (
-                <Text style={styles.inputError}>
-                  {passForm.formState.errors.confirmPassword.message}
-                </Text>
-              )}
-              
-                {(showPassword ? (
-                  <EyeIcon
-                    name="eye-outline"
-                    onTap={() => setShowPassword(!showPassword)}
-                  />
-                ) : (
-                  <EyeIcon
-                    name="eye-off-outline"
-                    onTap={() => setShowPassword(!showPassword)}
-                  />
-                ))}
-            </View>
-          )}
-        />
-
-        <Pressable
-          style={[
-            styles.button,
-            {
-              backgroundColor: passForm.formState.isValid
-                ? "#007BFF"
-                : "rgba(0, 0, 0, 0.4)",
-            },
-          ]}
-          onPress={passForm.handleSubmit(resetPassword)}
+        <LinearGradient
+          style={styles.container}
+          colors={["#ADD8E6", "#EAF5F8"]}
+          locations={[0.27, 1]}
         >
-          {passForm.formState.isSubmitting ? (
-            <ActivityIndicator size="small" color="white" />
-          ) : (
-            <Text
-              style={{
-                fontFamily: "Inter_600SemiBold",
-                color: "#ffffff",
-                fontSize: height * 0.0196,
-                textAlign: "center",
-              }}
-            >
-              RESET
-            </Text>
-          )}
-        </Pressable>
-      </LinearGradient>
+          <Alert />
+          <Banner />
+
+          
+            <Back onPress={handleBack}/>
+          
+
+          <Text style={styles.heading}>Reset Password</Text>
+
+          <Text style={[styles.paragraph, { marginBottom: height * 0.03 }]}>
+            Please type something you would remember
+          </Text>
+
+          <Text style={[styles.inputLabel, { paddingBottom: height * 0.005 }]}>
+            New Password
+          </Text>
+          <Controller
+            control={passForm.control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={{ justifyContent: "center" }}>
+                <TextInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  style={[
+                    styles.input,
+                    {
+                      borderColor: passForm.formState.errors.password
+                        ? failedColor
+                        : "#D8DADC",
+                    },
+                  ]}
+                  inputMode="text"
+                  secureTextEntry={!showPassword}
+                />
+
+                {passForm.formState.errors.password && (
+                  <Text style={styles.inputError}>
+                    {passForm.formState.errors.password.message}
+                  </Text>
+                )}
+
+                {showPassword ? (
+                  <EyeIcon
+                    name="eye-outline"
+                    onTap={() => setShowPassword(!showPassword)}
+                  />
+                ) : (
+                  <EyeIcon
+                    name="eye-off-outline"
+                    onTap={() => setShowPassword(!showPassword)}
+                  />
+                )}
+              </View>
+            )}
+          />
+
+          <Text
+            style={[
+              styles.inputLabel,
+              { paddingBottom: height * 0.005, paddingTop: height * 0.025 },
+            ]}
+          >
+            Confirm New Password
+          </Text>
+          <Controller
+            control={passForm.control}
+            name="confirmPassword"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <View style={{ justifyContent: "center" }}>
+                <TextInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  style={[
+                    styles.input,
+                    {
+                      borderColor: passForm.formState.errors.confirmPassword
+                        ? failedColor
+                        : "#D8DADC",
+                    },
+                  ]}
+                  inputMode="text"
+                  secureTextEntry={!showPassword}
+                />
+
+                {passForm.formState.errors.confirmPassword && (
+                  <Text style={styles.inputError}>
+                    {passForm.formState.errors.confirmPassword.message}
+                  </Text>
+                )}
+
+                {showPassword ? (
+                  <EyeIcon
+                    name="eye-outline"
+                    onTap={() => setShowPassword(!showPassword)}
+                  />
+                ) : (
+                  <EyeIcon
+                    name="eye-off-outline"
+                    onTap={() => setShowPassword(!showPassword)}
+                  />
+                )}
+              </View>
+            )}
+          />
+
+          <Pressable
+            style={[
+              styles.button,
+              {
+                backgroundColor: passForm.formState.isValid
+                  ? "#007BFF"
+                  : "rgba(0, 0, 0, 0.4)",
+              },
+            ]}
+            onPress={passForm.handleSubmit(resetPassword)}
+          >
+            {passForm.formState.isSubmitting ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  color: "#ffffff",
+                  fontSize: height * 0.0196,
+                  textAlign: "center",
+                }}
+              >
+                RESET PASSWORD
+              </Text>
+            )}
+          </Pressable>
+
+          <View style= {{ flexDirection: 'row', flex:1, padding:height*0.03, alignItems:'flex-end', alignSelf:'center'}}>
+        <Text style={[styles.inputLabel, {fontSize: height * 0.019}]}> Remember password?</Text>
+        <Link href="/login" asChild>
+          <Pressable hitSlop={20}>
+          <Text
+            style={{
+              fontFamily: "Inter_600SemiBold",
+              color: "#007BFF",
+              textDecorationLine: "underline",
+              fontSize: height * 0.019,
+            }}
+          > {" "}Log in</Text>
+          </Pressable>
+          </Link>
+        </View>
+        </LinearGradient>
+      </ScrollView>
     );
   } else
     return (
+
+      <ScrollView
+      //style={{borderWidth:10}}
+      automaticallyAdjustKeyboardInsets={true}
+      keyboardDismissMode="none"
+      contentContainerStyle={{alignItems:'center', height:height-(insets.top+insets.bottom)}}
+      >
       <LinearGradient
         style={styles.container}
         colors={["#ADD8E6", "#EAF5F8"]}
@@ -517,19 +588,19 @@ export default function PasswordReset() {
         <Alert />
         <Banner />
 
-        <Link href="/login" asChild>
-          <Back />
-        </Link>
+        
+        <Back onPress={handleBack}/>
+       
 
         <Text style={styles.heading}>Forgot Password?</Text>
 
         <Text style={styles.paragraph}>
-          {email === ""
+          {email === "" || email === "backed"
             ? "Don't worry! It happens. Please enter the email associated with your account."
             : `We have sent a six digit OTP to ${email}`}
         </Text>
 
-        {email === "" ? (
+        {email === "" || email === "backed" ? (
           <View style={styles.inputView}>
             <Text style={[styles.inputLabel]}>Email address</Text>
             <Controller
@@ -577,7 +648,7 @@ export default function PasswordReset() {
                     textAlign: "center",
                   }}
                 >
-                  RESET PASSWORD
+                  CONTINUE
                 </Text>
               )}
             </Pressable>
@@ -643,25 +714,23 @@ export default function PasswordReset() {
           </View>
         )}
 
-        <Text
-          style={[
-            styles.inputLabel,
-            { marginTop: height * 0.43, textAlign: "center" },
-          ]}
-        >
-          Remember password?{" "}
+<View style= {{ flexDirection: 'row', flex:1, padding:height*0.03, alignItems:'flex-end', alignSelf:'center'}}>
+        <Text style={[styles.inputLabel, {fontSize: height * 0.019}]}> Remember password?</Text>
+        <Link href="/login" asChild>
+          <Pressable hitSlop={20}>
           <Text
             style={{
               fontFamily: "Inter_600SemiBold",
               color: "#007BFF",
               textDecorationLine: "underline",
+              fontSize: height * 0.019,
             }}
-          >
-            {" "}
-            Log in
-          </Text>
-        </Text>
+          > {" "}Log in</Text>
+          </Pressable>
+          </Link>
+        </View>
       </LinearGradient>
+      </ScrollView>
     );
 }
 
@@ -669,6 +738,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: "92%",
+    
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     borderRadius: 24,
     paddingHorizontal: height * 0.024,
@@ -692,8 +762,6 @@ const styles = StyleSheet.create({
 
   inputView: {
     alignSelf: "stretch",
-    //backgroundColor: 'white',
-    //paddingHorizontal: "6%",
     rowGap: height * 0.00734,
     marginTop: height * 0.0428,
   },
@@ -701,7 +769,6 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: "#ffffff",
     borderRadius: 10,
-    //width: "100%",
     fontFamily: "Inter_400Regular",
     fontSize: height * 0.0196,
     color: "rgba(0, 0, 0, 1)",

@@ -4,7 +4,7 @@ import { height } from "@/app/_layout"
 
 
 export default function Back({onPress}: any) {
-    return (<Pressable style={styles.close} onPress={onPress}>
+    return (<Pressable style={styles.close} onPress={onPress} hitSlop={20}>
               <Ionicons name="chevron-back" size={height * 0.034} color="#565555" />
             </Pressable>)
 }

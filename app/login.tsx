@@ -8,17 +8,18 @@ import {
 import { Image, useImage } from "expo-image";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
 import { Redirect, useRouter, Link } from "expo-router";
-import { height, OS } from "./_layout";
+import { height } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useUserStore } from "@/hooks/useStore";
 import { useState } from "react";
+import { WarnIcon, EyeIcon } from "@/components/Icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const imgSource = require("@/assets/images/edumatch.png");
 
@@ -57,29 +58,7 @@ const MyLoader = ({ w, h }: any) => (
   </ContentLoader>
 );
 
-export const WarnIcon = () => {
-  return (
-    <Ionicons
-      name="warning-outline"
-      color="red"
-      size={height * 0.02447}
-      style={{ position: "absolute", right: 8, top:8 }}
-    />
-  );
-};
 
-export const EyeIcon = ({name, onTap}: any) => {
-  return (
-    <Pressable onPress={onTap} hitSlop={10} style={{ position: "absolute", right: 8, top:8 }}>
-    <Ionicons
-      name={name}
-      color="black"
-      size={height * 0.02447}
-      
-    />
-    </Pressable>
-  );
-}
 
 export default function Login() {
   const { openAlert, Alert } = useAlert();
@@ -87,6 +66,7 @@ export default function Login() {
   const router = useRouter();
   const { setUserAndTokenAsync, user } = useUserStore();
   const [showPassword, setShowPassword] = useState<boolean>(false)
+  const insets = useSafeAreaInsets();
 
   const {
     control,
@@ -158,15 +138,15 @@ export default function Login() {
       }
     }
   };
-
+  //console.log(fontScale)
   //if(!user)
   return (
     <ScrollView
-      style={styles.container}
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{ alignItems: "center" }}
+      contentContainerStyle={{alignItems:'center', height:height-(insets.top+insets.bottom)}}
     >
+      <View style={styles.container}>
       <Alert />
       {!image ? (
         <MyLoader w={229 * (height / 817)} h={218 * (height / 817)} />
@@ -266,19 +246,24 @@ export default function Login() {
         </Text>
       </Link>
 
-      <Text style={[styles.inputLabel, {marginTop:height*0.20}]}>
-        Don't have an account?{" "}
-        <Text
-          style={{
-            fontFamily: "Inter_600SemiBold",
-            color: "#007BFF",
-            textDecorationLine: "underline",
-          }}
-        >
-          {" "}
-          Sign up
-        </Text>
-      </Text>
+
+      <View style= {{ flexDirection: 'row', flex:1, padding:height*0.03, alignItems:'flex-end', alignSelf:'center'}}>
+              <Text style={[styles.inputLabel, {fontSize: height * 0.019}]}> Don't have an account?</Text>
+              <Link href="/registration" asChild>
+                <Pressable hitSlop={20}>
+                <Text
+                  style={{
+                    fontFamily: "Inter_600SemiBold",
+                    color: "#007BFF",
+                    textDecorationLine: "underline",
+                    fontSize: height * 0.019,
+                  }}
+                > {" "}Sign up</Text>
+                </Pressable>
+                </Link>
+              </View>
+
+              </View>
     </ScrollView>
   );
 
@@ -293,6 +278,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     borderRadius: 24,
     paddingHorizontal: height * 0.024,
+    alignItems: "center",
   },
 
   heading: {

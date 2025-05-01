@@ -82,7 +82,7 @@ export default function Sections() {
       locations={[0.27, 1]}
       style={styles.container}
     >
-      <Pressable style={styles.close}>
+      <Pressable style={styles.close} onPress={logout}>
         <Ionicons name="close-outline" size={height * 0.034} color="#565555" />
       </Pressable>
 
