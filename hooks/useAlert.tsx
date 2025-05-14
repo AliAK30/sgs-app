@@ -2,7 +2,7 @@ import { useState } from "react";
 import { View, Text } from "@/components/Themed";
 import Modal from "react-native-modal";
 import { StyleSheet, Pressable } from "react-native";
-import { height } from "../app/_layout";
+import { height, width } from "../app/_layout";
 import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 
 type stateObj = {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: "#ffffff",
     borderRadius: 14,
-    width: "90%",
+    width: width*0.9,
     alignSelf: "center",
     minHeight: "10%",
     alignItems: "center",

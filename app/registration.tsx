@@ -207,8 +207,63 @@ export default function Registration() {
   };
   //console.log(fontScale);
   const register: SubmitHandler<SecondSchema> = async (data) => {
-    console.log(data)
+    try {
+          if (isConnected) {
+
+            const uni_id = universitiesRef.current?.find((university)=>university.name===data.uni_name)?._id
+            const replicaData = {role: user?.role, email:user?.email, first_name:user?.first_name, last_name:user?.last_name
+              , password:data.password, dob: data.dob, gender: data.gender, uni_name: data.uni_name, uni_id: uni_id};
+            const res: any = await axios.post(`${url}/student/register`, replicaData, {
+              timeout: 1000 * 15,
+            });
+    
+            await openAlert("success", "Registration Successful!", 'Lets transform your Learning Experience!');
+            router.replace("/login");
+            
+            }
+          else {
+            openAlert("fail", "Failed!", "No Internet Connection!");
+            return;
+          }
+
+            
+          
+        } catch (e: any) {
+          if (!e.status) {
+            switch (e.code) {
+              case "ECONNABORTED":
+                openAlert(
+                  "fail",
+                  "Failed!",
+                  "Request TImed out\nPlease try again later!"
+                );
+                return;
+    
+              case "ERR_NETWORK":
+                openAlert(
+                  "fail",
+                  "Failed!",
+                  "Server is not Responding\nPlease try again later!"
+                );
+                return;
+            }
+          }
+    
+          if (e.status === 400) {
+            switch (e.response.data.code) {
+              case "VALIDATION_ERROR":
+                openAlert("fail", "Failed!", e.response.data.message);
+                return;
+            }
+          }
+    
+          if (e.status === 500) {
+            openAlert("fail", "Failed!", e.message);
+            return;
+          }
+        }
   };
+
 
   
   const handleBack = () => {

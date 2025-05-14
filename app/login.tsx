@@ -64,7 +64,7 @@ export default function Login() {
   const { openAlert, Alert } = useAlert();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
-  const { setUserAndTokenAsync, user } = useUserStore();
+  const { setUserAndTokenAsync, user, token } = useUserStore();
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const insets = useSafeAreaInsets();
 
@@ -139,7 +139,7 @@ export default function Login() {
     }
   };
   //console.log(fontScale)
-  //if(!user)
+  if(!token)
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}

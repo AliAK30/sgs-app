@@ -27,7 +27,7 @@ import * as NavigationBar from "expo-navigation-bar"
 
 const dims = Dimensions.get("screen");
 export const height = dims.height;
-export const width = dims.width
+export const width = dims.width>624 ? 624 : dims.width
 export const fontScale = dims.fontScale;
 export const base_height = 817
 export const base_width = 412
@@ -58,6 +58,9 @@ export const unstable_settings = {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+
+  const visibility = NavigationBar.useVisibility();
+  
   const [loaded, error] = useFonts({
     Inter_400Regular,
     Inter_600SemiBold,
@@ -77,17 +80,20 @@ export default function RootLayout() {
   //we will pass this as a prop on the choose "admin" or student login screen
   //const [role, setRole] = useState<string>("");
 
+  
+
   useEffect(() => {
-    if (OS === "android") {
-      // Hides navigation bar in android
-      //NavigationBar.setVisibilityAsync("hidden"); 
-      // Keeps it hidden unless swiped
-      NavigationBar.setBehaviorAsync("overlay-swipe"); 
-      NavigationBar.addVisibilityListener(({ visibility }) => {
-        if(visibility==='visible') setTimeout(()=>NavigationBar.setVisibilityAsync("hidden"), 2000);
-      });
-      
+    if (Platform.OS === 'android') {
+    if (visibility === 'visible') {
+      setTimeout(() => {
+        NavigationBar.setVisibilityAsync('hidden');
+      }, 2000);
     }
+    }
+  }, [visibility]);
+
+  useEffect(() => {
+    
     initialize();
 
     return () => {
@@ -139,6 +145,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    
+    width: width,
+    alignSelf: 'center'
   },
 });
