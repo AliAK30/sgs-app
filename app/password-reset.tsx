@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter, Link } from "expo-router";
-import { height } from "./_layout";
+import { height, OS } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState, useEffect, useRef } from "react";
@@ -101,7 +101,7 @@ export default function PasswordReset() {
 
   // Handle countdown timer
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    let interval: number | null = null;
 
     if (isTimerActive) {
       interval = setInterval(() => {
@@ -411,7 +411,7 @@ export default function PasswordReset() {
       <ScrollView
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', height:height-(insets.top+insets.bottom)}}
+      contentContainerStyle={{alignItems:'center', height:height-(OS==='android'?0:insets.top)}}
       >
         <LinearGradient
           style={styles.container}
@@ -578,7 +578,7 @@ export default function PasswordReset() {
       //style={{borderWidth:10}}
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', height:height-(insets.top+insets.bottom)}}
+      contentContainerStyle={{alignItems:'center', height:height-(OS==='android'?0:insets.top)}}
       >
       <LinearGradient
         style={styles.container}

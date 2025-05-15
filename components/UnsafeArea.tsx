@@ -9,7 +9,8 @@ export default function UnsafeArea() {
       style={{
         backgroundColor: "#ffffff",
         width: "100%",
-        height: insets.top + insets.bottom,
+        height: insets.top,
+       
       }}
     ></View>
   );

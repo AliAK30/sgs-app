@@ -3,6 +3,7 @@ import {
   Inter_400Regular,
   Inter_600SemiBold,
   Inter_500Medium,
+  Inter_700Bold,
 } from "@expo-google-fonts/inter";
 
 import {
@@ -25,13 +26,18 @@ import * as NavigationBar from "expo-navigation-bar"
 
 
 
-const dims = Dimensions.get("screen");
+const dims = Dimensions.get("window");
 export const height = dims.height;
 export const width = dims.width>624 ? 624 : dims.width
 export const fontScale = dims.fontScale;
+export const scale = dims.scale
 export const base_height = 817
 export const base_width = 412
 export const {OS} = Platform
+//export const height = dims.width>dims.height?dims.width:dims.height
+//export const width = dims.width>dims.height?dims.height:dims.width
+export const h = height/base_height;
+export const w = width/base_width;
 
 
 
@@ -68,6 +74,7 @@ export default function RootLayout() {
     Poppins_600SemiBold,
     Poppins_400Regular,
     Inter_500Medium,
+    Inter_700Bold,
   });
 
   const {
@@ -83,7 +90,7 @@ export default function RootLayout() {
   
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
+    if (OS === 'android') {
     if (visibility === 'visible') {
       setTimeout(() => {
         NavigationBar.setVisibilityAsync('hidden');
@@ -94,6 +101,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     
+    if(OS==='android') NavigationBar.setBehaviorAsync('overlay-swipe');
     initialize();
 
     return () => {

@@ -4,11 +4,10 @@ import {
   Pressable,
   ActivityIndicator,
   ScrollView,
-  TouchableOpacity,
 } from "react-native";
 import { useRouter, Link } from "expo-router";
-import { height, width, OS, fontScale } from "./_layout";
-import { useForm, Controller, SubmitHandler, SubmitErrorHandler } from "react-hook-form";
+import { height, width, OS } from "./_layout";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState, useEffect, useRef } from "react";
 import * as yup from "yup";
@@ -29,6 +28,8 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Checkbox from "expo-checkbox";
+import ServiceTerms from "@/components/ServiceTerms";
+import PrivacyPolicy from "@/components/PrivacyPolicy";
 
 const firstSchema = yup
   .object()
@@ -81,7 +82,6 @@ const secondSchema = yup.object().shape({
     .string()
     .required("Please re-enter Password")
     .oneOf([yup.ref("password")], "Passwords must match"),
-  agreeToTerms: yup.boolean().oneOf([true], "You must agree to the terms"),
 });
 
 type FirstSchema = yup.InferType<typeof firstSchema>;
@@ -93,29 +93,25 @@ export default function Registration() {
 
   const insets = useSafeAreaInsets();
   const { openAlert, Alert } = useAlert();
-  const { openBanner, Banner } = useBanner();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(1989, 1, 11));
   const { user, setUser } = useUserStore();
-  const [uni, setUni] = useState<string>("");
-  const universitiesRef = useRef<University[] | null>([
-    {
-      _id: "677534463f4abf3b23f8b6d1",
-      name: "Muhammad Ali Jinnah University",
-      campus: "Main",
-      city: "Karachi",
-      country: "Pakistan",
-    },
-  ]);
+  const [openToS, setOpenToS] = useState<boolean>(false); //Terms of Service
+  const [openPP, setOpenPP] = useState<boolean>(false); // Privacy Policy
+  const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
+
+  const universitiesRef = useRef<University[] | null>([]);
+
   const dateRef = useRef<HTMLInputElement | null>(null);
 
   const {
     control,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
+    reset
   } = useForm({
     mode: "onSubmit",
     resolver: yupResolver(firstSchema),
@@ -135,16 +131,8 @@ export default function Registration() {
       gender: "",
       password: "",
       confirmPassword: "",
-      agreeToTerms: false,
     },
   });
-
-  useEffect(()=> {
-    if(secondForm.formState.errors.agreeToTerms)
-    {
-      openAlert('fail', 'Error', secondForm.formState.errors.agreeToTerms.message);
-    }
-  }, [secondForm.formState.errors.agreeToTerms])
 
   const checkEmail: SubmitHandler<FirstSchema> = async (data) => {
     try {
@@ -208,6 +196,11 @@ export default function Registration() {
   //console.log(fontScale);
   const register: SubmitHandler<SecondSchema> = async (data) => {
     try {
+          if(!agreeTerms)
+          {
+            await openAlert('fail', 'Error', "You must agree to our terms of service and privacy policy");
+            return;
+          }
           if (isConnected) {
 
             const uni_id = universitiesRef.current?.find((university)=>university.name===data.uni_name)?._id
@@ -219,7 +212,9 @@ export default function Registration() {
     
             await openAlert("success", "Registration Successful!", 'Lets transform your Learning Experience!');
             router.replace("/login");
-            
+            setUser({role:'student'});
+            reset();
+            secondForm.reset();
             }
           else {
             openAlert("fail", "Failed!", "No Internet Connection!");
@@ -291,7 +286,7 @@ export default function Registration() {
       //style={{flex:1}}
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', height:height-(insets.top+insets.bottom)}}
+      contentContainerStyle={{alignItems:'center', height:height-(OS==='android'?0:insets.top)}}
     >
       <LinearGradient
         style={styles.container}
@@ -299,7 +294,8 @@ export default function Registration() {
         locations={[0.27, 1]}
       >
         <Alert />
-        <Banner />
+        <ServiceTerms isVisible={openToS} setIsVisible={setOpenToS}/>
+        <PrivacyPolicy isVisible={openPP} setIsVisible={setOpenPP}/>
 
         <Back onPress={handleBack} />
 
@@ -755,23 +751,36 @@ export default function Registration() {
                       />
 
                       {/* Terms Agreement */}
-      <Controller
-        control={secondForm.control}
-        render={({ field: { onChange, value } }) => (
+      
           <View style={{ flexDirection: 'row', marginTop: height*0.007}}>
             <Checkbox
-              value={value}
-              onValueChange={onChange}
-              color={value ? '#007AFF' : undefined}
+              value={agreeTerms}
+              onValueChange={setAgreeTerms}
+              color={agreeTerms ? '#007AFF' : undefined}
               style={{marginTop:height*0.002}}
               hitSlop={10}
             />
-            <Text style={[styles.inputLabel, {paddingLeft:width*0.025}]}>I agree to the Terms of Service and Privacy Policy</Text>
+            <Text style={[styles.inputLabel, {paddingLeft:width*0.025}]}>I agree to the <Pressable hitSlop={20} onPress={()=>setOpenToS(true)}>
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  color: "#007BFF",
+                  textDecorationLine: "underline",
+                  fontSize: height * 0.019,
+                }}
+              >Terms of Service</Text>
+            </Pressable> and <Pressable hitSlop={20} onPress={()=>setOpenPP(true)}>
+              <Text
+                style={{
+                  fontFamily: "Inter_600SemiBold",
+                  color: "#007BFF",
+                  textDecorationLine: "underline",
+                  fontSize: height * 0.019,
+                }}
+              >Privacy Policy</Text></Pressable></Text>
             
           </View>
-        )}
-        name="agreeToTerms"
-      />
+        
     
             <Pressable
               style={[

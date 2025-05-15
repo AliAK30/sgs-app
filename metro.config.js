@@ -10,10 +10,10 @@ const config = getDefaultConfig(__dirname);
  */
 
 
-config.resolver.assetExts.push(
+/* config.resolver.assetExts.push(
   // Adds support for `.db` files for SQLite databases
   'lottie'
-);
+); */
 
 /* const config = {
   resolver: {

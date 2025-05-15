@@ -8,7 +8,7 @@ import {
 import { Image, useImage } from "expo-image";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
 import { Redirect, useRouter, Link } from "expo-router";
-import { height } from "./_layout";
+import { height, OS } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -138,13 +138,13 @@ export default function Login() {
       }
     }
   };
-  //console.log(fontScale)
+  
   if(!token)
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', height:height-(insets.top+insets.bottom)}}
+      contentContainerStyle={{alignItems:'center', flex:1}}
     >
       <View style={styles.container}>
       <Alert />
@@ -279,6 +279,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: height * 0.024,
     alignItems: "center",
+    //borderWidth:3,
   },
 
   heading: {
