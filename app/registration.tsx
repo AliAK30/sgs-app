@@ -30,6 +30,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Checkbox from "expo-checkbox";
 import ServiceTerms from "@/components/ServiceTerms";
 import PrivacyPolicy from "@/components/PrivacyPolicy";
+import Modal from "react-native-modal";
 
 const firstSchema = yup
   .object()
@@ -274,10 +275,12 @@ export default function Registration() {
   };
 
   const onDateChange = (event: DateTimePickerEvent, date?: Date) => {
-    setShowDatePicker(OS ==='ios');
+    //setShowDatePicker(OS ==='ios');
     if (date) {
       setSelectedDate(date);
       secondForm.setValue("dob", date);
+      console.log('here');
+      secondSchema.validateAt('dob', secondForm.getValues()).then(()=>secondForm.clearErrors("dob")); 
     }
   };
 
@@ -429,7 +432,7 @@ export default function Registration() {
               render={({ field: { onChange, value } }) => (
                 <View>
                   <RNPickerSelect
-                    onValueChange={(val)=>secondForm.setValue("uni_name", val)}
+                    onValueChange={(val)=>{if(val!=="") {secondForm.setValue("uni_name", val); secondForm.clearErrors("uni_name")}}}
                     //onDonePress={()=>console.log(value)}
                     style={{
                       inputIOS: {
@@ -501,8 +504,6 @@ export default function Registration() {
                     (<View>
                     <input 
                     type="date" 
-
-                    
                     value={value.toISOString().split('T')[0]} 
                     max={(new Date).toISOString().split('T')[0]}
                     onChange={(e)=> {onChange(e.target.valueAsDate)}} 
@@ -520,7 +521,7 @@ export default function Registration() {
                       borderColor: secondForm.formState.errors.dob ? failedColor: "#D8DADC"}}/>
 
 {secondForm.formState.errors.dob && (
-                      <Text style={{ color: "red" }}>
+                      <Text style={[styles.inputError, {paddingTop:height*0.015}]}>
                         {secondForm.formState.errors.dob.message}
                       </Text>
                     )}
@@ -542,8 +543,7 @@ export default function Registration() {
                           borderColor: secondForm.formState.errors.dob
                             ? failedColor
                             : "#D8DADC",
-                          //paddingRight: height * 0.005,
-                          //paddingVertical: height * 0.008,
+                          
                           
                         },
                       ]}
@@ -565,18 +565,30 @@ export default function Registration() {
                         color="#539DF3"
                       />
                     </Pressable>
-                    {showDatePicker && (
-                      <DateTimePicker
+                    {<Modal
+                      isVisible={showDatePicker}
+                      hasBackdrop={true}
+                      customBackdrop={
+                        <Pressable onPress={()=>setShowDatePicker(false)} style={styles.backdrop}></Pressable>
+                      }
+                      
+                      animationIn="fadeIn"
+                      animationOut="fadeOut"
+                      >
+                        <DateTimePicker
                         value={value}
                         mode="date"
-                        display={OS === "ios" ? "spinner" : "default"}
+                        display={OS === "ios" ? "inline" : "default"}
                         maximumDate={new Date()}
+                        style={{backgroundColor:'black', borderRadius:24}}
                         onChange={onDateChange}
                       />
-                    )}
+                      </Modal>
+                      
+                    }
                 
                     {secondForm.formState.errors.dob && (
-                      <Text style={{ color: "red" }}>
+                      <Text style={[styles.inputError, {paddingTop:height*0.015}]}>
                         {secondForm.formState.errors.dob.message}
                       </Text>
                     )}
@@ -593,7 +605,7 @@ export default function Registration() {
               render={({ field: { onChange, value } }) => (
                 <View>
                   <RNPickerSelect
-                    onValueChange={(val)=>secondForm.setValue("gender", val)}
+                    onValueChange={(val)=>{if(val!=="") {secondForm.setValue("gender", val); secondForm.clearErrors("gender")}}}
                     //onDonePress={()=>console.log(value)}
                     
                     style={{
@@ -658,7 +670,7 @@ export default function Registration() {
               </View>
             </View>
 
-            <Text style={styles.inputLabel}>
+            <Text style={[styles.inputLabel, {marginTop:width>=570? 0 : height*0.017}]}>
                         Password
                       </Text>
                       <Controller
@@ -889,6 +901,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: "80%",
   },
+
+  backdrop: {
+    flex: 1,
+    backgroundColor: "black",
+    opacity: 0.4,
+    
+
+    },
 
   inputLabel: {
     fontFamily: "Inter_400Regular",

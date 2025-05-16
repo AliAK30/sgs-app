@@ -30,90 +30,128 @@ export default function PrivacyPolicy({isVisible, setIsVisible}: Props) {
                   <Text style={[styles.paraBold, {paddingTop:h*5, alignSelf:'center'}]}>Last Updated: March 31, 2025</Text>
                   <View style={{paddingTop: h*20, paddingRight:w*25}}>
                     <Text style={styles.para}>At <Text style={styles.paraBold}>EduMatch</Text>, we are committed to protecting your privacy in accordance with Pakistani laws, including the principles of the Personal Data Protection Bill 2023 (if enacted) and general data protection practices. This Privacy Policy explains how we collect, use, share, and protect your personal information when you use our mobile application ("the App") in Karachi, Sindh, Pakistan. By using the App, you consent to the practices described in this Privacy Policy.</Text>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>1. Acceptance of Terms</Text>
-                    <Text style={styles.para}>By creating an account or using the App, you confirm that you are at least 10 years old (or the age of majority in your jurisdiction) and agree to these Terms. If you are using the App on behalf of an organization (e.g., a university or study group), you represent that you have the authority to bind that organization to these Terms.</Text>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>2. Use of the App</Text>
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>1. Information we collect</Text>
+                    <Text style={styles.para}>We collect the following types of information, keeping in mind the educational context of Karachi:</Text>
+                    
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                         <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}><Text style={styles.paraBold}>Permitted Use:</Text> The App is intended for personal, non-commercial use by university students to assist with studying, scheduling, note-taking, and collaboration.</Text>
-                    </View>
-                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
-                        <Text style={styles.paraBold}>{"\u2022"}</Text>
-                    <Text style={styles.para}><Text style={styles.paraBold}>Prohibited Use:</Text> You may not:</Text>
+                        <Text style={styles.paraBold}>Information you provide:</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:25*w, columnGap:w*5}}>
                             <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>Use the App for any illegal or unauthorized purpose.</Text>
+                        <Text style={styles.para}>Account Information: When you sign up, we collect your name, email address, university name (e.g., University of Karachi, NED University), date of birth, and gender, as these are common fields required by educational apps in Pakistan.</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:25*w, columnGap:w*5}}>
                             <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>Share, upload, or distribute content that is harmful, offensive, or infringes on the rights of others (e.g., copyrighted material, defamatory content).</Text>
+                        <Text style={styles.para}>User Content: Study notes, flashcards, schedules, and messages you create or share within the App.</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:25*w, columnGap:w*5}}>
                             <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>Attempt to hack, reverse-engineer, or interfere with the App's functionality.</Text>
+                        <Text style={styles.para}>Communications: Information you provide when you contact us for support, which may be routed through our Karachi-based support team.</Text>
+                    </View>
+
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                        <Text style={styles.paraBold}>{"\u2022"}</Text>
+                        <Text style={styles.paraBold}>Automatically Collected Information:</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:25*w, columnGap:w*5}}>
                             <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>Use the App to harass, bully, or harm others.</Text>
+                        <Text style={styles.para}>Usage Data: Information about how you use the App, such as pages visited, features used, and time spent, to improve the App for Karachi students.</Text>
+                    </View>
+                    <View style={{flexDirection:'row', paddingLeft:25*w, columnGap:w*5}}>
+                            <Text style={styles.paraBold}>{"\u2022"}</Text>
+                        <Text style={styles.para}>Device Information: Device type, operating system, IP address, and unique device identifiers, which may be collected to ensure compatibility with devices commonly used in Karachi.</Text>
+                    </View>
+                    <View style={{flexDirection:'row', paddingLeft:25*w, columnGap:w*5}}>
+                            <Text style={styles.paraBold}>{"\u2022"}</Text>
+                        <Text style={styles.para}>Analytics: We use tools like Google Analytics to collect anonymized data about App usage, ensuring compliance with Pakistani data protection principles.</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                         <Text style={styles.paraBold}>{"\u2022"}</Text>
-                    <Text style={styles.para}><Text style={styles.paraBold}>Account Responsibility:</Text> You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</Text>
+                        <Text style={styles.paraBold}>Third-Party Information:</Text>
                     </View>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>3. User Generated Content</Text>
+                    <View style={{flexDirection:'row', paddingLeft:25*w, columnGap:w*5}}>
+                            <Text style={styles.paraBold}>{"\u2022"}</Text>
+                        <Text style={styles.para}>If you connect the App to third-party services (e.g., University of Karachi’s student portal, cloud storage), we may collect information such as your university ID or files you choose to sync, with your consent.</Text>
+                    </View>
+
+
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>2. How We Use Your Information</Text>
+                    <Text style={styles.para}>We use your information to:</Text>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                             <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>You may create, upload, or share content such as study notes, flashcards, or group messages ("User Content").</Text>
-                    </View>
-                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
-                            <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>By uploading User Content, you grant <Text style={styles.paraBold}>EduMatch</Text> a non-exclusive, royalty-free, worldwide license to use, store, and display your content solely for the purpose of operating and improving the App.</Text>
-                    </View>
-                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
-                            <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>You are responsible for ensuring that your User Content does not violate any laws or third-party rights (e.g., copyright, privacy).</Text>
-                    </View>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>4. Intellectual Property</Text>
-                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
-                            <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>The App, including its design, code, and content (excluding User Content), is owned by <Text style={styles.paraBold}>EduMatch</Text> or its licensors and is protected by copyright, trademark, and other intellectual property laws.</Text>
+                        <Text style={styles.para}>Provide and improve the App’s functionality (e.g., saving your study notes, enabling group collaboration for Karachi students).</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                             <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>You may not copy, modify, distribute, or create derivative works of the App without prior written permission.</Text>
-                    </View>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>5. Third Party Services</Text>
-                    <Text style={styles.para}>The App may integrate with third-party services (e.g., cloud storage, university portals). Your use of these services is subject to their respective terms and privacy policies. <Text style={styles.paraBold}>EduMatch</Text> is not responsible for the performance or security of third-party services.</Text>
-                  <Text style={[styles.paraBold, {paddingTop:h*20}]}>6. Termination</Text>
-                  <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
-                            <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>We reserve the right to suspend or terminate your account if you violate these Terms or engage in behavior that harms the App or its users.</Text>
+                        <Text style={styles.para}>Personalize your experience (e.g., recommending study resources based on your university or courses, such as those offered by the University of Karachi or Aga Khan University).</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                             <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>You may delete your account at any time through the App's settings. Upon deletion, your User Content may be removed, but some data (e.g., backups) may be retained as required by law.</Text>
-                    </View>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>7. Disclaimers</Text>
-                  <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
-                            <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}>The App is provided "as is" without warranties of any kind, express or implied. We do not guarantee that the App will be error-free, secure, or available at all times.</Text>
+                        <Text style={styles.para}>Communicate with you (e.g., sending notifications about updates or support responses, considering Karachi's time zone, PKT).</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                             <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}><Text style={styles.paraBold}>EduMatch</Text> is not responsible for the accuracy or reliability of User Content or third-party resources accessed through the App.</Text>
+                        <Text style={styles.para}>Analyze usage patterns to enhance the App's performance, especially for students in Karachi, where literacy rates are higher (around 75% in urban areas) but access to digital tools varies.</Text>
                     </View>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>8. Limitation of Liability</Text>
-                    <Text style={styles.para}>To the fullest extent permitted by law, <Text style={styles.paraBold}>EduMatch</Text> shall not be liable for any indirect, incidental, or consequential damages (e.g., loss of data, academic performance) arising from your use of the App.</Text>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>9. Changes to These Terms</Text>
-                    <Text style={styles.para}>We may update these Terms from time to time. If we make significant changes, we will notify you via the App or email. Your continued use of the App after such changes constitutes acceptance of the updated Terms.</Text>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>10. Governing Laws</Text>
-                    <Text style={styles.para}>These Terms are governed by the laws of Pakistan, with specific adherence to the jurisdiction of Sindh, where Karachi courts will have exclusive jurisdiction over any disputes arising from these Terms. This aligns with the legal framework for educational apps operating in Karachi.</Text>
-                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>11. Contact Us</Text>
-                    <Text style={styles.para}>If you have questions about these Terms, please contact us at:</Text>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                            <Text style={styles.paraBold}>{"\u2022"}</Text>
+                        <Text style={styles.para}>Comply with legal obligations under Pakistani law, such as responding to requests from the Federal Investigation Agency (FIA) in Karachi.</Text>
+                    </View>
+
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>3. How We Share Your Information</Text>
+                    <Text style={styles.para}>We do not sell your personal information. We may share your information in the following cases, ensuring compliance with Pakistani law:</Text>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                    <Text style={styles.paraBold}>{"\u2022"}</Text>
+                    <Text style={styles.para}><Text style={styles.paraBold}>With Your Consent:</Text> If you choose to share your study notes or collaborate with others, your User Content may be visible to other users in Karachi or beyond.</Text>
+                    </View>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                    <Text style={styles.paraBold}>{"\u2022"}</Text>
+                    <Text style={styles.para}><Text style={styles.paraBold}>Service Providers:</Text> We work with third-party providers (e.g., cloud storage, analytics) to operate the App. These providers are bound by confidentiality agreements and may only use your data to provide their services, in line with Pakistani data protection principles.</Text>
+                    </View>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                    <Text style={styles.paraBold}>{"\u2022"}</Text>
+                    <Text style={styles.para}><Text style={styles.paraBold}>Legal Requirements:</Text> We may disclose your information if required by Pakistani law, such as under PECA 2016, or to protect the rights, safety, or property of <Text style={styles.paraBold}>EduMatch</Text> or others. This may include cooperation with the Sindh Education Department or the FIA.</Text>
+                    </View>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                    <Text style={styles.paraBold}>{"\u2022"}</Text>
+                    <Text style={styles.para}><Text style={styles.paraBold}>Business Transfers:</Text> If <Text style={styles.paraBold}>EduMatch</Text> is acquired or merged, your information may be transferred as part of the transaction, with notice to users in Karachi.</Text>
+                    </View>
+
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>4. Data Security</Text>
+                    <Text style={styles.para}>We use industry-standard measures (e.g., encryption, secure servers) to protect your information, especially given Karachi's high cybercrime rates. However, no system is completely secure, and we cannot guarantee the absolute security of your data, particularly during power outages or network disruptions common in Karachi</Text>
+
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>5. Your Choices and Rights</Text>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                    <Text style={styles.paraBold}>{"\u2022"}</Text>
+                    <Text style={styles.para}><Text style={styles.paraBold}>Access and Update:</Text> You can view and update your account information through the App's settings.</Text>
+                    </View>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                    <Text style={styles.paraBold}>{"\u2022"}</Text>
+                    <Text style={styles.para}><Text style={styles.paraBold}>Delete Your Account:</Text> You can delete your account at any time, which will remove your personal information and User Content (though some data may be retained as required by Pakistani law, e.g., for audit purposes).</Text>
+                    </View>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                    <Text style={styles.paraBold}>{"\u2022"}</Text>
+                    <Text style={styles.para}><Text style={styles.paraBold}>Opt-Out:</Text> You can opt out of non-essential notifications in the App's settings.</Text>
+                    </View>
+                    <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
+                    <Text style={styles.paraBold}>{"\u2022"}</Text>
+                    <Text style={styles.para}><Text style={styles.paraBold}>Data Rights:</Text> Under Pakistani law, you may have the right to access, correct, or delete your data. Contact us to exercise these rights, and we will respond in accordance with Sindh jurisdiction requirements.</Text>
+                    </View>
+
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>6. Children's Privacy</Text>
+                    <Text style={styles.para}>The App is intended for university students aged 18 and above, in line with typical university admission ages in Karachi. We do not knowingly collect personal information from children under 10, as per global best practices and Pakistani law.</Text>
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>7. International Data Transfer</Text>
+                    <Text style={styles.para}>Your information is primarily stored and processed in Pakistan. If data is transferred outside Pakistan (e.g., to cloud servers), we will ensure compliance with Pakistani data protection principles and obtain your consent where required.</Text>
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>8. Third-Party Links</Text>
+                    <Text style={styles.para}>The App may contain links to third-party websites or services (e.g., University of Karachi's portal, Sindh Education Department resources). We are not responsible for the privacy practices of these third parties. We encourage you to review their privacy policies.</Text>
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>9. Changes to this Privacy Policies</Text>
+                    <Text style={styles.para}>We may update this Privacy Policy to reflect changes in Pakistani law, such as updates to the Personal Data Protection Bill 2023, or Sindh educational policies. If we make significant changes, we will notify you via the App or email. Your continued use of the App after such changes constitutes acceptance of the updated Privacy Policy.</Text>
+                    <Text style={[styles.paraBold, {paddingTop:h*20}]}>10. Contact Us</Text>
+                    <Text style={styles.para}>If you have questions about this Privacy Policy or how we handle your data, please reach us at:</Text>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                         <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}><Text style={styles.paraBold}>Email:</Text> sgs@gmail.com</Text>
+                        <Text style={styles.para}><Text style={styles.paraBold}>Email:</Text> edumatch@gmail.com</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                         <Text style={styles.paraBold}>{"\u2022"}</Text>
@@ -134,6 +172,7 @@ const styles = StyleSheet.create({
         width:width*0.90,
         maxHeight:height*0.82,
         paddingHorizontal:w*15,
+        alignSelf:'center',
     },
 
     backdrop: {

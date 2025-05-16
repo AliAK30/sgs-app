@@ -27,7 +27,7 @@ const animationSource = require("@/assets/images/hand.json");
 
 export default function Survey() {
   //section is from 1 to 4
-  const { selectedSection, getStartQuestion, setSelectedSection } =
+  const { selectedSection, getStartQuestion, setSelectedSection, section1Count, section2Count, section3Count, section4Count} =
     useSurveyStore((state) => state);
 
   const { openAlert, Alert } = useAlert();
@@ -110,14 +110,16 @@ export default function Survey() {
     setIsSubmitting(true);
     try {
       if (isConnected) {
-        await axios.patch(`${url}/student/update/questions`, answers.current, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          timeout: 1000 * 15,
-        });
-        const res: any = await axios.get(
+        if(section1Count+section2Count+section3Count+section4Count === 44)
+        {
+            await axios.patch(`${url}/student/update/questions`, {answers: answers.current, isSurveyCompleted: true}, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            timeout: 1000 * 15,
+          });
+          const res: any = await axios.get(
           `${url}/student/identify/learningstyle`,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -131,6 +133,10 @@ export default function Survey() {
         );
         router.replace("/statistics");
         if (token)setUserAndTokenAsync(res.data.student, token);
+        }
+        
+        else await openAlert('fail', 'Error', 'Please answer all the questions from previous sections');
+        
 
 
       } else {
@@ -328,6 +334,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     width: "92%",
     paddingHorizontal: height * 0.024,
+    alignSelf:'center',
   },
 
 

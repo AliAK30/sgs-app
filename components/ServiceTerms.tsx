@@ -116,7 +116,7 @@ export default function ServiceTerms({isVisible, setIsVisible}: Props) {
                     <Text style={styles.para}>If you have questions about these Terms, please contact us at:</Text>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                         <Text style={styles.paraBold}>{"\u2022"}</Text>
-                        <Text style={styles.para}><Text style={styles.paraBold}>Email:</Text> sgs@gmail.com</Text>
+                        <Text style={styles.para}><Text style={styles.paraBold}>Email:</Text> edumatch@gmail.com</Text>
                     </View>
                     <View style={{flexDirection:'row', paddingLeft:7*w, columnGap:w*5}}>
                         <Text style={styles.paraBold}>{"\u2022"}</Text>
@@ -136,8 +136,8 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         width:width*0.90,
         paddingHorizontal:w*15,
-        alignSelf:'center',
         maxHeight:height*0.82,
+        alignSelf:'center',
         
     },
 

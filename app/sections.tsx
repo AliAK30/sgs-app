@@ -11,7 +11,10 @@ import { useSurveyStore } from "@/hooks/useStore";
 import useAnswers from "@/hooks/useAnswers";
 import { useUserStore } from "@/hooks/useStore";
 import { useRouter } from "expo-router";
-
+import { useNetInfo } from "@react-native-community/netinfo";
+import axios from "axios";
+import { url } from "@/constants/Server";
+import { useAlert } from "@/hooks/useAlert";
 
 const getAnswers = async () => {
   try {
@@ -44,7 +47,9 @@ export default function Sections() {
 
   const [loaded, setLoaded] = useState<boolean>(false)
   const { answers, getQuestionsCount } = useAnswers();
-  const {clear} = useUserStore();
+  const {isConnected} = useNetInfo();
+  const { openAlert, Alert } = useAlert();
+  const {clear, user, token} =  useUserStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -68,10 +73,61 @@ export default function Sections() {
   if (!loaded) {
     return <Loader size="large" color="blue" />;
   }
+  
 
   const logout = async () => {
-    await AsyncStorage.multiRemove(["user", "token", "answers"], clear)
-    router.replace("/login");
+    try {
+      if (isConnected) {
+        if(!user?.isSurveyCompleted)
+        await axios.patch(`${url}/student/update/questions`, {answers: answers.current, isSurveyCompleted: false}, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          timeout: 1000 * 15,
+        });
+        
+        
+        await AsyncStorage.multiRemove(["user", "token", "answers"], clear)
+        router.replace("/login");
+
+
+      } else {
+        openAlert("fail", "Failed!", "No Internet Connection!");
+        return;
+      }
+    } catch (e: any) {
+      if (!e.status) {
+        switch (e.code) {
+          case "ECONNABORTED":
+            openAlert("fail", "Failed!", "Request TImed out\nPlease try again later!");
+            return;
+
+          case "ERR_NETWORK":
+            openAlert(
+              "fail",
+              "Failed!",
+              "Server is not Responding\nPlease try again later!"
+            );
+            return;
+        }
+      }
+
+      if (e.status === 400) {
+        switch (e.response.data.code) {
+
+          case "VALIDATION_ERROR":
+            openAlert("fail", "Failed!", e.response.data.message);
+            return;
+        }
+      }
+
+      if (e.status === 500) {
+        openAlert("fail", "Failed!", e.message);
+        return;
+      }
+    } 
+    
   }
 
   
@@ -82,6 +138,7 @@ export default function Sections() {
       locations={[0.27, 1]}
       style={styles.container}
     >
+      <Alert/>
       <Pressable style={styles.close} onPress={logout}>
         <Ionicons name="close-outline" size={height * 0.034} color="#565555" />
       </Pressable>
@@ -118,6 +175,24 @@ export default function Sections() {
             questionsCompleted={section4Count}
           />
         </View>
+        {user?.isSurveyCompleted && <Pressable
+                  style={[
+                    styles.button,
+                    { backgroundColor: "#007BFF" },
+                  ]}
+                  onPress={()=>router.replace("/statistics")}
+                >
+              
+                    <Text
+                      style={{
+                        fontFamily: "Inter_600SemiBold",
+                        color: "#ffffff",
+                        fontSize: height * 0.0196,
+                        textAlign: "center",
+                      }}
+                    >MY LEARNING STYLE</Text>
+                </Pressable> }
+        
       </View>
     </LinearGradient>
   );
@@ -130,6 +205,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     paddingHorizontal: height * 0.024,
+    alignSelf:'center'
   },
 
   close: {
@@ -154,6 +230,13 @@ const styles = StyleSheet.create({
     color: "rgba(0, 0 ,0, 0.7)",
     fontFamily: "Inter_400Regular",
     fontSize: height * 0.0196,
+  },
+    button: {
+    marginBottom: height * 0.019,
+    boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+    borderRadius: 10,
+    paddingVertical: height * 0.0208,
+    marginTop: height * 0.04161,
   },
 });
 

@@ -93,7 +93,7 @@ export default function Login() {
     try {
       if (isConnected) {
         const res: any = await axios.post(`${url}/student/login`, data, {
-          timeout: 1000 * 15,
+          timeout: 1000 * 25,
         });
 
         //await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);

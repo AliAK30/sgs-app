@@ -82,7 +82,7 @@ export const useUserStore = create<UserState>()((set, get) => ({
   setUserAndTokenAsync: async (userToSet: User, tokenToSet: string)  => {
 
     const { setUser, setToken } = get();
-
+    if(userToSet.questions?.length) await AsyncStorage.setItem("answers", JSON.stringify(userToSet.questions));
     await AsyncStorage.setItem("user", JSON.stringify(userToSet));
     await AsyncStorage.setItem("token", tokenToSet);
     setUser(userToSet);

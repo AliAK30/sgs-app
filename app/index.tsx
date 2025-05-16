@@ -7,11 +7,11 @@ import { Redirect } from "expo-router";
 
 export default function Index() {
 
-  const {user} = useUserStore();
+  const {user, token} = useUserStore();
   
   //if(user?.isSurveyCompleted) return (<Redirect href="/statistics"/>)
 
-  //if(user) return (<Redirect href="/sections"/>)
+  if(token) return (<Redirect href="/sections"/>)
 
   return (<Redirect href="/login"/>)
 }

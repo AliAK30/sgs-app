@@ -138,7 +138,7 @@ export default function PasswordReset() {
             `${url}/student/otp/generate`,
             newData,
             {
-              timeout: 1000 * 15,
+              timeout: 1000 * 25,
             }
           );
           setEmail(data.email);
@@ -263,7 +263,7 @@ export default function PasswordReset() {
           `${url}/student/otp/verify`,
           { email: email, otp: otpString },
           {
-            timeout: 1000 * 15,
+            timeout: 1000 * 25,
           }
         );
 

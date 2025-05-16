@@ -7,6 +7,10 @@ type AnswerRef = {
 // Singleton ref
 let answers: AnswerRef = { current: undefined };
 
+/* const initializeAnswers = (data: Array<Answer>) => {
+  answers.current = data;
+} */
+
 // Provide a way to update the ref
 const updateAnswersRef = (index: number, answer: Answer) => {
   if (answers.current) answers.current[index] = answer;

@@ -2,14 +2,22 @@ import { Text, View } from "@/components/Themed";
 import { StyleSheet } from "react-native";
 import { height } from "./_layout";
 import { useUserStore } from "@/hooks/useStore";
+import Back from "@/components/Back";
 import LearningStyleComponent from "@/components/LearningStyle";
+import { useRouter } from "expo-router";
 
 export default function Statistics() {
   const { user } = useUserStore();
+  const router  = useRouter();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Your Statistics</Text>
+      
+        <Back onPress={()=>router.replace("/sections")}/>
+        <Text style={styles.heading}>Your Statistics</Text>
+      
+      
+
       <View style={styles.main}>
         <View style={styles.learningStyle}>
           
@@ -28,6 +36,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(245, 247, 250, 1)",
     paddingHorizontal: height * 0.024,
     paddingTop: height * 0.02,
+    alignSelf:'center'
   },
 
   
@@ -51,7 +60,6 @@ const styles = StyleSheet.create({
     color: "#565555",
     fontSize: height * 0.03059,
     textAlign: "center",
-    
   },
 });
 

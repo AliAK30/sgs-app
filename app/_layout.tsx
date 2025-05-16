@@ -79,9 +79,10 @@ export default function RootLayout() {
 
   const {
     isUserLoaded,
-    setUser,
-    setToken,
+    setUserAndTokenAsync,
     setIsUserLoaded,
+    setUser,
+    setToken
   } = useUserStore();
 
   //we will pass this as a prop on the choose "admin" or student login screen
@@ -124,8 +125,8 @@ export default function RootLayout() {
     try {
       const newUser = await AsyncStorage.getItem("user");
       if (newUser) {
-        setToken(await AsyncStorage.getItem("token"));
-        setUser(JSON.parse(newUser));
+        const tok = await AsyncStorage.getItem("token");
+        setUserAndTokenAsync(JSON.parse(newUser), tok ? tok : "");
       } else {
         setUser({role: 'student'});
       }
@@ -154,6 +155,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
     width: width,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
 });
