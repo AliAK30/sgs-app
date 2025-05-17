@@ -184,8 +184,7 @@ export default function PasswordReset() {
 
       if(e.status === 429)
       {
-        const retryAfter = Math.ceil(e.response.headers['retry-after']/60); // Header value (seconds)
-        openAlert("fail", "Please wait", `Please wait ${retryAfter} minutes before generating another OTP`);
+        openAlert("fail", "Error", e.response.data.message);
       }
 
       if (e.status === 500) {

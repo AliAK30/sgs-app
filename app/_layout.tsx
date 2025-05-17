@@ -61,7 +61,9 @@ export const unstable_settings = {
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+OS !== 'web' && SplashScreen.preventAutoHideAsync();
+//Hide navigation bar on android
+OS==='android' && NavigationBar.setBehaviorAsync('overlay-swipe');
 
 export default function RootLayout() {
 
@@ -102,7 +104,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     
-    if(OS==='android') NavigationBar.setBehaviorAsync('overlay-swipe');
+    
     initialize();
 
     return () => {
