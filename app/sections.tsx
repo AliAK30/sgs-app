@@ -16,7 +16,7 @@ import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
 
-const getAnswers = async () => {
+/* const getAnswers = async () => {
   try {
     let tempAnswers = await AsyncStorage.getItem("answers");
     if (tempAnswers) {
@@ -29,7 +29,7 @@ const getAnswers = async () => {
   } catch (e: any) {
     return e.message;
   } 
-};
+}; */
 
 export default function Sections() {
   
@@ -45,7 +45,7 @@ export default function Sections() {
     selectedSection,
   } = useSurveyStore((state) => state);
 
-  const [loaded, setLoaded] = useState<boolean>(false)
+  //const [loaded, setLoaded] = useState<boolean>(false)
   const { answers, getQuestionsCount } = useAnswers();
   const {isConnected} = useNetInfo();
   const { openAlert, Alert } = useAlert();
@@ -54,15 +54,15 @@ export default function Sections() {
 
   useEffect(() => {
     //console.log(`loaded: ${loaded}`);
-    if (loaded) {
+    //if (loaded) {
       if(selectedSection === 1 || selectedSection || 5) setSection1Count(getQuestionsCount(1));
       if(selectedSection === 2 || selectedSection || 5) setSection2Count(getQuestionsCount(2));
       if(selectedSection === 3 || selectedSection || 5) setSection3Count(getQuestionsCount(3));
       if(selectedSection === 4 || selectedSection || 5) setSection4Count(getQuestionsCount(4));
-    }
-  }, [loaded, answers]);
+    //}
+  }, [answers.current?.length]);
 
-  const initialize = async () => {
+/*   const initialize = async () => {
     const val = await getAnswers();
     answers.current = val;
     setLoaded(true);
@@ -72,7 +72,7 @@ export default function Sections() {
 
   if (!loaded) {
     return <Loader size="large" color="blue" />;
-  }
+  } */
   
 
   const logout = async () => {

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { User } from "@/types";
+import useAnswers from "./useAnswers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type SurveyState = {
@@ -80,10 +81,15 @@ export const useUserStore = create<UserState>()((set, get) => ({
   isUserLoaded: false,
   setIsUserLoaded: (load) => set(() => ({ isUserLoaded: load })),
   setUserAndTokenAsync: async (userToSet: User, tokenToSet: string)  => {
-
+    const { answers } = useAnswers();
     const { setUser, setToken } = get();
     const temp = await AsyncStorage.getItem("answers");
-    if(temp===null) await AsyncStorage.setItem("answers", JSON.stringify(userToSet.questions));
+    if(temp===null) {
+      await AsyncStorage.setItem("answers", JSON.stringify(userToSet.questions));
+      answers.current = userToSet.questions
+    } else {
+      answers.current = JSON.parse(temp)
+    }
     await AsyncStorage.setItem("user", JSON.stringify(userToSet));
     await AsyncStorage.setItem("token", tokenToSet);
     setUser(userToSet);
