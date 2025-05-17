@@ -174,12 +174,18 @@ export default function PasswordReset() {
         }
       }
 
-      if (e.status >= 400 && e.status < 500) {
+      if (e.status === 404) {
         switch (e.response.data.code) {
           case "ACCOUNT_NOT_EXISTS":
             openAlert("fail", "Failed!", e.response.data.message);
             return;
         }
+      }
+
+      if(e.status === 429)
+      {
+        const retryAfter = Math.ceil(e.response.headers['retry-after']/60); // Header value (seconds)
+        openAlert("fail", "Please wait", `Please wait ${retryAfter} minutes before generating another OTP`);
       }
 
       if (e.status === 500) {

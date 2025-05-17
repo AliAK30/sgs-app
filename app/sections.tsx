@@ -122,6 +122,11 @@ export default function Sections() {
         }
       }
 
+      if(e.status === 429)
+      {
+        openAlert("fail", "Error", e.response.data.message);
+      }
+
       if (e.status === 500) {
         openAlert("fail", "Failed!", e.message);
         return;
