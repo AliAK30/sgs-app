@@ -55,10 +55,10 @@ export default function Sections() {
   useEffect(() => {
     //console.log(`loaded: ${loaded}`);
     //if (loaded) {
-      if(selectedSection === 1 || selectedSection || 5) setSection1Count(getQuestionsCount(1));
-      if(selectedSection === 2 || selectedSection || 5) setSection2Count(getQuestionsCount(2));
-      if(selectedSection === 3 || selectedSection || 5) setSection3Count(getQuestionsCount(3));
-      if(selectedSection === 4 || selectedSection || 5) setSection4Count(getQuestionsCount(4));
+      if(selectedSection === 1 || selectedSection == 5) setSection1Count(getQuestionsCount(1));
+      if(selectedSection === 2 || selectedSection == 5) setSection2Count(getQuestionsCount(2));
+      if(selectedSection === 3 || selectedSection == 5) setSection3Count(getQuestionsCount(3));
+      if(selectedSection === 4 || selectedSection == 5) setSection4Count(getQuestionsCount(4));
     //}
   }, [answers.current?.length]);
 
