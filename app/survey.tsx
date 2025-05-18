@@ -34,7 +34,7 @@ export default function Survey() {
   const { isConnected } = useNetInfo();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { token, setUser } = useUserStore();
+  const { user, token, setUser } = useUserStore();
 
   //startQuestion is 0 indexing so from 0 to 10
   const startQuestion = getStartQuestion();
@@ -117,36 +117,41 @@ export default function Survey() {
     setIsSubmitting(true);
     try {
       if (isConnected) {
-        if(section.one+section.two+section.three+section.four === 44)
+        if(!user?.isSurveyCompleted)
         {
-            await axios.patch(`${url}/student/update/questions`, {answers: answers.current, isSurveyCompleted: true}, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            timeout: 1000 * 15,
-          });
-          const res: any = await axios.get(
-          `${url}/student/identify/learningstyle`,
+          if(section.one+section.two+section.three+section.four === 44)
           {
-            headers: { Authorization: `Bearer ${token}` },
-            timeout: 1000 * 35,
+              await axios.patch(`${url}/student/update/questions`, {answers: answers.current, isSurveyCompleted: true}, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              timeout: 1000 * 15,
+            });
+            const res: any = await axios.get(
+            `${url}/student/identify/learningstyle`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+              timeout: 1000 * 35,
+            }
+          );
+          await openAlert(
+            "success",
+            "Submission Successful!",
+            `Thanks for submitting! You will now see your learning style`
+          );
+          router.replace("/statistics");
+          //update the user state
+          if (token){
+            setUser(res.data.student);
+            await AsyncStorage.setItem("user", JSON.stringify(res.data.student));
           }
-        );
-        await openAlert(
-          "success",
-          "Submission Successful!",
-          `Thanks for submitting! You will now see your learning style`
-        );
-        router.replace("/statistics");
-        //update the user state
-        if (token){
-          setUser(res.data.student);
-          await AsyncStorage.setItem("user", JSON.stringify(res.data.student));
-        }
-        }
+          }
         
-        else await openAlert('fail', 'Error', 'Please answer all the questions from previous sections');
+          else await openAlert('fail', 'Error', 'Please answer all the questions from previous sections');
+
+        } else await openAlert('info', 'Already submitted', `Dear ${user.first_name}, you have already submitted the answers.`)
+        
         
 
 
