@@ -1,6 +1,6 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet, Pressable, ActivityIndicator } from "react-native";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { questions } from "@/constants/Questions";
@@ -49,13 +49,13 @@ export default function Survey() {
     getAnswersRef(realQuestionCount - 1)
   );
 
-  const animationRef = useRef<LottieView>(null);
+/*   const animationRef = useRef<LottieView>(null);
 
   useEffect(() => {
     animationRef.current?.play();
     animationRef.current?.play(0, 222);
   }, []);
-
+ */
   const next = async () => {
     
 
@@ -233,7 +233,7 @@ export default function Survey() {
               questions[selectedSection - 1][count - 1].gradientColorEnd,
             ]}
           >
-            <LottieView autoPlay ref={animationRef} source={animationSource} />
+            <LottieView autoPlay source={animationSource} loop />
           </LinearGradient>
         )}
         <View style={[styles.main]}>
