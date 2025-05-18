@@ -89,6 +89,10 @@ export default function Sections() {
           case "VALIDATION_ERROR":
             openAlert("fail", "Failed!", e.response.data.message);
             return;
+
+          case "RESUBMISSION":
+            openAlert("info", "Already Submitted!", e.response.data.message);
+            return;
         }
       }
 
