@@ -5,7 +5,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { questions } from "@/constants/Questions";
 import { height } from "./_layout";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Link } from "expo-router";
 import { useSurveyStore } from "@/hooks/useStore";
 import LottieView from "lottie-react-native";
@@ -20,6 +19,7 @@ import axios from "axios";
 import Back from "@/components/Back";
 
 import { Redirect } from "expo-router";
+import useSection from "@/hooks/useSection";
 
 const animationSource = require("@/assets/images/hand.json");
 
@@ -27,14 +27,14 @@ const animationSource = require("@/assets/images/hand.json");
 
 export default function Survey() {
   //section is from 1 to 4
-  const { selectedSection, getStartQuestion, setSelectedSection, section1Count, section2Count, section3Count, section4Count} =
+  const { selectedSection, getStartQuestion, setSelectedSection, setSectionsCount} =
     useSurveyStore((state) => state);
-
+  const {section} = useSection();
   const { openAlert, Alert } = useAlert();
   const { isConnected } = useNetInfo();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { token, user, setUserAndTokenAsync } = useUserStore();
+  const { token, setUser } = useUserStore();
 
   //startQuestion is 0 indexing so from 0 to 10
   const startQuestion = getStartQuestion();
@@ -57,15 +57,7 @@ export default function Survey() {
   }, []);
 
   const next = async () => {
-    if (realQuestionCount !== 44) {
-      //first set the answer state to reflect change on users screen
-      setAnswer(getAnswersRef(realQuestionCount));
-      //then change the questions and options
-      if (count === 11) {
-        setSelectedSection(selectedSection + 1);
-        setCount(1);
-      } else setCount(count + 1);
-    }
+    
 
     //this is what saves the selected answer to the async storage
     if (getAnswersRef(realQuestionCount - 1) !== answer) {
@@ -74,12 +66,27 @@ export default function Survey() {
           q: realQuestionCount,
           answer: answer,
         });
+        setSectionsCount();
         await AsyncStorage.setItem("answers", JSON.stringify(answers.current));
+        
       } catch (e: any) {
         console.log(e.message);
       }
     }
 
+    if (realQuestionCount !== 44) {
+      //first set the answer state to reflect change on users screen
+      
+      setAnswer(getAnswersRef(realQuestionCount));
+  
+      //then change the questions and options
+      if (count === 11) {
+        setSelectedSection(selectedSection + 1);
+        setCount(1);
+      } else setCount(count=>count + 1);
+      
+    }
+    
     //submit if last question
     realQuestionCount === 44 && submit();
   };
@@ -94,7 +101,7 @@ export default function Survey() {
       setCount(11);
       return;
     }
-    setCount(count - 1);
+    setCount(count=>count - 1);
   };
 
   const skipTo = (num: number) => {
@@ -110,7 +117,7 @@ export default function Survey() {
     setIsSubmitting(true);
     try {
       if (isConnected) {
-        if(section1Count+section2Count+section3Count+section4Count === 44)
+        if(section.one+section.two+section.three+section.four === 44)
         {
             await axios.patch(`${url}/student/update/questions`, {answers: answers.current, isSurveyCompleted: true}, {
             headers: {
@@ -132,7 +139,11 @@ export default function Survey() {
           `Thanks for submitting! You will now see your learning style`
         );
         router.replace("/statistics");
-        if (token)setUserAndTokenAsync(res.data.student, token);
+        //update the user state
+        if (token){
+          setUser(res.data.student);
+          await AsyncStorage.setItem("user", JSON.stringify(res.data.student));
+        }
         }
         
         else await openAlert('fail', 'Error', 'Please answer all the questions from previous sections');

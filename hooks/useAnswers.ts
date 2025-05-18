@@ -7,9 +7,9 @@ type AnswerRef = {
 // Singleton ref
 let answers: AnswerRef = { current: undefined };
 
-/* const initializeAnswers = (data: Array<Answer>) => {
+const initializeAnswers = (data: Array<Answer>|undefined) => {
   answers.current = data;
-} */
+}
 
 // Provide a way to update the ref
 const updateAnswersRef = (index: number, answer: Answer) => {
@@ -29,11 +29,12 @@ const getQuestionsCount = (section: number): number => {
       if (answers.current[(section - 1) * 11 + i].answer !== "") count++;
     }
   }
+
   return count;
 };
 
 const useAnswers = () => {
-  return { answers, updateAnswersRef, getAnswersRef, getQuestionsCount };
+  return { answers, updateAnswersRef, getAnswersRef, getQuestionsCount, initializeAnswers };
 };
 
 export default useAnswers;

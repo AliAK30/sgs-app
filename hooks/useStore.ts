@@ -2,62 +2,61 @@ import { create } from "zustand";
 import { User } from "@/types";
 import useAnswers from "./useAnswers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import useSection from "./useSection";
 
 type SurveyState = {
-  section1Count: number;
-  section2Count: number;
-  section3Count: number;
-  section4Count: number;
-  setSection1Count: (num: number) => void;
-  setSection2Count: (num: number) => void;
-  setSection3Count: (num: number) => void;
-  setSection4Count: (num: number) => void;
   selectedSection: number;
   setSelectedSection: (num: number) => void;
   getStartQuestion: () => number;
+  setSectionsCount: () =>Promise<void>;
+  reset: () => void;
 };
 
-export const useSurveyStore = create<SurveyState>()((set, get) => ({
-  section1Count: 0,
-  section2Count: 0,
-  section3Count: 0,
-  section4Count: 0,
-  setSection1Count: (num) => set(() => ({ section1Count: num })),
-  setSection2Count: (num) => set(() => ({ section2Count: num })),
-  setSection3Count: (num) => set(() => ({ section3Count: num })),
-  setSection4Count: (num) => set(() => ({ section4Count: num })),
+const initialSurveyState = {
   selectedSection: 5,
+}
+
+export const useSurveyStore = create<SurveyState>()((set, get) => ({
+  ...initialSurveyState,
   setSelectedSection: (num) => set(() => ({ selectedSection: num })),
   getStartQuestion: () => {
-    const {
-      selectedSection,
-      section1Count,
-      section2Count,
-      section3Count,
-      section4Count,
-    } = get();
+
+    const { selectedSection } = get();
+    const {section} = useSection();
 
     switch (selectedSection) {
       case 1: {
-        if (section1Count === 11) return 0;
-        else return section1Count;
+        if (section.one === 11) return 0;
+        else return section.one;
       }
       case 2: {
-        if (section2Count === 11) return 0;
-        else return section2Count;
+        if (section.two === 11) return 0;
+        else return section.two;
       }
       case 3: {
-        if (section3Count === 11) return 0;
-        else return section3Count;
+        if (section.three === 11) return 0;
+        else return section.three;
       }
       case 4: {
-        if (section4Count === 11) return 0;
-        else return section4Count;
+        if (section.four === 11) return 0;
+        else return section.four;
       }
       default:
         return 0;
     }
   },
+  setSectionsCount: async () => {
+
+    const { selectedSection } = get();
+    const {getQuestionsCount} = useAnswers();
+    const {section} = useSection();
+
+    if(selectedSection === 1 || selectedSection == 5) section.one = getQuestionsCount(1);
+    if(selectedSection === 2 || selectedSection == 5) section.two = getQuestionsCount(2);
+    if(selectedSection === 3 || selectedSection == 5) section.three = getQuestionsCount(3);
+    if(selectedSection === 4 || selectedSection == 5) section.four = getQuestionsCount(4);
+  },
+  reset: () => set(() => ({...initialSurveyState}))
 }));
 
 
@@ -66,41 +65,53 @@ type UserState = {
   token: string | null;
   setUser: (user: User|null) => void;
   setToken: (token:string|null) => void;
-  isUserLoaded: boolean;
-  setIsUserLoaded: (load: boolean) => void;
-  setUserAndTokenAsync: (userToSet: User, tokenToSet: string) => Promise<void>;
-  clear: () => void;
+  initializeUser: (userToSet: User, tokenToSet: string) => Promise<void>;
+  resetUserState: () => void;
 };
+
+const initialUserState = {
+  user: null,
+  token: null,
+}
 
 export const useUserStore = create<UserState>()((set, get) => ({
 
-  user: null,
-  token: null,
+  ...initialUserState,
   setUser: (user) => set(() => ({ user: user })),
   setToken: (token) => set(() => ({ token: token })),
-  isUserLoaded: false,
-  setIsUserLoaded: (load) => set(() => ({ isUserLoaded: load })),
-  setUserAndTokenAsync: async (userToSet: User, tokenToSet: string)  => {
-    const { answers } = useAnswers();
+  initializeUser: async (userToSet: User, tokenToSet: string)  => {
+    
+    const { initializeAnswers, answers } = useAnswers();
     const { setUser, setToken } = get();
+    //get answers from local storage
     const temp = await AsyncStorage.getItem("answers");
+    //if answers dont exist in local storage
+
     if(temp===null) {
-      await AsyncStorage.setItem("answers", JSON.stringify(userToSet.questions));
-      answers.current = userToSet.questions
+      //check if answers are stored in questions array of user
+      if(userToSet.questions?.length)
+      {
+        
+        //if so then initiliaze the answers ref using questions array of user object
+        initializeAnswers(userToSet.questions)
+      } else {
+        //user is new to the app so create an empty array and initialize the answersRef
+        initializeAnswers(new Array(44).fill({q: 0, answer: ''}));
+      }
+      
     } else {
-      answers.current = JSON.parse(temp)
+      //if answers already exist in the local storage just initialize the answers ref using that
+      initializeAnswers(JSON.parse(temp))
     }
+    
     await AsyncStorage.setItem("user", JSON.stringify(userToSet));
     await AsyncStorage.setItem("token", tokenToSet);
     setUser(userToSet);
     setToken(tokenToSet);
-  },
-  clear: () => {
-    const { setUser, setToken } = get();
-    setToken(null);
-    setUser(null);
     
-  }
+
+  },
+  resetUserState: () => set(() => ({...initialUserState}))
 
 
 }))

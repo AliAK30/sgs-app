@@ -16,7 +16,7 @@ import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-import { useUserStore } from "@/hooks/useStore";
+import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import { useState } from "react";
 import { WarnIcon, EyeIcon } from "@/components/Icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -64,8 +64,9 @@ export default function Login() {
   const { openAlert, Alert } = useAlert();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
-  const { setUserAndTokenAsync, user, token } = useUserStore();
+  const { initializeUser, user, token } = useUserStore();
   const [showPassword, setShowPassword] = useState<boolean>(false)
+  const {setSectionsCount} = useSurveyStore();
   const insets = useSafeAreaInsets();
 
   const {
@@ -97,7 +98,8 @@ export default function Login() {
         });
 
         //await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
-        setUserAndTokenAsync(res.data.user, res.data.token);
+        await initializeUser(res.data.user, res.data.token);
+        setSectionsCount();
         router.replace("/sections");
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");

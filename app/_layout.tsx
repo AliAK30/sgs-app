@@ -14,14 +14,14 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
 import { StatusBar,  } from "expo-status-bar";
 import Loader from "@/components/Loader";
-import { useUserStore } from "@/hooks/useStore";
+import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import * as NavigationBar from "expo-navigation-bar"
 
 
@@ -79,13 +79,15 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
+  const [isUserLoaded, setIsUserLoaded] = useState<boolean>(false)
+
   const {
-    isUserLoaded,
-    setUserAndTokenAsync,
-    setIsUserLoaded,
+    initializeUser,
     setUser,
     setToken
   } = useUserStore();
+
+  const {setSectionsCount} = useSurveyStore();
 
   //we will pass this as a prop on the choose "admin" or student login screen
   //const [role, setRole] = useState<string>("");
@@ -128,7 +130,8 @@ export default function RootLayout() {
       const newUser = await AsyncStorage.getItem("user");
       if (newUser) {
         const tok = await AsyncStorage.getItem("token");
-        setUserAndTokenAsync(JSON.parse(newUser), tok ? tok : "");
+        await initializeUser(JSON.parse(newUser), tok ? tok : "");
+        setSectionsCount();
       } else {
         setUser({role: 'student'});
       }

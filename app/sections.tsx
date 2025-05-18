@@ -3,10 +3,8 @@ import { Pressable, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Section from "@/components/Section";
-import Loader from "@/components/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { height } from "./_layout";
-import { useEffect, useState } from "react";
 import { useSurveyStore } from "@/hooks/useStore";
 import useAnswers from "@/hooks/useAnswers";
 import { useUserStore } from "@/hooks/useStore";
@@ -15,6 +13,7 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
+import useSection from "@/hooks/useSection";
 
 /* const getAnswers = async () => {
   try {
@@ -24,7 +23,7 @@ import { useAlert } from "@/hooks/useAlert";
     }
     else
     {
-      return new Array(44).fill({q: 0, answer: ''})
+      return 
     }
   } catch (e: any) {
     return e.message;
@@ -33,46 +32,15 @@ import { useAlert } from "@/hooks/useAlert";
 
 export default function Sections() {
   
-  const {
-    section1Count,
-    setSection1Count,
-    section2Count,
-    setSection2Count,
-    section3Count,
-    setSection3Count,
-    section4Count,
-    setSection4Count,
-    selectedSection,
-  } = useSurveyStore((state) => state);
-
-  //const [loaded, setLoaded] = useState<boolean>(false)
-  const { answers, getQuestionsCount } = useAnswers();
+  const {reset} = useSurveyStore();
+  const {section} = useSection();
+  const { answers } = useAnswers();
   const {isConnected} = useNetInfo();
   const { openAlert, Alert } = useAlert();
-  const {clear, user, token} =  useUserStore();
+  const {resetUserState, user, token} =  useUserStore();
   const router = useRouter();
 
-  useEffect(() => {
-    //console.log(`loaded: ${loaded}`);
-    //if (loaded) {
-      if(selectedSection === 1 || selectedSection == 5) setSection1Count(getQuestionsCount(1));
-      if(selectedSection === 2 || selectedSection == 5) setSection2Count(getQuestionsCount(2));
-      if(selectedSection === 3 || selectedSection == 5) setSection3Count(getQuestionsCount(3));
-      if(selectedSection === 4 || selectedSection == 5) setSection4Count(getQuestionsCount(4));
-    //}
-  }, [answers.current?.length]);
 
-/*   const initialize = async () => {
-    const val = await getAnswers();
-    answers.current = val;
-    setLoaded(true);
-  }
-
-  useEffect(()=> {initialize()}, [])
-
-  if (!loaded) {
-    return <Loader size="large" color="blue" />;
-  } */
   
 
   const logout = async () => {
@@ -88,7 +56,9 @@ export default function Sections() {
         });
         
         
-        await AsyncStorage.multiRemove(["user", "token", "answers"], clear)
+        await AsyncStorage.multiRemove(["user", "token", "answers"])
+        reset();
+        resetUserState();
         router.replace("/login");
 
 
@@ -145,7 +115,7 @@ export default function Sections() {
     >
       <Alert/>
       <Pressable style={styles.close} onPress={logout}>
-        <Ionicons name="close-outline" size={height * 0.034} color="#565555" />
+        <Text style={styles.paragraph}>Logout</Text>
       </Pressable>
 
       <View style={styles.main}>
@@ -158,26 +128,26 @@ export default function Sections() {
             section={1}
             gradient1="rgba(221, 246, 255, 0.8)"
             gradient2="rgba(234, 255, 239, 0.8)"
-            questionsCompleted={section1Count}
+            questionsCompleted={section.one}
           />
 
           <Section
             section={2}
             gradient1="rgba(255, 242, 219, 0.8)"
             gradient2="rgba(255, 219, 247, 0.8)"
-            questionsCompleted={section2Count}
+            questionsCompleted={section.two}
           />
           <Section
             section={3}
             gradient1="rgba(221, 254, 255, 0.8)"
             gradient2="rgba(255, 234, 234, 0.8)"
-            questionsCompleted={section3Count}
+            questionsCompleted={section.three}
           />
           <Section
             section={4}
             gradient1="rgba(255, 251, 221, 0.8)"
             gradient2="rgba(255, 219, 219, 0.8)"
-            questionsCompleted={section4Count}
+            questionsCompleted={section.four}
           />
         </View>
         {user?.isSurveyCompleted && <Pressable
@@ -219,6 +189,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginVertical: height * 0.0257,
     alignSelf: "flex-start",
+    padding: height *0.01
   },
 
   main: {
