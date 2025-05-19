@@ -8,7 +8,7 @@ import { height } from "./_layout";
 import { useSurveyStore } from "@/hooks/useStore";
 import useAnswers from "@/hooks/useAnswers";
 import { useUserStore } from "@/hooks/useStore";
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";
@@ -109,6 +109,8 @@ export default function Sections() {
     
   }
 
+
+  if(!token) return <Redirect href="/login"/>
   
   return (
     <LinearGradient

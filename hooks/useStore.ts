@@ -81,12 +81,12 @@ export const useUserStore = create<UserState>()((set, get) => ({
   setToken: (token) => set(() => ({ token: token })),
   initializeUser: async (userToSet: User, tokenToSet: string)  => {
     
+    
     const { initializeAnswers, answers } = useAnswers();
     const { setUser, setToken } = get();
     //get answers from local storage
     const temp = await AsyncStorage.getItem("answers");
     //if answers dont exist in local storage
-
     if(temp===null) {
       //check if answers are stored in questions array of user
       if(userToSet.questions?.length)
@@ -95,11 +95,13 @@ export const useUserStore = create<UserState>()((set, get) => ({
         //if so then initiliaze the answers ref using questions array of user object
         initializeAnswers(userToSet.questions)
       } else {
+         
         //user is new to the app so create an empty array and initialize the answersRef
         initializeAnswers(new Array(44).fill({q: 0, answer: ''}));
       }
       
     } else {
+      
       //if answers already exist in the local storage just initialize the answers ref using that
       initializeAnswers(JSON.parse(temp))
     }

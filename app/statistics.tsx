@@ -4,11 +4,14 @@ import { height } from "./_layout";
 import { useUserStore } from "@/hooks/useStore";
 import Back from "@/components/Back";
 import LearningStyleComponent from "@/components/LearningStyle";
-import { useRouter } from "expo-router";
+import { useRouter, Redirect } from "expo-router";
 
 export default function Statistics() {
-  const { user } = useUserStore();
+  const { user, token } = useUserStore();
   const router  = useRouter();
+
+  
+  if(!token) return <Redirect href="/login"/>
 
   return (
     <View style={styles.container}>

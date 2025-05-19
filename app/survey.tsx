@@ -26,9 +26,16 @@ const animationSource = require("@/assets/images/hand.json");
 //USE OF WITHAUTH TO PROTECT ROUTE
 
 export default function Survey() {
+
+  
   //section is from 1 to 4
   const { selectedSection, getStartQuestion, setSelectedSection, setSectionsCount} =
     useSurveyStore((state) => state);
+  //in case use directly visits /survey route
+  if(selectedSection===5) {
+    return (<Redirect href="/sections"/>)
+  }
+
   const {section} = useSection();
   const { openAlert, Alert } = useAlert();
   const { isConnected } = useNetInfo();
@@ -203,9 +210,9 @@ export default function Survey() {
     }
   };
 
-  if(selectedSection===5) {
-    return (<Redirect href="/sections"/>)
-  }
+  if(!token) return <Redirect href="/login"/>
+
+  
 
   return (
     <View

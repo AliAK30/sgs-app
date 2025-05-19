@@ -126,9 +126,11 @@ export default function RootLayout() {
   }, [loaded, isUserLoaded]);
 
   const initialize = async () => {
+    
     try {
       const newUser = await AsyncStorage.getItem("user");
       if (newUser) {
+        
         const tok = await AsyncStorage.getItem("token");
         await initializeUser(JSON.parse(newUser), tok ? tok : "");
         setSectionsCount();
