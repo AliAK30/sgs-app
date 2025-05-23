@@ -37,7 +37,7 @@ export default function Sections() {
   const { answers } = useAnswers();
   const {isConnected} = useNetInfo();
   const { openAlert, Alert } = useAlert();
-  const {resetUserState, user, token} =  useUserStore();
+  const {resetUserState, user, token, setUser} =  useUserStore();
   const router = useRouter();
 
 
@@ -59,6 +59,7 @@ export default function Sections() {
         await AsyncStorage.multiRemove(["user", "token", "answers"])
         reset();
         resetUserState();
+        setUser({role: 'student'});
         router.replace("/login");
 
 
