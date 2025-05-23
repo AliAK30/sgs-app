@@ -516,6 +516,8 @@ export default function Registration() {
       </LinearGradient>
     </ScrollView>
   );
+
+  return <Redirect href="/sections"/>;
 }
 
 const styles = StyleSheet.create({
