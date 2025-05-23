@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Section from "@/components/Section";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { height } from "./_layout";
+import { height } from "../_layout";
 import { useSurveyStore } from "@/hooks/useStore";
 import useAnswers from "@/hooks/useAnswers";
 import { useUserStore } from "@/hooks/useStore";
@@ -39,8 +39,7 @@ export default function Sections() {
   const { openAlert, Alert } = useAlert();
   const {resetUserState, user, token} =  useUserStore();
   const router = useRouter();
-
-
+  
   
 
   const logout = async () => {
@@ -108,9 +107,6 @@ export default function Sections() {
     } 
     
   }
-
-
-  if(!token) return <Redirect href="/login"/>
   
   return (
     <LinearGradient
@@ -156,23 +152,7 @@ export default function Sections() {
             questionsCompleted={section.four}
           />
         </View>
-        {user?.isSurveyCompleted && <Pressable
-                  style={[
-                    styles.button,
-                    { backgroundColor: "#007BFF" },
-                  ]}
-                  onPress={()=>router.replace("/statistics")}
-                >
-              
-                    <Text
-                      style={{
-                        fontFamily: "Inter_600SemiBold",
-                        color: "#ffffff",
-                        fontSize: height * 0.0196,
-                        textAlign: "center",
-                      }}
-                    >MY LEARNING STYLE</Text>
-                </Pressable> }
+        
         
       </View>
     </LinearGradient>

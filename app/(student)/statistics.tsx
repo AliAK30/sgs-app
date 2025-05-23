@@ -1,17 +1,16 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet } from "react-native";
-import { height } from "./_layout";
+import { height } from "../_layout";
 import { useUserStore } from "@/hooks/useStore";
 import Back from "@/components/Back";
 import LearningStyleComponent from "@/components/LearningStyle";
-import { useRouter, Redirect } from "expo-router";
+import { useRouter } from "expo-router";
 
 export default function Statistics() {
-  const { user, token } = useUserStore();
+  const { user } = useUserStore();
   const router  = useRouter();
 
-  
-  if(!token) return <Redirect href="/login"/>
+
 
   return (
     <View style={styles.container}>

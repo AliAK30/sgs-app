@@ -100,7 +100,7 @@ export default function Login() {
         //await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
         await initializeUser(res.data.user, res.data.token);
         setSectionsCount();
-        router.replace("/sections");
+        router.replace("/(student)");
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;

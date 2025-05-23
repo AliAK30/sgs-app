@@ -11,7 +11,7 @@ export default function Index() {
   
   //if(user?.isSurveyCompleted) return (<Redirect href="/statistics"/>)
 
-  if(token) return (<Redirect href="/sections"/>)
+  if(token) return (<Redirect href="/(student)"/>)
 
   return (<Redirect href="/login"/>)
 }

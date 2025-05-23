@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
-import "react-native-reanimated";
+//import "react-native-reanimated";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
@@ -28,7 +28,7 @@ import * as NavigationBar from "expo-navigation-bar"
 
 const dims = Dimensions.get("window");
 export const height = dims.height;
-export const width = dims.width>624 ? 624 : dims.width
+export const width = dims.width>480 ? 480 : dims.width
 export const fontScale = dims.fontScale;
 export const scale = dims.scale
 export const base_height = 817
