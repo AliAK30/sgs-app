@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
-import { useRouter, Link } from "expo-router";
+import { useRouter, Link, Redirect } from "expo-router";
 import { height, OS } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,6 +21,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import OTPInput from "@/components/OTPInput";
 import { EyeIcon, WarnIcon } from "@/components/Icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUserStore } from "@/hooks/useStore";
 
 const emailSchema = yup.object().shape({
   email: yup
@@ -55,6 +56,7 @@ const initialTime = 10 * 60; //10 minutes for otp expiration
 
 export default function PasswordReset() {
 
+  const {token} = useUserStore();
   const insets = useSafeAreaInsets();
   const { openAlert, Alert } = useAlert();
   const { openBanner, Banner } = useBanner();
@@ -410,6 +412,8 @@ export default function PasswordReset() {
       router.replace('/login');
     }
   }
+
+  if(token) return <Redirect href="/sections"/>
 
   if (otpVerfied.current) {
     return (

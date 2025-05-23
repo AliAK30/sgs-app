@@ -5,7 +5,7 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
-import { useRouter, Link } from "expo-router";
+import { useRouter, Link, Redirect } from "expo-router";
 import { height, width, OS, w } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -99,7 +99,7 @@ export default function Registration() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(2025, 1, 1));
-  const { user, setUser } = useUserStore();
+  const { user, setUser, token } = useUserStore();
   const [openToS, setOpenToS] = useState<boolean>(false); //Terms of Service
   const [openPP, setOpenPP] = useState<boolean>(false); // Privacy Policy
   const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
@@ -296,6 +296,9 @@ export default function Registration() {
     }
   };
 
+   
+
+  if(!token)
   return (
     <ScrollView
       //style={{flex:1}}
@@ -861,6 +864,8 @@ export default function Registration() {
       </LinearGradient>
     </ScrollView>
   );
+
+  return <Redirect href="/sections"/>;
 }
 
 const styles = StyleSheet.create({
