@@ -163,5 +163,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     width: width,
     alignSelf: 'center',
+    
   },
 });

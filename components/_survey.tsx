@@ -4,7 +4,7 @@ import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { questions } from "@/constants/Questions";
-import { height } from "../_layout";
+import { height } from "@/app/_layout";
 import { Link } from "expo-router";
 import { useSurveyStore } from "@/hooks/useStore";
 import LottieView from "lottie-react-native";

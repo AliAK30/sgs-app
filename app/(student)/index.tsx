@@ -1,18 +1,26 @@
 import { View, Text, TextInput } from "@/components/Themed";
-import { StyleSheet, ScrollView, } from "react-native";
+import { StyleSheet, ScrollView, Pressable, } from "react-native";
 import { useUserStore } from "@/hooks/useStore";
+import { useState } from "react";
 import { Image } from "expo-image";
+import SearchResult from "@/components/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import {w, h, width, OS} from "../_layout"
+import { router, useRouter } from "expo-router";
 
 
 
 
 export default function Index() {
 
+    const [click, setClick] = useState<boolean>(false);
+    const router = useRouter();
     const {user} = useUserStore();
+    const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
     
+    if(click)
+        return (<SearchResult value={value} click={click} setValue={setValue} setClick={setClick}/>);
   return (
     <ScrollView 
     automaticallyAdjustKeyboardInsets={true}
@@ -25,14 +33,14 @@ export default function Index() {
             <Text style={styles.title}>Welcome {user?.first_name} 👋</Text>
             <Text style={styles.belowTitle}>Connect, Collaborate, Learn in your style!</Text>
             </View>
-            <Image source={imgSource} style={{width:h*26+w*26, height:h*26+w*26}}/>
+            <Image source={imgSource} style={{width:h*26+w*26, height:h*26+w*26, borderRadius:'100%'}}/>
             
             
         </View>
         <View style={{flexDirection:'row', columnGap:w*8}}>
             <View style={styles.searchView}>
-                <TextInput style={styles.search} placeholder="Search a student by name.." inputMode="text" placeholderTextColor="#85878D"/>
-                <Feather name="search" color="black" size={19}/>
+                <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
+                <Pressable onPress={()=>setClick(true)}><Feather name="search" color="black" size={19}/></Pressable>
             </View>
             <View style={styles.bell}>
                 <Ionicons name="notifications-outline" color="black" size={19}/>

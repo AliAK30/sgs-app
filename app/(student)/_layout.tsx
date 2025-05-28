@@ -78,13 +78,13 @@ export default function StudentLayout() {
           }}
         />
         <Tabs.Screen
-          name="survey"
+          name="peers"
           options={{
             title: "Peers",
             tabBarIcon: ({ color }) => (
               <Feather size={iconSize} name="users" color={color} />
             ),
-            tabBarItemStyle: focusedTab === "survey" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
+            tabBarItemStyle: focusedTab === "peers" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
           }}
         />
         <Tabs.Screen

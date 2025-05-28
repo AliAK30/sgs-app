@@ -25,7 +25,7 @@ export default function Section({
 
   const onPress = () => {
     setSelectedSection(section);
-    router.navigate("/(student)/survey");
+    //router.navigate("/(student)/survey");
   }
   
 

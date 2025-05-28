@@ -46,6 +46,7 @@ export type User = {
     phone_number: number,
     gpa: number,
     learning_style: number,
+    dob: number,
   };
   push_notifications?: boolean;
 
