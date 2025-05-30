@@ -5,8 +5,8 @@ import { useState } from "react";
 import { Image } from "expo-image";
 import SearchResult from "@/components/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import {w, h, width, OS} from "../_layout"
-import { router, useRouter } from "expo-router";
+import {w, h,} from "../_layout"
+import { useRouter } from "expo-router";
 
 
 
@@ -14,13 +14,14 @@ import { router, useRouter } from "expo-router";
 export default function Index() {
 
     const [click, setClick] = useState<boolean>(false);
+    const [fetching, setFetching] = useState<boolean>(false)
     const router = useRouter();
     const {user} = useUserStore();
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
     
     if(click)
-        return (<SearchResult value={value} click={click} setValue={setValue} setClick={setClick}/>);
+        return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
   return (
     <ScrollView 
     automaticallyAdjustKeyboardInsets={true}
@@ -40,7 +41,7 @@ export default function Index() {
         <View style={{flexDirection:'row', columnGap:w*8}}>
             <View style={styles.searchView}>
                 <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
-                <Pressable onPress={()=>setClick(true)}><Feather name="search" color="black" size={19}/></Pressable>
+                <Pressable onPress={()=>{setFetching(true); setClick(true);}} hitSlop={15}><Feather name="search" color="black" size={19}/></Pressable>
             </View>
             <View style={styles.bell}>
                 <Ionicons name="notifications-outline" color="black" size={19}/>

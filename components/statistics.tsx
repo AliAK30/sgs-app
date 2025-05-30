@@ -1,6 +1,6 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet } from "react-native";
-import { height } from "../_layout";
+import { height } from "../app/_layout";
 import { useUserStore } from "@/hooks/useStore";
 import Back from "@/components/Back";
 import LearningStyleComponent from "@/components/LearningStyle";
@@ -15,7 +15,7 @@ export default function Statistics() {
   return (
     <View style={styles.container}>
       
-        <Back onPress={()=>router.replace("/sections")}/>
+        
         <Text style={styles.heading}>Your Statistics</Text>
       
       

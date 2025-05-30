@@ -1,19 +1,12 @@
 import { Text, View } from "@/components/Themed";
-import { Pressable, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import Section from "@/components/Section";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { height } from "../_layout";
-import { useSurveyStore } from "@/hooks/useStore";
-import useAnswers from "@/hooks/useAnswers";
-import { useUserStore } from "@/hooks/useStore";
-import { Redirect, useRouter } from "expo-router";
-import { useNetInfo } from "@react-native-community/netinfo";
-import axios from "axios";
-import { url } from "@/constants/Server";
+import { height, h } from "../app/_layout";
 import { useAlert } from "@/hooks/useAlert";
 import useSection from "@/hooks/useSection";
+import { useSurveyStore } from "@/hooks/useStore";
+import Survey from "./survey";
 
 /* const getAnswers = async () => {
   try {
@@ -32,81 +25,13 @@ import useSection from "@/hooks/useSection";
 
 export default function Sections() {
   
-  const {reset} = useSurveyStore();
+  
   const {section} = useSection();
-  const { answers } = useAnswers();
-  const {isConnected} = useNetInfo();
-  const { openAlert, Alert } = useAlert();
-  const {resetUserState, user, token} =  useUserStore();
-  const router = useRouter();
-  
+  const { Alert } = useAlert();
+  const selectedSection = useSurveyStore(state=>state.selectedSection) 
   
 
-  const logout = async () => {
-    try {
-      if (isConnected) {
-        if(!user?.isSurveyCompleted)
-        await axios.patch(`${url}/student/update/questions`, {answers: answers.current, isSurveyCompleted: false}, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          timeout: 1000 * 15,
-        });
-        
-        
-        await AsyncStorage.multiRemove(["user", "token", "answers"])
-        reset();
-        resetUserState();
-        router.replace("/login");
-
-
-      } else {
-        openAlert("fail", "Failed!", "No Internet Connection!");
-        return;
-      }
-    } catch (e: any) {
-      if (!e.status) {
-        switch (e.code) {
-          case "ECONNABORTED":
-            openAlert("fail", "Failed!", "Request TImed out\nPlease try again later!");
-            return;
-
-          case "ERR_NETWORK":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Server is not Responding\nPlease try again later!"
-            );
-            return;
-        }
-      }
-
-      if (e.status === 400) {
-        switch (e.response.data.code) {
-
-          case "VALIDATION_ERROR":
-            openAlert("fail", "Failed!", e.response.data.message);
-            return;
-
-          case "RESUBMISSION":
-            openAlert("info", "Already Submitted!", e.response.data.message);
-            return;
-        }
-      }
-
-      if(e.status === 429)
-      {
-        openAlert("fail", "Error", e.response.data.message);
-      }
-
-      if (e.status === 500) {
-        openAlert("fail", "Failed!", e.message);
-        return;
-      }
-    } 
-    
-  }
+  if(selectedSection!==5) return <Survey/>
   
   return (
     <LinearGradient
@@ -116,9 +41,7 @@ export default function Sections() {
       style={styles.container}
     >
       <Alert/>
-      <Pressable style={styles.close} onPress={logout}>
-        <Text style={styles.paragraph}>Logout</Text>
-      </Pressable>
+      
 
       <View style={styles.main}>
         <Text style={styles.heading}>Questions</Text>
@@ -166,7 +89,8 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     paddingHorizontal: height * 0.024,
-    alignSelf:'center'
+    alignSelf:'center',
+    paddingVertical:h*20
   },
 
   close: {

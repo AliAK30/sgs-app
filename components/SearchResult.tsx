@@ -3,8 +3,8 @@ import { FlatList, Pressable, StyleSheet, ActivityIndicator } from "react-native
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
 import Back from "./Back";
-import { useState, useEffect, memo } from "react";
-import { Redirect, useRouter } from "expo-router";
+import { useState, useEffect,useMemo, useRef, useCallback } from "react";
+import { useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";
@@ -12,11 +12,13 @@ import { useAlert } from "@/hooks/useAlert";
 import { useUserStore } from "@/hooks/useStore";
 import { h, w } from "@/app/_layout";
 import { User } from "@/types";
+import debounce from 'lodash/debounce';
 import Peer from "./Peer";
 
 type Props = {
   value: string;
-  click: boolean;
+  fetching: boolean;
+  setFetching: React.Dispatch<React.SetStateAction<boolean>>;
   setClick: React.Dispatch<React.SetStateAction<boolean>>;
   setValue: React.Dispatch<React.SetStateAction<string>>;
 };
@@ -24,52 +26,61 @@ type Props = {
 type ExtendedUser = { full_name: string } & User;
 
 function Seperator() {
-  return(
-    <View style={{paddingVertical:h*4}}>
-
-    </View>
-  )
+  return <View style={{paddingVertical:h*6}}></View>
 }
 
 function Header({text}: any) {
-  return (
-    <Text style={styles.friends}>{text}</Text>
-  )
+  return <Text style={styles.friends}>{text}</Text>
 }
 
 function SearchResult({
   value,
-  click,
   setClick,
   setValue,
+  fetching, setFetching
 }: Props) {
-  const [results, setResults] = useState<Array<ExtendedUser>>();
-  const [fetching, setFetching] = useState<boolean>(false)
+
+  const [results, setResults] = useState<Array<ExtendedUser>>([]);
+  
+  const [fetchingMore, setFetchingMore] = useState<boolean>(false);
   const { Alert, openAlert } = useAlert();
-  const router = useRouter();
   const { isConnected } = useNetInfo();
   const { token } = useUserStore();
+  const page = useRef<number>(1);
+  const hasMore = useRef<boolean>(true);
+  const totalCount = useRef<number>(0);
 
-  useEffect(() => {
-    fetchStudents(value);
-  }, [value]);
-
-  const fetchStudents = async (name: string) => {
+  const fetchStudents = useCallback(async (name: string, pageNum: number) => {
     try {
-      if (isConnected === null || isConnected) {
-        if (name.trim().length > 1) {
-          setFetching(true);
+      
+      if (isConnected || isConnected===null) {
+        if (name.trim().length >= 1) {
+          
+          if (pageNum === 1) {
+            setFetching(true);
+          } else {
+            setFetchingMore(true);
+          }
+
           const res: any = await axios.get(`${url}/student/search`, {
-            params: { name },
+            params: { name, page: pageNum },
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
             timeout: 1000 * 25,
           });
+
+          hasMore.current = res.data.hasMore;
+          page.current = res.data.currentPage+1;
           
-          setResults(res.data);
-          
+          if (pageNum === 1) {
+            totalCount.current = res.data.totalCount
+            setResults(res.data.students);
+          } else {
+            setResults(prev => [...prev, ...res.data.students]);
+          }
+
         }
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
@@ -104,7 +115,53 @@ function SearchResult({
         return;
       }
     } finally {
-      setFetching(false)
+      if (pageNum === 1) {
+          setFetching(false);
+        } else {
+          setFetchingMore(false);
+        }
+    }
+  }, [isConnected, token]);
+
+
+  const debouncedFetch = useMemo(() => debounce((val: string) => {
+  page.current = 1;
+  hasMore.current = true;
+  totalCount.current = 0;
+  fetchStudents(val, 1);
+}, 400), [fetchStudents]);
+
+    /* useEffect(() => {
+    console.log("Fetching updated to:", fetching);
+  }, [fetching]);
+ */
+  useEffect(() => {
+    
+    if(isConnected || isConnected === false)
+    {
+      if (value.trim() === "") {
+      page.current = 1;
+      hasMore.current = true;
+      totalCount.current = 0;
+      setResults([]);
+      } else {
+        debouncedFetch(value);
+      }
+    } 
+  
+  return () => {
+    debouncedFetch.cancel(); // clean up on unmount or change
+  };
+
+}, [value, isConnected]);
+
+  
+
+  const handleEndReached = () => {
+    if (hasMore.current && !fetchingMore) {
+      
+      fetchStudents(value, page.current);
+      return;
     }
   };
   
@@ -116,6 +173,7 @@ function SearchResult({
         locations={[0.15, 0.35]}
         style={styles.container}
       >
+        
         <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
           <Back onPress={() => setClick(false)} />
           <Text style={styles.title}>Search Results</Text>
@@ -130,15 +188,17 @@ function SearchResult({
             inputMode="text"
             placeholderTextColor="#85878D"
           />
-          <Pressable onPress={() => fetchStudents(value)}>
+          <Pressable onPress={() => { debouncedFetch.cancel(); page.current = 1; 
+          hasMore.current = true; fetchStudents(value, page.current); 
+          }}>
             <Feather name="search" color="black" size={19} />
           </Pressable>
         </View>
 
         
-        {!isConnected ? (
+        {isConnected===false ? (
           <Text style={styles.notfound}>No Internet Connection</Text>
-        ) : fetching ? <ActivityIndicator size="large" color="grey"/> : results?.length ? (
+        ) : fetching ? <View style={{flex:1, justifyContent:'center'}}><ActivityIndicator size="large" color="grey"/></View> : 
           <FlatList
             data={results}
             renderItem={({ item }) => (
@@ -151,19 +211,21 @@ function SearchResult({
             )}
             keyExtractor={(item, index)=>item?._id ?? ""}
             ItemSeparatorComponent={Seperator}
-            ListHeaderComponent={<Header text={`Total Results (${results?.length ?? 0})`}/>}
-            ListFooterComponent={Seperator}
+            ListHeaderComponent={<Header text={`Total Results (${totalCount.current})`}/>}
+            ListFooterComponent={fetchingMore ? <ActivityIndicator size="small" color="gray" style={{paddingTop:h*15}}/> : <Seperator/>}
+            onEndReached={handleEndReached}
+            onEndReachedThreshold={0.01}
+            ListEmptyComponent={<Text style={styles.notfound}>No students found</Text>}
           />
-        ) : (
-          <Text style={styles.notfound}>No students found</Text>
-        )}
-
+       }
+       
+      
       </LinearGradient>
     </View>
   );
 }
 
-export default memo(SearchResult, (prevProps, nextProps)=>prevProps.value === nextProps.value)
+export default SearchResult;
 
 const styles = StyleSheet.create({
   container: {

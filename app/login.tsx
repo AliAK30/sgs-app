@@ -146,7 +146,7 @@ export default function Login() {
     }
   };
   
-  if(!token)
+  
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
@@ -274,7 +274,6 @@ export default function Login() {
     </ScrollView>
   );
 
-  return <Redirect href="/sections" />;
 }
 
 

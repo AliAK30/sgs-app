@@ -58,7 +58,7 @@ export default function StudentLayout() {
           }}
         />
         <Tabs.Screen
-          name="sections"
+          name="groups"
           options={{
             title: "Groups",
             tabBarIcon: ({ color }) => (
@@ -68,7 +68,7 @@ export default function StudentLayout() {
           }}
         />
         <Tabs.Screen
-          name="statistics"
+          name="analytics"
           options={{
             title: "Analytics",
             tabBarIcon: ({ color }) => (

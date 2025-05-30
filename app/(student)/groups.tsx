@@ -10,12 +10,12 @@ import { useAlert } from "@/hooks/useAlert";
 import {h, w} from '../_layout'
 
 
-export default function Peers() {
+export default function Groups() {
   
   const {Alert} = useAlert()
   const router = useRouter();
   
-  const friends = 1;
+  const groups = 1;
 
   
   return (
@@ -27,14 +27,14 @@ export default function Peers() {
       style={styles.container}
     >
       <Alert/>
-      <Text style={styles.title}>Your Peers</Text>
+      <Text style={styles.title}>Your Groups</Text>
       <View style={styles.searchView}>
-        <TextInput style={styles.search} placeholder="Search your peers" inputMode="text" placeholderTextColor="#85878D"/>
+        <TextInput style={styles.search} placeholder="Search your groups" inputMode="text" placeholderTextColor="#85878D"/>
         <Feather name="search" color="black" size={19}/>
         <Pressable><Feather name="search" color="black" size={19}/></Pressable>
     </View>
 
-    <Text style={styles.friends}>Total Friends ({friends})</Text>
+    <Text style={styles.friends}>Total Groups ({groups})</Text>
     </LinearGradient>
     </View>
   );

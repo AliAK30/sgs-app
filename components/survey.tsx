@@ -1,10 +1,10 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet, Pressable, ActivityIndicator } from "react-native";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { questions } from "@/constants/Questions";
-import { height } from "@/app/_layout";
+import { height, h } from "@/app/_layout";
 import { Link } from "expo-router";
 import { useSurveyStore } from "@/hooks/useStore";
 import LottieView from "lottie-react-native";
@@ -17,10 +17,9 @@ import { useRouter } from "expo-router";
 import { useUserStore } from "@/hooks/useStore";
 import axios from "axios";
 import Back from "@/components/Back";
-
 import { Redirect } from "expo-router";
 import useSection from "@/hooks/useSection";
-
+import { Answer } from "@/types";
 const animationSource = require("@/assets/images/hand.json");
 
 //USE OF WITHAUTH TO PROTECT ROUTE
@@ -31,10 +30,7 @@ export default function Survey() {
   //section is from 1 to 4
   const { selectedSection, getStartQuestion, setSelectedSection, setSectionsCount} =
     useSurveyStore((state) => state);
-  //in case use directly visits /survey route
-  if(selectedSection===5) {
-    return (<Redirect href="/sections"/>)
-  }
+  
 
   const {section} = useSection();
   const { openAlert, Alert } = useAlert();
@@ -49,12 +45,19 @@ export default function Survey() {
   const [count, setCount] = useState(startQuestion + 1);
   // used to record answers
   const { answers, updateAnswersRef, getAnswersRef } = useAnswers();
-
+  // used to check for changes in the answer ref
+  const checksumRef = useRef({hash: 0, index:0}); 
   //numbering questions from 1 to 44, so total 44
   const realQuestionCount = (selectedSection - 1) * 11 + count;
   const [answer, setAnswer] = useState<string>(
     getAnswersRef(realQuestionCount - 1)
   );
+
+
+  useEffect(()=>{
+    console.log(`It ran ${checksumRef.current.hash} and index ${checksumRef.current.index}`);
+    answers.current && updateQuestion([answers.current[checksumRef.current.index]]);
+  }, [checksumRef.current.hash])
 
 /*   const animationRef = useRef<LottieView>(null);
 
@@ -72,7 +75,7 @@ export default function Survey() {
         updateAnswersRef(realQuestionCount - 1, {
           q: realQuestionCount,
           answer: answer,
-        });
+        }, checksumRef);
         setSectionsCount();
         await AsyncStorage.setItem("answers", JSON.stringify(answers.current));
         
@@ -120,6 +123,24 @@ export default function Survey() {
     }
   };
 
+  const updateQuestion = async (oneAnswer: Array<Answer>) => {
+    try {
+      if (isConnected) {
+        
+        await axios.patch(`${url}/student/update/questions`, {answers: oneAnswer, isSurveyCompleted: false}, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        timeout: 1000 * 15,
+        });
+        console.log('done')
+      } 
+    } catch (e: any) {
+      console.log(e);
+    } 
+  }
+
   const submit = async () => {
     setIsSubmitting(true);
     try {
@@ -147,8 +168,8 @@ export default function Survey() {
             "Submission Successful!",
             `Thanks for submitting! You will now see your learning style`
           );
-          router.replace("/statistics");
-          //update the user state
+          
+          //update the user state so statistics screen is displayed
           if (token){
             setUser(res.data.student);
             await AsyncStorage.setItem("user", JSON.stringify(res.data.student));
@@ -223,9 +244,11 @@ export default function Survey() {
       ]}
     >
       <Alert />
-      <Link href="/sections" asChild>
-        <Back/>
-      </Link>
+        <View style={{paddingVertical:h*10, marginBottom:h*15}}>
+          <Back onPress={()=>setSelectedSection(5)}/>
+        </View>
+        
+      
 
       <Text style={styles.heading}>Section {selectedSection}</Text>
 

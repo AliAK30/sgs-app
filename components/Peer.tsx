@@ -19,6 +19,44 @@ type Props = {
   picture?: string;
 };
 
+/* 
+// Keep second-to-last name as-is (with proper case)
+else if (index === nameParts.length - 2) {
+  return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+}
+// Last name - capitalize first letter only
+else {
+  return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+}
+*/
+
+function formatName(fullName: string): string {
+  if (!fullName || typeof fullName !== 'string') {
+    return fullName;
+  }
+
+  // Trim and split the name into parts
+  const nameParts = fullName.trim().split(' ');
+  // split by one or more spaces use split(/\s+/) 
+  
+  // If there are less than 3 parts, return as-is
+  if (nameParts.length < 3) {
+    return fullName;
+  }
+
+  // Process all parts
+  const formattedParts = nameParts.map((part, index) => {
+    // Abbreviate all except last two names
+    if (index < nameParts.length - 2) {
+      return `${part.charAt(0).toUpperCase()}.`;
+    }
+    return part;
+  });
+
+  return formattedParts.join(' ');
+}
+
+
 export default function Peer({ id, full_name, uni_name, picture }: Props) {
 
     const [openProfile, setOpenProfile] = useState<boolean>(false);
@@ -33,13 +71,11 @@ export default function Peer({ id, full_name, uni_name, picture }: Props) {
     >
         {openProfile && <Profile openProfile={openProfile} setOpenProfile={setOpenProfile} id={id ?? "1"}/>}
         <Pressable onPress={()=>setOpenProfile(true)}><Image source={imgSource} style={{width:h*30+w*30, height:h*30+w*30, borderRadius:"100%"}}/></Pressable>
-        <View style={{rowGap:h*2}}>
-            <Text style={styles.name}>{full_name}</Text>
+        <View style={{rowGap:h*6, flex:1}}>
+            <View style={{paddingBottom:h*4,borderBottomWidth:0.5, borderColor:'#FFFFFF', alignSelf:'flex-start'}}>
+            <Text style={styles.name}>{formatName(full_name)}</Text>
             <Text style={styles.uni_name}>{uni_name}</Text>
-            <View style={{paddingTop:h*2,borderBottomWidth:0.5, borderColor:'#FFFFFF'}}></View>
-        </View>
-        <View style={{justifyContent:'flex-end', flex:1}}>
-
+            </View>
         
         <Pressable style={styles.addFriendButton}>
             <Text style={styles.add}>Add to Peers</Text>

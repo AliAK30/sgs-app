@@ -12,8 +12,16 @@ const initializeAnswers = (data: Array<Answer>|undefined) => {
 }
 
 // Provide a way to update the ref
-const updateAnswersRef = (index: number, answer: Answer) => {
-  if (answers.current) answers.current[index] = answer;
+const updateAnswersRef = (index: number, answer: Answer, ref:React.RefObject<{
+    hash: number;
+    index: number;
+}>) => {
+  if (answers.current && answers.current[index].answer !== answer.answer) 
+  {
+    ref.current.hash += 1;
+    ref.current.index = index;
+    answers.current[index] = answer;
+  }
 };
 
 const getAnswersRef = (index: number): string => {

@@ -82,29 +82,33 @@ export const useUserStore = create<UserState>()((set, get) => ({
   initializeUser: async (userToSet: User, tokenToSet: string)  => {
     
     
-    const { initializeAnswers, answers } = useAnswers();
+    const { initializeAnswers } = useAnswers();
     const { setUser, setToken } = get();
-    //get answers from local storage
-    const temp = await AsyncStorage.getItem("answers");
+    //get answers from local storage if user has not completed survey
+    if(!userToSet.isSurveyCompleted)
+    {
+      const temp = await AsyncStorage.getItem("answers");
     //if answers dont exist in local storage
-    if(temp===null) {
-      //check if answers are stored in questions array of user
-      if(userToSet.questions?.length)
-      {
+      if(temp===null) {
+        //check if answers are stored in questions array of user
+        if(userToSet.questions?.length)
+        {
+          
+          //if so then initiliaze the answers ref using questions array of user object
+          initializeAnswers(userToSet.questions)
+        } else {
+          
+          //user is new to the app so create an empty array and initialize the answersRef
+          initializeAnswers(new Array(44).fill({q: 0, answer: ''}));
+        }
         
-        //if so then initiliaze the answers ref using questions array of user object
-        initializeAnswers(userToSet.questions)
-      } else {
-         
-        //user is new to the app so create an empty array and initialize the answersRef
-        initializeAnswers(new Array(44).fill({q: 0, answer: ''}));
-      }
-      
-    } else {
-      
-      //if answers already exist in the local storage just initialize the answers ref using that
-      initializeAnswers(JSON.parse(temp))
+        } else {
+          
+          //if answers already exist in the local storage just initialize the answers ref using that
+          initializeAnswers(JSON.parse(temp))
+        }
     }
+    
     
     await AsyncStorage.setItem("user", JSON.stringify(userToSet));
     await AsyncStorage.setItem("token", tokenToSet);

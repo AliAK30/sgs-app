@@ -198,7 +198,7 @@ function Profile({openProfile, setOpenProfile, id}: Props) {
         animationOut="fadeOut"
         >
             <Alert/>
-            <View style={styles.container}>
+            <View style={[styles.container, {justifyContent: fetching ? 'center': 'flex-start'}]}>
                 {fetching ? <ActivityIndicator size="large" color="grey"/> 
                 :
                 <>
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#F5F7FA",
         borderRadius: 24,
         width:width*0.9,
-        maxHeight:height*0.69,
+        maxHeight:height*0.75,
         paddingHorizontal:w*15,
         alignSelf:'center',
         
@@ -407,7 +407,8 @@ const styles = StyleSheet.create({
         borderRadius:19,
         backgroundColor: '#F5F7FA',
         flexDirection:'row',
-        columnGap:w*5
+        columnGap:w*5,
+        alignItems:'center'
     },
 
     callText: {
@@ -425,6 +426,7 @@ const styles = StyleSheet.create({
         borderWidth:2,
         flexDirection:'row',
         columnGap:w*5,
+        alignItems:'center'
         
     },
 
