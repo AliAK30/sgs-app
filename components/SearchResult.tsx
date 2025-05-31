@@ -174,8 +174,9 @@ function SearchResult({
         style={styles.container}
       >
         
-        <View style={{ flexDirection: "row", justifyContent: "flex-start" }}>
+        
           <Back onPress={() => setClick(false)} />
+            <View style={{position:'absolute', alignSelf:'center' }}>
           <Text style={styles.title}>Search Results</Text>
         </View>
         <Alert />

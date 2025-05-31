@@ -46,7 +46,7 @@ export default function Survey() {
   // used to record answers
   const { answers, updateAnswersRef, getAnswersRef } = useAnswers();
   // used to check for changes in the answer ref
-  const checksumRef = useRef({hash: 0, index:0}); 
+  const checksumRef = useRef({hash: 0, index:-1}); 
   //numbering questions from 1 to 44, so total 44
   const realQuestionCount = (selectedSection - 1) * 11 + count;
   const [answer, setAnswer] = useState<string>(
@@ -55,8 +55,8 @@ export default function Survey() {
 
 
   useEffect(()=>{
-    console.log(`It ran ${checksumRef.current.hash} and index ${checksumRef.current.index}`);
-    answers.current && updateQuestion([answers.current[checksumRef.current.index]]);
+    if(answers.current && checksumRef.current.index>-1)
+    updateQuestion([answers.current[checksumRef.current.index]]);
   }, [checksumRef.current.hash])
 
 /*   const animationRef = useRef<LottieView>(null);
@@ -244,7 +244,7 @@ export default function Survey() {
       ]}
     >
       <Alert />
-        <View style={{paddingVertical:h*10, marginBottom:h*15}}>
+        <View style={{paddingTop:h*18, marginBottom:h*15}}>
           <Back onPress={()=>setSelectedSection(5)}/>
         </View>
         

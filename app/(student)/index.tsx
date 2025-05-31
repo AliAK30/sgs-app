@@ -7,6 +7,7 @@ import SearchResult from "@/components/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import {w, h,} from "../_layout"
 import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 
 
@@ -19,6 +20,7 @@ export default function Index() {
     const {user} = useUserStore();
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
+    const imgSource2 = require("@/assets/images/bino.svg");
     
     if(click)
         return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
@@ -47,6 +49,19 @@ export default function Index() {
                 <Ionicons name="notifications-outline" color="black" size={19}/>
             </View>
         </View>
+        <LinearGradient
+              style={{flexDirection:'row',borderRadius:20}}
+              colors={["#0B0B0B", "rgba(23, 23, 23, 0.98)", "rgba(46, 46, 46, 0.95)" ]}
+              locations={[0.17, 0.34, 0.70]}
+              start={{ x: 0.5, y: 0 }}
+            >
+                <Image source={imgSource2} style={{width:152, height:68}}/>
+                <View style={{justifyContent:'center', rowGap:h*4,}}>
+                    <Text style={styles.findTwin}>Find your Study Twin</Text>
+                    <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
+                </View>
+                    
+            </LinearGradient>
         
     </ScrollView>
   );
@@ -61,7 +76,7 @@ const styles = StyleSheet.create({
         paddingTop: h*25,
         width:"92%",
         alignSelf:'center',
-        rowGap:h*15
+        rowGap:h*20
       },
 
     title: {
@@ -97,7 +112,7 @@ const styles = StyleSheet.create({
         paddingVertical:h*10,
         paddingHorizontal:w*10,
         alignItems:'center',
-        marginRight:w*4
+        
         
     },
     search: {
@@ -108,5 +123,16 @@ const styles = StyleSheet.create({
         outlineWidth:0
     },
 
+    findTwin: {
+        color: '#ADD8E6',
+        fontFamily:'Inter_600SemiBold',
+        fontSize: 8.5*w+8.5*h,
+    },
+
+    findTwinSubText: {
+        color: "#FFFEFE",
+        fontFamily:'Inter_400Regular',
+        fontSize:5*h+5*w,
+    }
 });
 
