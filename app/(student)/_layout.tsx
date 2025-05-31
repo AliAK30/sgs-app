@@ -8,7 +8,7 @@ import { useUserStore } from "@/hooks/useStore";
 import { useState } from "react";
 
 const iconSize: number = 24;
-const gap: number = w*7;
+const gap: number = w*5;
 
 
 type TabBarButtonProps = PressableProps & {
@@ -64,7 +64,7 @@ export default function StudentLayout() {
             tabBarIcon: ({ color }) => (
               <MaterialIcons size={iconSize} name="groups" color={color} />
             ),
-            tabBarItemStyle: focusedTab === "sections" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
+            tabBarItemStyle: focusedTab === "groups" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
           }}
         />
         <Tabs.Screen
@@ -72,9 +72,9 @@ export default function StudentLayout() {
           options={{
             title: "Analytics",
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons size={iconSize} name="spider-web" color={color} />
+              <Feather size={iconSize} name="pie-chart" color={color} />
             ),
-            tabBarItemStyle: focusedTab === "statistics" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
+            tabBarItemStyle: focusedTab === "analytics" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
           }}
         />
         <Tabs.Screen
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12*h,
-    width:55,
+    width:63,
     
   },
   tabBarIcon: {
