@@ -8,22 +8,26 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import {w, h,} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import SimilarStudents from "@/components/SimilarStudents";
 
 
 
 
 export default function Index() {
 
-    const [click, setClick] = useState<boolean>(false);
+    const [click, setClick] = useState<number>(0);
     const [fetching, setFetching] = useState<boolean>(false)
     const router = useRouter();
     const {user} = useUserStore();
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
-    const imgSource2 = require("@/assets/images/bino.svg");
+    const imgSource2 = require("@/assets/images/bino.png");
     
-    if(click)
+    if(click === 1)
         return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
+
+    if(click === 2)
+        return (<SimilarStudents id={user?._id ?? ""} fetching={fetching} setFetching={setFetching} setClick={setClick}/>)
   return (
     <ScrollView 
     automaticallyAdjustKeyboardInsets={true}
@@ -43,12 +47,13 @@ export default function Index() {
         <View style={{flexDirection:'row', columnGap:w*8}}>
             <View style={styles.searchView}>
                 <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
-                <Pressable onPress={()=>{setFetching(true); setClick(true);}} hitSlop={15}><Feather name="search" color="black" size={19}/></Pressable>
+                <Pressable onPress={()=>{setFetching(true); setClick(1);}} hitSlop={15}><Feather name="search" color="black" size={19}/></Pressable>
             </View>
             <View style={styles.bell}>
                 <Ionicons name="notifications-outline" color="black" size={19}/>
             </View>
         </View>
+        <Pressable onPress={()=>setClick(2)}>
         <LinearGradient
               style={{flexDirection:'row',borderRadius:20}}
               colors={["#0B0B0B", "rgba(23, 23, 23, 0.98)", "rgba(46, 46, 46, 0.95)" ]}
@@ -61,7 +66,8 @@ export default function Index() {
                     <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
                 </View>
                     
-            </LinearGradient>
+        </LinearGradient>
+        </Pressable>
         
     </ScrollView>
   );

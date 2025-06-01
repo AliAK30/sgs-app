@@ -17,6 +17,7 @@ type Props = {
   full_name: string;
   uni_name?: string;
   picture?: string;
+  similarity?: number;
 };
 
 /* 
@@ -57,7 +58,7 @@ function formatName(fullName: string): string {
 }
 
 
-export default function Peer({ id, full_name, uni_name, picture }: Props) {
+export default function Peer({ id, full_name, uni_name, picture, similarity=-1 }: Props) {
 
     const [openProfile, setOpenProfile] = useState<boolean>(false);
     const imgSource = picture ?? require("@/assets/images/no-dp.svg");
@@ -72,11 +73,20 @@ export default function Peer({ id, full_name, uni_name, picture }: Props) {
         {openProfile && <Profile openProfile={openProfile} setOpenProfile={setOpenProfile} id={id ?? "1"}/>}
         <Pressable onPress={()=>setOpenProfile(true)}><Image source={imgSource} style={{width:h*30+w*30, height:h*30+w*30, borderRadius:"100%"}}/></Pressable>
         <View style={{rowGap:h*6, flex:1}}>
-            <View style={{paddingBottom:h*4,borderBottomWidth:0.5, borderColor:'#FFFFFF', alignSelf:'flex-start'}}>
+          <View style={{flexDirection:'row',}}>
+            <View style={{flex:2*w}}>
             <Text style={styles.name}>{formatName(full_name)}</Text>
             <Text style={styles.uni_name}>{uni_name}</Text>
             </View>
+              <View style={{flex:0.9*w, alignItems:'center'}}>
+                {similarity>-1 && 
+                <>
+                  <Text style={{fontFamily:'Inter_700Bold', fontSize:h*9+w*9, color:'#FFFFFF'}}>{similarity}%</Text>
+                  <Text style={{fontFamily:'Inter_400Regular', fontSize:h*5+w*5, color:'#FFFFFF'}}>Similarity</Text>
+                </>}
         
+              </View>
+            </View>
         <Pressable style={styles.addFriendButton}>
             <Text style={styles.add}>Add to Peers</Text>
         </Pressable>
@@ -104,6 +114,10 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontSize: 4.5 * h + 4.5 * w,
     color:'#FFFFFF',
+    borderBottomWidth:0.5,
+    borderColor:'white',
+    alignSelf:'flex-start',
+    paddingBottom:h*3,
   },
   addFriendButton: {
     backgroundColor: "#539DF3",
