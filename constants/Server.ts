@@ -1,6 +1,7 @@
-const local = "http://192.168.230.1:8080";
+const waleed = "http://192.168.230.1:8080";
+const ali = "http://192.168.0.100:8080";
 
 const server = "https://edumatch.southeastasia.cloudapp.azure.com";
 
-export const url: string = local;
+export const url: string = ali;
 
