@@ -254,7 +254,7 @@ export default function Login() {
       </Link>
 
 
-      <View style= {{ flexDirection: 'row', flex:1, padding:height*0.03, alignItems:'flex-end', alignSelf:'center'}}>
+      {user?.role==='student' && <View style= {{ flexDirection: 'row', flex:1, padding:height*0.03, alignItems:'flex-end', alignSelf:'center'}}>
               <Text style={[styles.inputLabel, {fontSize: height * 0.019}]}> Don't have an account?</Text>
               <Link href="/registration" asChild>
                 <Pressable hitSlop={20}>
@@ -269,6 +269,7 @@ export default function Login() {
                 </Pressable>
                 </Link>
               </View>
+      }
 
               </View>
     </ScrollView>

@@ -12,10 +12,8 @@ const imgSource = require("@/assets/images/guy-reads.svg");
 
 export default function Index() {
 
+  const {user, token, setUser} = useUserStore();
 
-  
-
-  const {user, token} = useUserStore();
   
   //if(user?.isSurveyCompleted) return (<Redirect href="/statistics"/>)
 
@@ -32,7 +30,7 @@ export default function Index() {
     
   return (
   <ScrollView contentContainerStyle={
-    { flexGrow: 1,
+    { flex: 1,
       justifyContent: 'center',
       alignItems:'center',
     }}>
@@ -54,7 +52,7 @@ export default function Index() {
       
       <Image
         source={image}
-        style={[styles.backgroundImg,
+        style={[styles.backgroundImg, 
         {
           width: (imgSource.width * height) / 817,
           height: (imgSource.height * height) / 817,
@@ -69,8 +67,10 @@ export default function Index() {
                   marginTop: height * 0.02,
                  },
               ]}
-              onPress={()=>router.push("/login")}
-              >
+              onPress={()=>{
+                setUser({role:'student'})
+                router.push("/login")}
+              }>
               <View style={styles.buttonContent}>
               <Image
                 source={require("@/assets/images/grad-cap.svg")}
@@ -88,7 +88,10 @@ export default function Index() {
                 styles.button,
                 { backgroundColor: "#635B92" },
               ]}
-              onPress={()=>router.push("/login")}>
+              onPress={()=>{
+                setUser({role:'admin'})
+                router.push("/login")
+              }}>
               <View style={styles.buttonContent}>
               <Image
                 source={require("@/assets/images/gear.svg")}
@@ -115,7 +118,7 @@ const styles = StyleSheet.create({
   },
   backgroundImg: {
     position: 'absolute',
-    bottom: 0,
+    bottom: -70,
     left: '10%',
     opacity: 0.65,
     resizeMode: 'contain',
