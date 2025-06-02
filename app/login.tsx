@@ -7,8 +7,8 @@ import {
 } from "react-native";
 import { Image, useImage } from "expo-image";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
-import { Redirect, useRouter, Link } from "expo-router";
-import { height, OS } from "./_layout";
+import { useRouter, Link } from "expo-router";
+import { height, h, OS} from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -20,6 +20,7 @@ import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import { useState } from "react";
 import { WarnIcon, EyeIcon } from "@/components/Icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Back from "@/components/Back";
 
 const imgSource = require("@/assets/images/edumatch.png");
 
@@ -154,6 +155,9 @@ export default function Login() {
       contentContainerStyle={{alignItems:'center', flex:1}}
     >
       <View style={styles.container}>
+        <View style={{position:'absolute', alignSelf:'flex-start', marginTop:h*20, marginLeft: OS==='web' ? 0 : height*0.024}}>
+        <Back onPress={()=>router.replace('/')}/>
+          </View>
       <Alert />
       {!image ? (
         <MyLoader w={229 * (height / 817)} h={218 * (height / 817)} />
@@ -286,7 +290,6 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: height * 0.024,
     alignItems: "center",
-    //borderWidth:3,
   },
 
   heading: {
@@ -298,8 +301,6 @@ const styles = StyleSheet.create({
 
   inputView: {
     alignSelf: "stretch",
-    //backgroundColor: 'white',
-    //paddingHorizontal: "6%",
     rowGap: height * 0.00734,
     marginTop: height * 0.0428,
   },
@@ -307,7 +308,6 @@ const styles = StyleSheet.create({
   input: {
     backgroundColor: "#ffffff",
     borderRadius: 10,
-    //width: "100%",
     fontFamily: "Inter_400Regular",
     fontSize: height * 0.0196,
     color: "rgba(0, 0, 0, 1)",

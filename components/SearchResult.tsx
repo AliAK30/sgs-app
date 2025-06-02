@@ -83,14 +83,14 @@ function SearchResult({
 
         }
       } else {
-        openAlert("fail", "Failed!", "No Internet Connection!");
+        await openAlert("fail", "Failed!", "No Internet Connection!");
         return;
       }
     } catch (e: any) {
       if (!e.status) {
         switch (e.code) {
           case "ECONNABORTED":
-            openAlert(
+            await openAlert(
               "fail",
               "Failed!",
               "Request TImed out\nPlease try again later!"
@@ -98,7 +98,7 @@ function SearchResult({
             return;
 
           case "ERR_NETWORK":
-            openAlert(
+            await openAlert(
               "fail",
               "Failed!",
               "Server is not Responding\nPlease try again later!"
@@ -108,10 +108,10 @@ function SearchResult({
       }
 
       if (e.status >= 500) {
-        openAlert("fail", "Failed!", e.message);
+        await openAlert("fail", "Failed!", e.message);
         return;
       } else {
-        openAlert("fail", "Failed!", e.response.data.message);
+        await openAlert("fail", "Failed!", e.response.data.message);
         return;
       }
     } finally {
@@ -216,7 +216,7 @@ function SearchResult({
             ListHeaderComponent={<Header text={`Total Results (${totalCount.current})`}/>}
             ListFooterComponent={fetchingMore ? <ActivityIndicator size="small" color="gray" style={{paddingTop:h*15}}/> : <Seperator/>}
             onEndReached={handleEndReached}
-            onEndReachedThreshold={0.01}
+            //onEndReachedThreshold={0.01}
             ListEmptyComponent={<Text style={styles.notfound}>No students found</Text>}
           />
        }

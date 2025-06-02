@@ -1,9 +1,8 @@
 import { Text, View, TextInput } from "@/components/Themed";
 import { FlatList, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Feather from "@expo/vector-icons/Feather";
 import Back from "./Back";
-import { useState, useEffect,useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useRef,} from "react";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";
@@ -44,7 +43,7 @@ function SimilarStudents({
   const page = useRef<number>(1);
   const hasMore = useRef<boolean>(true);
 
-  const fetchStudents = useCallback(async (pageNum: number) => {
+  const fetchStudents = async (pageNum: number) => {
     try {
       
       if (isConnected || isConnected===null) {
@@ -77,14 +76,14 @@ function SimilarStudents({
 
         
       } else {
-        openAlert("fail", "Failed!", "No Internet Connection!");
+        await openAlert("fail", "Failed!", "No Internet Connection!");
         return;
       }
     } catch (e: any) {
       if (!e.status) {
         switch (e.code) {
           case "ECONNABORTED":
-            openAlert(
+            await openAlert(
               "fail",
               "Failed!",
               "Request TImed out\nPlease try again later!"
@@ -92,7 +91,7 @@ function SimilarStudents({
             return;
 
           case "ERR_NETWORK":
-            openAlert(
+            await openAlert(
               "fail",
               "Failed!",
               "Server is not Responding\nPlease try again later!"
@@ -102,10 +101,11 @@ function SimilarStudents({
       }
 
       if (e.status >= 500) {
-        openAlert("fail", "Failed!", e.message);
+        await openAlert("fail", "Failed!", e.message);
         return;
       } else {
-        openAlert("fail", "Failed!", e.response.data.message);
+        await openAlert("fail", "Failed!", e.response.data.message);
+        setClick(0);
         return;
       }
     } finally {
@@ -115,12 +115,13 @@ function SimilarStudents({
           setFetchingMore(false);
         }
     }
-  }, [isConnected, token]);
+  }
 
   useEffect(() => {
     
     if(isConnected || isConnected===null)
     {
+      console.log("i'm called useEffect");
       page.current = 1;
       hasMore.current = true;
       fetchStudents(page.current);
@@ -131,6 +132,7 @@ function SimilarStudents({
 
   const handleEndReached = () => {
     if (hasMore.current && !fetchingMore) {
+      console.log("i'm called");
       fetchStudents(page.current);
       return;
     }
@@ -173,7 +175,7 @@ function SimilarStudents({
             ListHeaderComponent={<Header/>}
             ListFooterComponent={fetchingMore ? <ActivityIndicator size="small" color="gray" style={{paddingTop:h*15}}/> : <Seperator/>}
             onEndReached={handleEndReached}
-            onEndReachedThreshold={0.01}
+            //onEndReachedThreshold={0.01}
             ListEmptyComponent={<Text style={styles.notfound}>No students found</Text>}
           />
        }

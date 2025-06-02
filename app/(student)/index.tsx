@@ -11,7 +11,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/SimilarStudents";
 
 
-
+const imgSource2 = require("@/assets/images/bino.svg");
 
 export default function Index() {
 
@@ -21,7 +21,7 @@ export default function Index() {
     const {user} = useUserStore();
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
-    const imgSource2 = require("@/assets/images/bino.png");
+    
     
     if(click === 1)
         return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
