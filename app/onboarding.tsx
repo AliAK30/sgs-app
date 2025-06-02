@@ -5,6 +5,8 @@ import {
   ScrollView,
   Dimensions,
   Image,
+  SafeAreaView,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useState, useRef } from "react";
@@ -15,9 +17,6 @@ import NextButton from "@/components/NextButton";
 import LottieView from "lottie-react-native";
 import { w, h, width, base_height } from "../app/_layout";
 
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-const height = screenHeight;
 
 const onboardingData = [
   {
@@ -46,6 +45,9 @@ export default function onboarding() {
   const [currentPage, setCurrentPage] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
 
+  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+
   const handleNext = () => {
     if (currentPage < onboardingData.length - 1) {
       const nextPage = currentPage + 1;
@@ -69,9 +71,11 @@ export default function onboarding() {
     setCurrentPage(pageIndex);
   };
 
-  return (<View style={[styles.container, { paddingTop: insets.top }]}>
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
+      <View style={[styles.container, { paddingTop: insets.top }]}>
       <LinearGradient
-        style={styles.gradient}
+        style={[styles.gradient, { width: Platform.OS === 'web' ? '92%' : '92%' }]}
         colors={["#ADD8E6", "#EAF5F8"]}
         locations={[0.27, 1]}
       >
@@ -84,14 +88,19 @@ export default function onboarding() {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           style={styles.scrollView}
+          contentContainerStyle={{ alignItems: 'center', minHeight: screenHeight * 0.85 }}
         >
           {onboardingData.map((item, index) => (
-            <View key={item.id} style={[styles.slide, { width: screenWidth * 0.92 }]}>
+            <View key={item.id} style={[styles.slide, { 
+              width: screenWidth * (Platform.OS === 'web' ? 0.92 : 0.92),
+              minHeight: screenHeight * 0.85,
+              paddingHorizontal: screenWidth * 0.04, 
+              }
+              ]}
+              >
               <View style={styles.imageContainer}>
-                <View style={styles.imageContainer}>
                     {/*<Image source={item.image} style={styles.image} resizeMode="contain"/>*/}
-                    <LottieView source={item.image} style={styles.image} resizeMode="contain" autoPlay={true} loop={true}/>
-                </View>
+                    <LottieView source={item.image} style={[styles.image, { maxHeight: screenHeight * 0.35 }]} resizeMode="contain" autoPlay={true} loop={true}/>
               </View>
 
               <View style={styles.contentContainer}>
@@ -122,6 +131,7 @@ export default function onboarding() {
         </View>
       </LinearGradient>
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -133,7 +143,7 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    width: "92%",
+    alignSelf: 'center',
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     borderRadius: 24,
     //paddingHorizontal: height * 0.024,
@@ -145,8 +155,7 @@ const styles = StyleSheet.create({
   slide: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: height * 0.02,
+    justifyContent: 'center',
   },
 
   imageContainer: {
@@ -154,14 +163,13 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: height * 0.05,
+    marginTop: '5%',
   },
 
   image: {
     width: '92%',
-    height: '92%',
-    //maxWidth: '92%',
-    //maxHeight: '92%',
+    height: undefined,
+    aspectRatio: 1,
     resizeMode: 'cover',
   },
 
@@ -177,46 +185,43 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "Poppins_700Bold",
     color: "#565555",
-    fontSize: h * 9 + w * 9,
+    fontSize: 20,
     textAlign: "center",
-    marginBottom: h * 5,
+    marginBottom: 12,
   },
 
   description: {
     fontFamily: "Poppins_400Regular",
-    fontSize: height * 0.018,
+    fontSize: 16,
     color: "rgba(0, 0, 0, 0.70)",
     textAlign: "center",
-    lineHeight: height * 0.025,
-    paddingHorizontal: h * 25,
+    lineHeight: 22,
+    paddingHorizontal: 24,
   },
 
   bottomControls: {
-    paddingBottom: h * 30 + w * 30,
+    paddingBottom: 32,
     alignItems: 'center',
   },
 
   progressContainer: {
-    marginBottom: height * 0.03,
+    marginBottom: 24,
     alignSelf: 'center',
   },
-
   controlsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: h * 20,
+    paddingHorizontal: 32,
   },
-
   skipButton: {
-    padding: height * 0.01,
+    padding: 8,
   },
-
   skipText: {
     fontFamily: "Inter_600SemiBold",
     color: "#007BFF",
     textDecorationLine: "underline",
-    fontSize: height * 0.018,
+    fontSize: 16,
   },
 })
