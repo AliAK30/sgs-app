@@ -1,8 +1,6 @@
 import { Tabs, Redirect } from "expo-router";
-import { View } from "@/components/Themed";
-import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Pressable, PressableProps, GestureResponderEvent } from "react-native"
-import { w, h, width,height, base_height } from "../_layout";
+import { w, h,height, base_height } from "../_layout";
 import { Feather, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUserStore } from "@/hooks/useStore";
 import { useState } from "react";
@@ -16,13 +14,13 @@ type TabBarButtonProps = PressableProps & {
   onPress?: (e: GestureResponderEvent) => void;
 };
 
-export default function StudentLayout() {
+export default function AdminLayout() {
 
     const {token, user} = useUserStore();
     const [focusedTab, setFocusedTab] = useState<string>("index")
 
     if(!token) return <Redirect href="/login"/>
-    if(user?.role === "admin") return <Redirect href="/(admin)"/>
+    if(user?.role === "student") return <Redirect href="/(student)"/>
 
     return (
         
@@ -69,23 +67,23 @@ export default function StudentLayout() {
           }}
         />
         <Tabs.Screen
-          name="analytics"
+          name="admins"
           options={{
-            title: "Analytics",
+            title: "Admins",
             tabBarIcon: ({ color }) => (
-              <Feather size={iconSize} name="pie-chart" color={color} />
+              <Feather size={iconSize} name="shield" color={color} />
             ),
-            tabBarItemStyle: focusedTab === "analytics" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
+            tabBarItemStyle: focusedTab === "admins" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
           }}
         />
         <Tabs.Screen
-          name="peers"
+          name="students"
           options={{
-            title: "Peers",
+            title: "Students",
             tabBarIcon: ({ color }) => (
               <Feather size={iconSize} name="users" color={color} />
             ),
-            tabBarItemStyle: focusedTab === "peers" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
+            tabBarItemStyle: focusedTab === "students" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
           }}
         />
         <Tabs.Screen

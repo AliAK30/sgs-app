@@ -134,9 +134,7 @@ export default function RootLayout() {
         const tok = await AsyncStorage.getItem("token");
         await initializeUser(JSON.parse(newUser), tok ? tok : "");
         setSectionsCount();
-      } else {
-        setUser({role: 'student'});
-      }
+      } 
     } catch (e: any) {
       console.log(e.message);
     } finally {

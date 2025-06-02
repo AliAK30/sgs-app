@@ -31,9 +31,14 @@ const MyLoader = ({ wi, hi }: any) => (
 
 export default function Index() {
   const insets = useSafeAreaInsets();
-  const { token, setUser } = useUserStore();
+  const { user, token, setUser } = useUserStore();
 
-  if (token) return <Redirect href="/(student)" />;
+  if (token)
+  {
+    if(user?.role === 'student') return <Redirect href="/(student)" />;
+    else return <Redirect href="/(admin)" />;
+  } 
+    
 
   const image = useImage(eduMatch, {
     maxWidth: 550,
@@ -43,18 +48,11 @@ export default function Index() {
     },
   });
 
-  const image2 = useImage(imgSource, {
-    maxWidth: 550,
-    onError(error, retry) {
-      console.error("Loading failed:", error.message);
-      retry();
-    },
-  });
 
   return (
     <View style={styles.container}>
       <Image
-        source={image2}
+        source={imgSource}
         style={{
           height: height * 0.41 - insets.top,
           width: width * 0.92,
@@ -68,7 +66,7 @@ export default function Index() {
       />
 
       {!image ? (
-        <MyLoader w={229 * (height / 817)} h={218 * (height / 817)} />
+        <MyLoader wi={229 * (height / 817)} hi={218 * (height / 817)} />
       ) : (
         <Image
           source={image}
@@ -92,6 +90,7 @@ export default function Index() {
           <Image
             source={require("@/assets/images/grad-cap.svg")}
             style={styles.icon}
+            contentFit="contain"
           />
           <View>
             <Text style={styles.buttonTitle}>Student</Text>
@@ -111,6 +110,7 @@ export default function Index() {
           <Image
             source={require("@/assets/images/gear.svg")}
             style={styles.icon}
+            contentFit="contain"
           />
 
           <View>
@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
   icon: {
     width: 48.86,
     height: 41.62,
-    resizeMode: "contain",
   },
 
   buttonTitle: {

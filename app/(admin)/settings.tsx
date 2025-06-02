@@ -25,6 +25,7 @@ export default function Settings() {
               router.replace("/login")
               reset();
               resetUserState();
+              
           } else {
             openAlert("fail", "Failed!", "No Internet Connection!");
           }

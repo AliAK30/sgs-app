@@ -5,15 +5,14 @@ import {
   ActivityIndicator,
   ScrollView,
 } from "react-native";
-import { useRouter, Link } from "expo-router";
-import { height, width, OS } from "./_layout";
+import { useRouter, Link, Redirect } from "expo-router";
+import { height, width, OS, w } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import * as yup from "yup";
 import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
-import { useBanner } from "@/hooks/useBanner";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
 import Back from "@/components/Back";
@@ -96,13 +95,21 @@ export default function Registration() {
   const { openAlert, Alert } = useAlert();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date(1989, 1, 11));
-  const { user, setUser } = useUserStore();
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date(2025, 1, 1));
+  const { user, setUser, token } = useUserStore();
   const [openToS, setOpenToS] = useState<boolean>(false); //Terms of Service
   const [openPP, setOpenPP] = useState<boolean>(false); // Privacy Policy
   const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
+
+  //redirect to home screen if user already logged in
+  if(token) 
+  {
+    if(user?.role ==='student') return <Redirect href="/(student)"/>
+    else return <Redirect href="/(admin)"/>
+  }
 
   const universitiesRef = useRef<University[] | null>([]);
 
@@ -128,7 +135,7 @@ export default function Registration() {
     resolver: yupResolver(secondSchema),
     defaultValues: {
       uni_name: "",
-      dob: new Date(1989, 1, 11),
+      dob: new Date(2025, 1, 1),
       gender: "",
       password: "",
       confirmPassword: "",
@@ -275,9 +282,10 @@ export default function Registration() {
   const handleBack = () => {
     //console.log(universitiesRef.current)
     //console.log(showDatePicker);
+    console.log('here');
     if (user?.email) {
       secondForm.reset();
-      setUser({ role: "student" });
+      setUser({role: user.role});
     } else {
       //console.log(user)
       router.replace("/login");
@@ -289,11 +297,15 @@ export default function Registration() {
     if (date) {
       setSelectedDate(date);
       secondForm.setValue("dob", date);
-      console.log('here');
+      
       secondSchema.validateAt('dob', secondForm.getValues()).then(()=>secondForm.clearErrors("dob")); 
     }
   };
 
+   
+
+  
+  
   return (
     <ScrollView
       //style={{flex:1}}
@@ -502,8 +514,8 @@ export default function Registration() {
             />
             
 
-            <View style={{ flexDirection: "row", justifyContent:'space-between', width:"100%"}}>
-                <View style={{rowGap:height*0.008, width:"42%"}}>
+            <View style={{ flexDirection: "row",  columnGap:w*10}}>
+                <View style={{rowGap:height*0.008, flex:1}}>
                 <Text style={styles.inputLabel}>Date of Birth</Text>
                 
               <Controller
@@ -514,7 +526,7 @@ export default function Registration() {
                     (<View>
                     <input 
                     type="date" 
-                    value={value.toISOString().split('T')[0]} 
+                    value={value?.toISOString().split('T')[0] ?? (new Date(2025, 1, 1)).toISOString().split('T')[0]} 
                     max={(new Date).toISOString().split('T')[0]}
                     onChange={(e)=> {onChange(e.target.valueAsDate)}} 
                     style={{backgroundColor: "#ffffff",
@@ -522,13 +534,14 @@ export default function Registration() {
                       fontFamily: "Inter_400Regular",
                       fontSize: height * 0.0196,
                       color: "rgba(0, 0, 0, 1)",
-                      paddingLeft: height * 0.01711,
-                      paddingRight: height * 0.0151,
+                      paddingLeft: w*9,
+                      paddingRight: w*9,
                       paddingTop: height * 0.010,
                       paddingBottom: height * 0.010,
                       borderStyle: "solid",
                       borderWidth: 1,
-                      borderColor: secondForm.formState.errors.dob ? failedColor: "#D8DADC"}}/>
+                      borderColor: secondForm.formState.errors.dob ? failedColor: "#D8DADC"}}
+                      />
 
 {secondForm.formState.errors.dob && (
                       <Text style={[styles.inputError, {paddingTop:height*0.015}]}>
@@ -547,7 +560,7 @@ export default function Registration() {
                           borderRadius: 10,
                           borderStyle: 'solid',
                           borderWidth: 1,
-                          flexDirection: "row",
+                          flexDirection:'row',
                           justifyContent: "space-evenly",
                           alignItems: 'center',
                           borderColor: secondForm.formState.errors.dob
@@ -561,9 +574,10 @@ export default function Registration() {
                       <Text
                         style={{
                           fontFamily: "Inter_400Regular",
+                          flex:1,
                           fontSize: height * 0.0196,
                           color: "rgba(0, 0, 0, 1)",
-                          paddingLeft: height * 0.0151,
+                          paddingHorizontal:w*9,
                           paddingVertical: height * 0.011,
                         }}
                       >
@@ -607,7 +621,7 @@ export default function Registration() {
               />
               </View>
 
-              <View style={{rowGap:height*0.008, flex:2, paddingLeft:width*0.063}}>
+              <View style={{rowGap:height*0.008, flex:1}}>
               <Text style={styles.inputLabel}>Gender</Text>
             <Controller
               control={secondForm.control}
@@ -615,15 +629,14 @@ export default function Registration() {
               render={({ field: { onChange, value } }) => (
                 <View>
                   <RNPickerSelect
-                    onValueChange={(val)=>{if(val!=="") {secondForm.setValue("gender", val); secondForm.clearErrors("gender")}}}
+                    onValueChange={(val)=>{secondForm.setValue("gender", val); if(val!=="") secondForm.clearErrors("gender")}}
                     //onDonePress={()=>console.log(value)}
                     
                     style={{
                       inputIOS: {
                         ...styles.input,
-                        paddingRight:width*0.09,
-                        paddingLeft: width*0.045,
                         
+                    
                         borderColor: secondForm.formState.errors.gender
                           ? failedColor
                           : "#D8DADC",
@@ -634,8 +647,7 @@ export default function Registration() {
                       },
                       inputAndroid: {
                         ...styles.input,
-                        paddingRight:width*0.09,
-                        paddingLeft: width*0.045,
+                        
                         
                         borderColor: secondForm.formState.errors.gender
                           ? failedColor
@@ -645,10 +657,11 @@ export default function Registration() {
                       
                       inputWeb: {
                         ...styles.input,
+                        
                         borderColor: secondForm.formState.errors.uni_name
                           ? failedColor
                           : "#D8DADC",
-                        paddingVertical: height*0.010
+                        paddingVertical: height*0.010,
                       },
                       inputIOSContainer: { pointerEvents: "none"},
                       
@@ -858,6 +871,8 @@ export default function Registration() {
       </LinearGradient>
     </ScrollView>
   );
+
+  
 }
 
 const styles = StyleSheet.create({
@@ -897,7 +912,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     fontSize: height * 0.0196,
     color: "rgba(0, 0, 0, 1)",
-    paddingHorizontal: height * 0.0171,
+    paddingHorizontal: w*9,
     paddingVertical: height * 0.011,
     borderStyle: "solid",
     borderWidth: 1,

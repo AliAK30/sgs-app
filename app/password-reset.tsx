@@ -21,6 +21,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import OTPInput from "@/components/OTPInput";
 import { EyeIcon, WarnIcon } from "@/components/Icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUserStore } from "@/hooks/useStore";
+import { Redirect } from "expo-router";
 
 const emailSchema = yup.object().shape({
   email: yup
@@ -55,6 +57,7 @@ const initialTime = 10 * 60; //10 minutes for otp expiration
 
 export default function PasswordReset() {
 
+  const {user, token} = useUserStore();
   const insets = useSafeAreaInsets();
   const { openAlert, Alert } = useAlert();
   const { openBanner, Banner } = useBanner();
@@ -69,6 +72,13 @@ export default function PasswordReset() {
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
   const otpVerfied = useRef<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  //redirect to home screen if user already logged in
+    if(token) 
+    {
+      if(user?.role ==='student') return <Redirect href="/(student)"/>
+      else return <Redirect href="/(admin)"/>
+    }
 
   const {
     control,

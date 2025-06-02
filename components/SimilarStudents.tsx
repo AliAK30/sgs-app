@@ -150,7 +150,7 @@ function SimilarStudents({
         <View style={{justifyContent:'center'}}>
           <Back onPress={() => setClick(0)} />
             <View style={{position:'absolute', alignSelf:'center'}}>
-          <Text style={styles.title}>Your Study Twins</Text>
+          <Text style={styles.title}>Similar to you</Text>
           </View>
         </View>
         <Alert />

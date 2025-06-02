@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import { Image, useImage } from "expo-image";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
-import { useRouter, Link } from "expo-router";
+import { useRouter, Link, Redirect } from "expo-router";
 import { height, h, OS} from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -62,6 +62,7 @@ const MyLoader = ({ w, h }: any) => (
 
 
 export default function Login() {
+
   const { openAlert, Alert } = useAlert();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
@@ -69,6 +70,13 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const {setSectionsCount} = useSurveyStore();
   const insets = useSafeAreaInsets();
+
+  //redirect back to index if user has not selected a role
+  if(!user?.role) return <Redirect href='/'/>
+  if(token) {
+    if(user.role === "student") return <Redirect href='/(student)'/>
+    else return <Redirect href='/(admin)'/>
+  }
 
   const {
     control,
@@ -91,17 +99,20 @@ export default function Login() {
     },
   });
 
+  
+
   const onSubmit: SubmitHandler<User> = async (data) => {
     try {
       if (isConnected) {
-        const res: any = await axios.post(`${url}/student/login`, data, {
+        const res: any = await axios.post(`${url}/${user?.role}/login`, data, {
           timeout: 1000 * 25,
         });
 
         //await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
         await initializeUser(res.data.user, res.data.token);
         setSectionsCount();
-        router.replace("/(student)");
+
+        user?.role === 'student' ? router.replace("/(student)") : router.replace("/(admin)");
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
