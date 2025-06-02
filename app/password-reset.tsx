@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter, Link } from "expo-router";
-import { height, OS } from "./_layout";
+import { h, height, OS } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState, useEffect, useRef } from "react";
@@ -143,9 +143,9 @@ export default function PasswordReset() {
         if(email === "")
         {
           //add the role because api expects it
-          const newData = { ...data, role: "student" };
+          const newData = { ...data, role: user?.role };
           const res: any = await axios.post(
-            `${url}/student/otp/generate`,
+            `${url}/password/otp/generate`,
             newData,
             {
               timeout: 1000 * 25,
@@ -208,8 +208,8 @@ export default function PasswordReset() {
     try {
       if (isConnected) {
         const res: any = await axios.post(
-          `${url}/student/otp/generate`,
-          { email: email, role: "student" },
+          `${url}/password/otp/generate`,
+          { email: email, role: user?.role },
           {
             timeout: 1000 * 15,
           }
@@ -275,7 +275,7 @@ export default function PasswordReset() {
         const otpString = OTPToString();
 
         const res: any = await axios.post(
-          `${url}/student/otp/verify`,
+          `${url}/password/otp/verify`,
           { email: email, otp: otpString },
           {
             timeout: 1000 * 25,
@@ -343,10 +343,11 @@ export default function PasswordReset() {
         const newData = {
           email: email,
           new_password: data.password,
+          role:user?.role,
           otp: OTPToString(),
         };
         const res: any = await axios.post(
-          `${url}/student/password/reset`,
+          `${url}/password/reset`,
           newData,
           {
             timeout: 1000 * 15,
@@ -753,7 +754,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: "92%",
-    
+    paddingVertical:h*20,
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     borderRadius: 24,
     paddingHorizontal: height * 0.024,

@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter, Link, Redirect } from "expo-router";
-import { height, width, OS, w } from "./_layout";
+import { height, width, OS, w, h } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState, useRef } from "react";
@@ -882,6 +882,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     borderRadius: 24,
     paddingHorizontal: height * 0.024,
+    paddingVertical:h*20,
   },
 
   heading: {

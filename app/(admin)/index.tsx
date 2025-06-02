@@ -1,22 +1,118 @@
 import { View, Text, TextInput } from "@/components/Themed";
-import { StyleSheet, ScrollView, Pressable } from "react-native";
+import { StyleSheet, ScrollView, Pressable, ActivityIndicator } from "react-native";
 import { useUserStore } from "@/hooks/useStore";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Image } from "expo-image";
 import SearchResult from "@/components/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { w, h, OS } from "../_layout";
+import { url } from "@/constants/Server";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { formatTwoWordsName } from "@/utils";
+import { useNetInfo } from "@react-native-community/netinfo";
+import { useAlert } from "@/hooks/useAlert";
+import axios from "axios";
+
+type Counts = {
+    admins: number;
+    students: number;
+    groups: number;
+};
 
 export default function Index() {
   const [click, setClick] = useState<number>(0);
   const [fetching, setFetching] = useState<boolean>(false);
-  const router = useRouter();
-  const { user } = useUserStore();
+  const {isConnected} = useNetInfo();
+  const { user, token } = useUserStore();
+  const {Alert,openAlert} = useAlert();
   const [value, setValue] = useState<string>("");
+  const InsightsRef = useRef<Counts>({admins: 0, students: 0, groups:0});
   const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
+
+  useEffect(()=> {
+    if(isConnected || isConnected===null)
+    {
+        fillAdminDashboard();
+    }
+  }, [])
+
+  const fillAdminDashboard = async () => {
+    try {
+      
+      if (isConnected || isConnected===null) {
+       
+        setFetching(true);
+        //FETCH TOTAL NUMBER OF STUDENTS
+        let res: any = await axios.get(`${url}/admin/students/count`, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        timeout: 1000 * 25,
+        });
+
+        InsightsRef.current.students = res.data;
+
+        //FETCH TOTAL NUMBER OF ADMINS
+        res = await axios.get(`${url}/admin/count`, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        timeout: 1000 * 25,
+        });
+
+        InsightsRef.current.admins = res.data;
+
+        //FETCH TOTAL NUMBER OF GROUPS
+        res = await axios.get(`${url}/admin/groups/count`, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        timeout: 1000 * 25,
+        });
+
+        InsightsRef.current.groups = res.data;
+        
+      } else {
+        await openAlert("fail", "Failed!", "No Internet Connection!");
+        return;
+      }
+    } catch (e: any) {
+      if (!e.status) {
+        switch (e.code) {
+          case "ECONNABORTED":
+            await openAlert(
+              "fail",
+              "Failed!",
+              "Request TImed out\nPlease try again later!"
+            );
+            return;
+
+          case "ERR_NETWORK":
+            await openAlert(
+              "fail",
+              "Failed!",
+              "Server is not Responding\nPlease try again later!"
+            );
+            return;
+        }
+      }
+
+      if (e.status >= 500) {
+        await openAlert("fail", "Failed!", e.message);
+        return;
+      } else {
+        await openAlert("fail", "Failed!", e.response.data.message);
+        setClick(0);
+        return;
+      }
+    } finally {
+      setFetching(false)
+    }
+  }
 
   if (click === 1)
     return (
@@ -94,7 +190,7 @@ export default function Index() {
 
           <View style={styles.insideLgView}>
             <Text style={styles.totalStudents}>Total Students</Text>
-            <Text style={styles.totalStudentsCount}>1200</Text>
+            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.students}</Text>}
           </View>
         </View>
       </View>
@@ -114,7 +210,7 @@ export default function Index() {
 
           <View style={styles.insideLgView}>
             <Text style={styles.totalStudents}>Total Admins</Text>
-            <Text style={styles.totalStudentsCount}>0</Text>
+            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.admins}</Text>}
           </View>
         </View>
         <View style={styles.lgView}>
@@ -132,12 +228,12 @@ export default function Index() {
 
           <View style={styles.insideLgView}>
             <Text style={styles.totalStudents}>Total Groups</Text>
-            <Text style={styles.totalStudentsCount}>0</Text>
+            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.groups}</Text>}
           </View>
         </View>
       </View>
       <View style={{ flexDirection: "row", columnGap: w * 10 }}>
-        <View style={styles.lgView}>
+        {user?.role === "system_admin" && <View style={styles.lgView}>
           <LinearGradient
             style={styles.linearG}
             colors={[
@@ -155,6 +251,7 @@ export default function Index() {
             <Text style={styles.create}>Add New Admin</Text>
           </View>
         </View>
+        }
         <View style={styles.lgView}>
           <LinearGradient
             style={styles.linearG}
