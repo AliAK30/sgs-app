@@ -71,12 +71,7 @@ export default function Login() {
   const {setSectionsCount} = useSurveyStore();
   const insets = useSafeAreaInsets();
 
-  //redirect back to index if user has not selected a role
-  if(!user?.role) return <Redirect href='/'/>
-  if(token) {
-    if(user.role === "student") return <Redirect href='/(student)'/>
-    else return <Redirect href='/(admin)'/>
-  }
+  
 
   const {
     control,
@@ -158,6 +153,12 @@ export default function Login() {
     }
   };
   
+  //redirect back to index if user has not selected a role
+  if(!user?.role) return <Redirect href='/'/>
+  if(token) {
+    if(user.role === "student") return <Redirect href='/(student)'/>
+    else return <Redirect href='/(admin)'/>
+  }
   
   return (
     <ScrollView
