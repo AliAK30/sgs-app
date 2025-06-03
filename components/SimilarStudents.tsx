@@ -121,7 +121,7 @@ function SimilarStudents({
     
     if(isConnected || isConnected===null)
     {
-      console.log("i'm called useEffect");
+      
       page.current = 1;
       hasMore.current = true;
       fetchStudents(page.current);
@@ -132,7 +132,6 @@ function SimilarStudents({
 
   const handleEndReached = () => {
     if (hasMore.current && !fetchingMore) {
-      console.log("i'm called");
       fetchStudents(page.current);
       return;
     }

@@ -3,7 +3,7 @@ import { Redirect, router } from "expo-router";
 import { StyleSheet, Pressable } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { Image, useImage } from "expo-image";
-import { height, w, h, width} from "./_layout";
+import { height, w, h, width, OS} from "./_layout";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -54,7 +54,7 @@ export default function Index() {
       <Image
         source={imgSource}
         style={{
-          height: height * 0.41 - insets.top,
+          height: height * 0.41 - (OS==='ios' ? insets.top : 0),
           width: width * 0.92,
           position: "absolute",
           zIndex: 0,

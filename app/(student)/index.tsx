@@ -41,7 +41,7 @@ export default function Index() {
             <Text style={styles.title}>Hey {formatTwoWordsName(user?.first_name??"")} 👋</Text>
             <Text style={styles.belowTitle}>Connect, Collaborate, Learn in your style!</Text>
             </View>
-            <Image source={imgSource} style={{width:h*26+w*26, height:h*26+w*26, borderRadius:'100%'}}/>
+            <Image source={imgSource} style={{width:h*26+w*26, height:h*26+w*26, borderRadius:50}}/>
             
             
         </View>
@@ -51,7 +51,7 @@ export default function Index() {
                 <Pressable onPress={()=>{setFetching(true); setClick(1);}} hitSlop={15}><Feather name="search" color="black" size={19}/></Pressable>
             </View>
             <View style={styles.bell}>
-                <Ionicons name="notifications-outline" color="black" size={19}/>
+                <Ionicons name="notifications-outline" color="black" size={19} />
             </View>
         </View>
         <Pressable onPress={()=>setClick(2)}>
@@ -61,7 +61,7 @@ export default function Index() {
               locations={[0.17, 0.34, 0.70]}
               start={{ x: 0.5, y: 0 }}
             >
-                <Image source={imgSource2} style={{width:152, height:68}}/>
+                <Image source={imgSource2} style={{width:152*w, height:68*h}}/>
                 <View style={{justifyContent:'center', rowGap:h*4,}}>
                     <Text style={styles.findTwin}>Find your Study Twin</Text>
                     <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
@@ -118,9 +118,7 @@ const styles = StyleSheet.create({
         borderWidth:0.78,
         paddingVertical:h*10,
         paddingHorizontal:w*10,
-        alignItems:'center',
-        
-        
+        justifyContent:'center',
     },
     search: {
         flex:1,

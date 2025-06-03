@@ -239,10 +239,10 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                 
                 {checkingLS !== 2 &&  
                 <BlurView 
-                experimentalBlurMethod="dimezisBlurView" 
+                experimentalBlurMethod="none" 
                 style={styles.blurview}
                 tint="extraLight"
-                intensity={OS==='ios' ? 25 :50 }
+                intensity={OS==='ios' ? 25 : OS === 'web' ? 50 : 110 }
                 
                 >   
                     {checkingLS ? <ActivityIndicator size="large" color='grey'/> :
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     image: {
         width:h*40+w*40, 
         height:h*40+w*40, 
-        borderRadius:"100%", 
+        borderRadius:50, 
         borderWidth:1.5, 
         borderColor:'#50BFAF',
         
@@ -396,8 +396,7 @@ const styles = StyleSheet.create({
         marginTop:h*6,
         alignSelf:'center',
         alignItems:'center',
-        justifyContent:'center',
-        
+        justifyContent:'center',      
     },
 
     call: {

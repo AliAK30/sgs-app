@@ -60,7 +60,7 @@ export default function Peer({ id, full_name, uni_name, picture, similarity=-1 }
       start={{ x: -0.4, y: 0 }}
     >
         {openProfile && <Profile openProfile={openProfile} setOpenProfile={setOpenProfile} id={id ?? "1"} similarity={similarity}/>}
-        <Pressable onPress={()=>setOpenProfile(true)}><Image source={imgSource} style={{width:h*30+w*30, height:h*30+w*30, borderRadius:"100%"}}/></Pressable>
+        <Pressable onPress={()=>setOpenProfile(true)}><Image source={imgSource} style={{width:h*30+w*30, height:h*30+w*30, borderRadius:50}}/></Pressable>
         <View style={{rowGap:h*6, flex:1}}>
           <View style={{flexDirection:'row',}}>
             <View style={{flex:2*w}}>
