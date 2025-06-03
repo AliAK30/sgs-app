@@ -1,40 +1,109 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import Peer from "@/components/Peer";
 import { LinearGradient } from "expo-linear-gradient";
+import { useState, useRef, useMemo, useCallback } from "react";
 import Feather from "@expo/vector-icons/Feather";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { Redirect, useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
-import {h, w} from '../_layout'
+import {h, height, w} from '../_layout'
+import { useUserStore } from "@/hooks/useStore";
+import { GroupType } from "@/types";
+import Group from "@/components/Group";
+import CreateGroup from "@/components/CreateGroup";
+import GroupDetails from "@/components/GroupDetails";
+import debounce from 'lodash/debounce';
 
+function Seperator() {
+  return <View style={{paddingVertical:h*6}}></View>
+}
+
+function Header({text}: any) {
+  return <Text style={styles.friends}>{text}</Text>
+}
 
 export default function Groups() {
   
   const {Alert} = useAlert()
   const router = useRouter();
+  const [results, setResults] = useState<Array<GroupType>>([]);
+  const [fetching, setFetching] = useState<boolean>(false);
+  const [fetchingMore, setFetchingMore] = useState<boolean>(false);
+  const [click, setClick] = useState<number>(0);
+  const { isConnected } = useNetInfo();
+  const { token } = useUserStore();
+  const page = useRef<number>(1);
+  const hasMore = useRef<boolean>(true);
+  const totalCount = useRef<number>(0);
+
   
-  const groups = 1;
+  
+
+  const handleEndReached = () => {
+    if (hasMore.current && !fetchingMore) {
+      
+      //fetchStudents(value, page.current);
+      return;
+    }
+  };
+
+
+  if(click===1) return <CreateGroup setClick={setClick}/>
+  if(click===2) return <></>
 
   
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
     <LinearGradient
-      // Background Linear Gradient
-      colors={["#ADD8E6", "#EAF5F8"]}
-      locations={[0.15, 0.35]}
-      style={styles.container}
-    >
+          // Background Linear Gradient
+          colors={["#D6EBF2", "#FDFEFE"]}
+          locations={[0.11, 1]}
+          style={styles.container}
+        >
       <Alert/>
       <Text style={styles.title}>Groups</Text>
       <View style={styles.searchView}>
-        <TextInput style={styles.search} placeholder="Search groups" inputMode="text" placeholderTextColor="#85878D"/>
-        <Feather name="search" color="black" size={19}/>
+        <TextInput style={styles.search} placeholder="Search groups by name" inputMode="text" placeholderTextColor="#85878D"/>
+        
         <Pressable><Feather name="search" color="black" size={19}/></Pressable>
     </View>
 
-    <Text style={styles.friends}>Total Groups ({groups})</Text>
+    {isConnected===false ? (
+              <Text style={styles.notfound}>No Internet Connection</Text>
+            ) : fetching ? <View style={{flex:1, justifyContent:'center'}}><ActivityIndicator size="large" color="grey"/></View> : 
+              <FlatList
+              
+                data={results}
+                renderItem={({ item }) => (
+                  <Group
+                    id={item._id}
+                    name={item.name}
+                    gender={item.gender}
+                    uni_name={item.uni_name}
+                    dim1={item.dim1.name}
+                    dim2={item.dim2.name}
+                    dim3={item.dim3.name}
+                    dim4={item.dim4.name}
+                  />
+                )}
+                keyExtractor={(item, index)=>item?._id ?? ""}
+                ItemSeparatorComponent={Seperator}
+                ListHeaderComponent={<Header text={`Total Results (${totalCount.current})`}/>}
+                ListFooterComponent={fetchingMore ? <ActivityIndicator size="small" color="gray" style={{paddingTop:h*15}}/> : <Seperator/>}
+                onEndReached={handleEndReached}
+                //onEndReachedThreshold={0.01}
+                ListEmptyComponent={<Text style={[styles.notfound, {paddingTop:h*20}]}>No Groups found</Text>}
+              />
+           }
+
+           <Pressable  style={styles.createButton} onPress={()=>setClick(1)}>
+            <FontAwesome5 name="plus" color="#FFFFFF" size={styles.createButtonText.fontSize*1.5}/>
+            <Text style={styles.createButtonText}>Create Group</Text>
+           </Pressable>
     </LinearGradient>
     </View>
   );
@@ -83,6 +152,32 @@ const styles = StyleSheet.create({
     color: "#565555",
     fontSize: h *8+w*8,
     paddingLeft:w*4
+  },
+
+  notfound: {
+    fontFamily: "Inter_700Bold",
+    color: "#565555",
+    fontSize: h * 8 + w * 8,
+    textAlign:'center'
+  },
+
+  createButton: {
+    backgroundColor: "#539DF3",
+    borderRadius:44,
+    alignSelf: "flex-end",
+    paddingHorizontal:19*w,
+    paddingVertical: 10*h,
+    flexDirection:'row',
+    alignItems:'center',
+    columnGap:w*8,
+    justifyContent:'center',
+    boxShadow: "2px 4px 7.4px 0px rgba(0, 0, 0, 0.35)",
+  },
+
+  createButtonText: {
+    fontFamily: "Inter_600SemiBold",
+    color:"#FFFFFF",
+    fontSize:h*8+w*8,
   },
 });
 

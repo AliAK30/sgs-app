@@ -12,7 +12,9 @@ import { LinearGradient } from "expo-linear-gradient";
 import { formatTwoWordsName } from "@/utils";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useAlert } from "@/hooks/useAlert";
+import CreateGroup from "@/components/CreateGroup";
 import axios from "axios";
+
 
 type Counts = {
     admins: number;
@@ -35,7 +37,7 @@ export default function Index() {
     {
         fillAdminDashboard();
     }
-  }, [])
+  }, [isConnected])
 
   const fillAdminDashboard = async () => {
     try {
@@ -81,6 +83,9 @@ export default function Index() {
         return;
       }
     } catch (e: any) {
+      InsightsRef.current.admins = -1
+      InsightsRef.current.groups = -1
+      InsightsRef.current.students = -1
       if (!e.status) {
         switch (e.code) {
           case "ECONNABORTED":
@@ -125,6 +130,9 @@ export default function Index() {
       />
     );
 
+  if(click === 2) 
+    return (<CreateGroup setClick={setClick}/>)
+
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
@@ -144,7 +152,7 @@ export default function Index() {
           style={{
             width: h * 26 + w * 26,
             height: h * 26 + w * 26,
-            borderRadius: "100%",
+            borderRadius: 50,
           }}
         />
       </View>
@@ -190,7 +198,7 @@ export default function Index() {
 
           <View style={styles.insideLgView}>
             <Text style={styles.totalStudents}>Total Students</Text>
-            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.students}</Text>}
+            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.students===-1?"?":InsightsRef.current.students}</Text>}
           </View>
         </View>
       </View>
@@ -210,7 +218,7 @@ export default function Index() {
 
           <View style={styles.insideLgView}>
             <Text style={styles.totalStudents}>Total Admins</Text>
-            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.admins}</Text>}
+            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.admins===-1?"?":InsightsRef.current.admins}</Text>}
           </View>
         </View>
         <View style={styles.lgView}>
@@ -228,12 +236,12 @@ export default function Index() {
 
           <View style={styles.insideLgView}>
             <Text style={styles.totalStudents}>Total Groups</Text>
-            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.groups}</Text>}
+            {fetching ? <ActivityIndicator size={15*h+15*w} color="#0C0C0C" style={{alignSelf:'flex-start', paddingTop:h*6}}/> : <Text style={styles.totalStudentsCount}>{InsightsRef.current.groups===-1?"?":InsightsRef.current.groups}</Text>}
           </View>
         </View>
       </View>
       <View style={{ flexDirection: "row", columnGap: w * 10 }}>
-        {user?.role === "system_admin" && <View style={styles.lgView}>
+        {user?.role === "system_admin" && <Pressable style={styles.lgView}>
           <LinearGradient
             style={styles.linearG}
             colors={[
@@ -250,9 +258,9 @@ export default function Index() {
             <Feather name="plus-circle" size={h * 25 + w * 25} />
             <Text style={styles.create}>Add New Admin</Text>
           </View>
-        </View>
+        </Pressable>
         }
-        <View style={styles.lgView}>
+        <Pressable style={styles.lgView} onPress={()=>setClick(2)}>
           <LinearGradient
             style={styles.linearG}
             colors={[
@@ -269,7 +277,7 @@ export default function Index() {
             <Feather name="users" size={h * 25 + w * 25} />
             <Text style={styles.create}>Create New Group</Text>
           </View>
-        </View>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -337,6 +345,7 @@ const styles = StyleSheet.create({
     paddingVertical: h * 10,
     paddingHorizontal: w * 10,
     alignItems: "center",
+    justifyContent:'center',
   },
   search: {
     flex: 1,

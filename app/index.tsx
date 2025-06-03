@@ -54,12 +54,12 @@ export default function Index() {
       <Image
         source={imgSource}
         style={{
-          height: height * 0.41 - (OS==='ios' ? insets.top : 0),
+          height: height * 0.41 - insets.top,
           width: width * 0.92,
           position: "absolute",
           zIndex: 0,
-          borderBottomLeftRadius: 24,
-          borderBottomRightRadius: 24,
+          borderBottomLeftRadius: 24*h,
+          borderBottomRightRadius: 24*h,
           top: h * 482,
         }}
         contentFit="fill"

@@ -118,6 +118,7 @@ const styles = StyleSheet.create({
         borderWidth:0.78,
         paddingVertical:h*10,
         paddingHorizontal:w*10,
+        alignItems: "center",
         justifyContent:'center',
     },
     search: {

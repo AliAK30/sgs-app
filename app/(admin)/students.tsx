@@ -21,16 +21,16 @@ export default function Students() {
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
     <LinearGradient
-      // Background Linear Gradient
-      colors={["#ADD8E6", "#EAF5F8"]}
-      locations={[0.15, 0.35]}
-      style={styles.container}
-    >
+              // Background Linear Gradient
+              colors={["#D6EBF2", "#FDFEFE"]}
+              locations={[0.11, 1]}
+              style={styles.container}
+            >
       <Alert/>
       <Text style={styles.title}>Students</Text>
       <View style={styles.searchView}>
         <TextInput style={styles.search} placeholder="Search students" inputMode="text" placeholderTextColor="#85878D"/>
-        <Feather name="search" color="black" size={19}/>
+        
         <Pressable><Feather name="search" color="black" size={19}/></Pressable>
     </View>
 

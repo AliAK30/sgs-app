@@ -55,7 +55,26 @@ export type User = {
 export type University = {
   _id: string;
   name: string;
-  campus: string;
-  city: string;
-  country: string;
+  campus?: string;
+  city?: string;
+  country?: string;
+}
+
+export type Dimension = {
+  name: string;
+  preference: string;
+}
+
+export type GroupType = {
+  _id: string;
+  name: string;
+  uni_name: string;
+  uni_id: string;
+  gender: string;
+  students?: string[];
+  dim1: Dimension;
+  dim2: Dimension;
+  dim3: Dimension;
+  dim4: Dimension;
+  createdAt?: Date;
 }

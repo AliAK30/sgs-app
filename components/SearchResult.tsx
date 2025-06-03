@@ -217,7 +217,7 @@ function SearchResult({
             ListFooterComponent={fetchingMore ? <ActivityIndicator size="small" color="gray" style={{paddingTop:h*15}}/> : <Seperator/>}
             onEndReached={handleEndReached}
             //onEndReachedThreshold={0.01}
-            ListEmptyComponent={<Text style={styles.notfound}>No students found</Text>}
+            ListEmptyComponent={<Text style={[styles.notfound, {paddingTop:h*20}]}>No Groups found</Text>}
           />
        }
        

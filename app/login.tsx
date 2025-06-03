@@ -19,7 +19,6 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import { useState } from "react";
 import { WarnIcon, EyeIcon } from "@/components/Icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Back from "@/components/Back";
 
 const imgSource = require("@/assets/images/edumatch.png");
@@ -69,7 +68,6 @@ export default function Login() {
   const { initializeUser, user, token } = useUserStore();
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const {setSectionsCount} = useSurveyStore();
-  const insets = useSafeAreaInsets();
 
   
 
@@ -164,7 +162,7 @@ export default function Login() {
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', flex:1}}
+      contentContainerStyle={{alignItems:'center', flexGrow:1}}
     >
       <View style={styles.container}>
         <View style={{position:'absolute', alignSelf:'flex-start', marginTop:h*20, marginLeft: OS==='web' ? 0 : height*0.024}}>

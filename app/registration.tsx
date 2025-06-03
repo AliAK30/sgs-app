@@ -91,7 +91,6 @@ const failedColor = "rgb(255, 0, 0)";
 
 export default function Registration() {
 
-  const insets = useSafeAreaInsets();
   const { openAlert, Alert } = useAlert();
   const { type, isConnected } = useNetInfo();
   const router = useRouter();
@@ -302,16 +301,13 @@ export default function Registration() {
     }
   };
 
-   
-
-  
   
   return (
     <ScrollView
       //style={{flex:1}}
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', height:height-(OS==='android'?0:insets.top)}}
+      contentContainerStyle={{alignItems:'center', flexGrow:1}}
     >
       <LinearGradient
         style={styles.container}
@@ -543,7 +539,7 @@ export default function Registration() {
                       borderColor: secondForm.formState.errors.dob ? failedColor: "#D8DADC"}}
                       />
 
-{secondForm.formState.errors.dob && (
+                      {secondForm.formState.errors.dob && (
                       <Text style={[styles.inputError, {paddingTop:height*0.015}]}>
                         {secondForm.formState.errors.dob.message}
                       </Text>

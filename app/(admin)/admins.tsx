@@ -20,12 +20,12 @@ export default function Admins() {
   
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
-    <LinearGradient
-      // Background Linear Gradient
-      colors={["#ADD8E6", "#EAF5F8"]}
-      locations={[0.15, 0.35]}
-      style={styles.container}
-    >
+   <LinearGradient
+             // Background Linear Gradient
+             colors={["#D6EBF2", "#FDFEFE"]}
+             locations={[0.11, 1]}
+             style={styles.container}
+           >
       <Alert/>
       <Text style={styles.title}>Admins</Text>
       <View style={styles.searchView}>
