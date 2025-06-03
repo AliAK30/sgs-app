@@ -20,17 +20,6 @@ type Props = {
   similarity?: number;
 };
 
-/* 
-// Keep second-to-last name as-is (with proper case)
-else if (index === nameParts.length - 2) {
-  return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
-}
-// Last name - capitalize first letter only
-else {
-  return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
-}
-*/
-
 function formatName(fullName: string): string {
   if (!fullName || typeof fullName !== 'string') {
     return fullName;
@@ -70,7 +59,7 @@ export default function Peer({ id, full_name, uni_name, picture, similarity=-1 }
       locations={[0.17, 0.34, 0.70]}
       start={{ x: -0.4, y: 0 }}
     >
-        {openProfile && <Profile openProfile={openProfile} setOpenProfile={setOpenProfile} id={id ?? "1"}/>}
+        {openProfile && <Profile openProfile={openProfile} setOpenProfile={setOpenProfile} id={id ?? "1"} similarity={similarity}/>}
         <Pressable onPress={()=>setOpenProfile(true)}><Image source={imgSource} style={{width:h*30+w*30, height:h*30+w*30, borderRadius:"100%"}}/></Pressable>
         <View style={{rowGap:h*6, flex:1}}>
           <View style={{flexDirection:'row',}}>

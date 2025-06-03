@@ -20,6 +20,7 @@ type Props = {
     openProfile: boolean;
     setOpenProfile: React.Dispatch<React.SetStateAction<boolean>>;
     id: string;
+    similarity: number;
 }
 
 type ExtendedUser = User & {print?: string, age?: number};
@@ -50,18 +51,18 @@ const obj: ExtendedUser = {
     picture: "https://edumatchstorage.blob.core.windows.net/edumatch-container/students/6833530a6f31a0f8fe7c7071/1748417786138-cropped.JPG?si=readonly&sip=0.0.0.0-255.255.255.255&spr=https&sv=2024-11-04&sr=c&sig=LrrrK7J%2F9rUxUcvRhDK%2BZsOUZILPEsaXiyb%2BPn4uJOI%3D"
 }
 
-const pieDatas = [ {value: 70, color: '#50BFAF', gradientCenterColor: '#0A594E'}, {value: 30, color: '#F8F8F8'},];
 
-function Profile({openProfile, setOpenProfile, id}: Props) {
+
+function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
 
     const {Alert, openAlert} = useAlert();
     const [fetching, setFetching] = useState<boolean>(false);
-    //const [pieData, setPieData] = useState<pieDataItem[]>(pieDatas);
-    const [checkingLS, setCheckingLS] = useState<number>(0);
+    
+    const [checkingLS, setCheckingLS] = useState<number>(similarity===-1 ? 0 : 2);
     const { isConnected } = useNetInfo();
     const user = useRef<ExtendedUser>({});
     const { token } = useUserStore();
-
+    const pieDatas = [ {value: similarity === -1 ? 70 : similarity, color: '#50BFAF', gradientCenterColor: '#0A594E'}, {value: similarity === -1 ? 30 : 100-similarity, color: '#F8F8F8'},];
     const pieData = useRef<pieDataItem[]|null>(pieDatas);
 
     useEffect(()=> {
@@ -69,7 +70,7 @@ function Profile({openProfile, setOpenProfile, id}: Props) {
         //user.current.print = user.current.gender + (user.current?.age ? ` | Age ${user.current.age} years` : "") + (user.current?.gpa ? ` | CGPA ${user.current.gpa} `: "");
     }, [id]);
 
-    console.log(user.current)
+    
 
     const imgSource = user.current.picture ?? require("@/assets/images/no-dp.svg");
 
