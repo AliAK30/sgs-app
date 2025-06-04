@@ -2,7 +2,7 @@ import { Text, View, TextInput } from "@/components/Themed";
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import Modal from "react-native-modal";
-import { LinearGradient } from "expo-linear-gradient";
+//import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect, useRef, memo } from "react";
 import { Link } from "expo-router";
 import { SimpleLineIcons, Ionicons, Octicons } from "@expo/vector-icons";
@@ -238,11 +238,20 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                 </View>
                 
                 {checkingLS !== 2 &&  
-                <BlurView 
-                experimentalBlurMethod="none" 
+                OS === 'web' ?
+
+                (<View style={[styles.blurview, {backdropFilter: 'saturate(150%) blur(5px)'}]}>   
+                    {checkingLS ? <ActivityIndicator size="large" color='grey'/> :
+                    <Pressable style={styles.similarity} onPress={checkLS}>
+                        <Text style={styles.similarityText}>Check Similarity</Text>
+                    </Pressable>
+                    }
+                </View>)
+                :
+                (<BlurView 
                 style={styles.blurview}
                 tint="extraLight"
-                intensity={OS==='ios' ? 25 : OS === 'web' ? 50 : 110 }
+                intensity={25}
                 
                 >   
                     {checkingLS ? <ActivityIndicator size="large" color='grey'/> :
@@ -250,8 +259,10 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                         <Text style={styles.similarityText}>Check Similarity</Text>
                     </Pressable>
                     }
-                </BlurView>
+                </BlurView>)
                 }
+
+
                 </View>
                 <View style={{flexDirection:'row', justifyContent:'center', columnGap:w*10, flex:1, alignItems:'center'}}>
                     {user.current.phone_number &&
