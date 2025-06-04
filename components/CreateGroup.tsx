@@ -26,7 +26,6 @@ import Preview from "./Preview";
 
 type Props = {
   setClick: React.Dispatch<React.SetStateAction<number>>;
-  
 };
 
 const failedColor = "rgb(255, 0, 0)";

@@ -1,7 +1,7 @@
 import { Text, View, TextInput } from "@/components/Themed";
 import { Pressable, StyleSheet, FlatList, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -13,6 +13,7 @@ import { useUserStore, useGroupStore } from "@/hooks/useStore";
 import { GroupType } from "@/types";
 import Group from "@/components/Group";
 import CreateGroup from "@/components/CreateGroup";
+import GroupDetails from "@/components/GroupDetails";
 
 function Seperator() {
   return <View style={{paddingVertical:h*6}}></View>
@@ -28,6 +29,7 @@ export default function Groups() {
   const {groups, setGroups} = useGroupStore();
   const [fetching, setFetching] = useState<boolean>(false);
   const [click, setClick] = useState<number>(0);
+  const indexRef = useRef<number>(0);
   const { isConnected } = useNetInfo();
   const { token } = useUserStore();
 
@@ -95,9 +97,25 @@ export default function Groups() {
   }
 
   
+  
+    
+  
 
   if(click===1) return <CreateGroup setClick={setClick}/>
-  if(click===2) return <></>
+  if (click === 2)
+      return (
+        <GroupDetails
+          setShowGD={setClick}
+          id={groups[indexRef.current]._id}
+          name={groups[indexRef.current].name}
+          dim1={groups[indexRef.current].dim1.name}
+          dim2={groups[indexRef.current].dim2.name}
+          dim3={groups[indexRef.current].dim3.name}
+          dim4={groups[indexRef.current].dim4.name}
+          uni_name={groups[indexRef.current].uni_name}
+          gender={groups[indexRef.current].gender}
+        />
+      );
 
   
   return (
@@ -122,7 +140,8 @@ export default function Groups() {
               <FlatList
               
                 data={groups}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
+                  <Pressable onPress={() => {indexRef.current = index; setClick(2);}}>
                   <Group
                     id={item._id}
                     name={item.name}
@@ -133,6 +152,7 @@ export default function Groups() {
                     dim3={item.dim3.name}
                     dim4={item.dim4.name}
                   />
+                  </Pressable>
                 )}
                 keyExtractor={(item, index)=>item?._id ?? ""}
                 ItemSeparatorComponent={Seperator}

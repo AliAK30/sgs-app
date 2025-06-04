@@ -47,7 +47,7 @@ export default function GroupDetails({
   const [editable, setEditable] = useState<boolean>(false);
   const [fetching, setFetching] = useState<boolean>(false);
   const [deleting, setDeleting] = useState<boolean>(false);
-  const { token } = useUserStore();
+  const { token, user } = useUserStore();
   const {groups, setGroups} = useGroupStore();
   const backup = useRef<User[]>(results);
 
@@ -59,15 +59,16 @@ export default function GroupDetails({
     try {
       if (isConnected || isConnected === null) {
         setFetching(true);
-        
-
-        const res = await axios.get(`${url}/group/${id}`, {
-          timeout: 1000 * 15,
+      
+        const res = await axios.get(`${url}/admin/group/${id}`, {
+          timeout: 1000 * 35,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
         });
+        //console.log(2)
+        //console.log(res.data)
         setResults(res.data);
         
       } else {
@@ -107,19 +108,22 @@ export default function GroupDetails({
     }
   };
 
+  console.log(user?.role)
+
   const deleteGroup = async () => {
     try {
       if (isConnected || isConnected === null) {
         setFetching(true);
         
 
-        const res = await axios.delete(`${url}/groups/delete/${id}`, {
+        const res = await axios.delete(`${url}/admin/groups/delete/${id}`, {
           timeout: 1000 * 15,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
         });
+
         setGroups(groups.filter(group=>group._id!==res.data._id));
         
       } else {
@@ -173,8 +177,10 @@ export default function GroupDetails({
           paddingBottom: h * 6,
         }}
       >
+
         <Text style={styles.friends}>{text}</Text>
-        {editable ? (
+        { user?.role !== 'student' && 
+        editable ? (
           <View style={{flexDirection:'row'}}>
             <Text onPress={handleUndo} style={styles.edit}>Undo | </Text>
             <Text onPress={handlePress} style={styles.edit}>Done</Text>
@@ -204,9 +210,7 @@ export default function GroupDetails({
 
         <View style={{ justifyContent: "center" }}>
           <Back onPress={() => setShowGD(0)} />
-          <View style={{ position: "absolute", alignSelf: "center" }}>
-            <Text style={styles.title}>Preview</Text>
-          </View>
+          
         </View>
 
         
@@ -243,11 +247,12 @@ export default function GroupDetails({
         )}
 
         
-        
+        {user?.role!== "student" && 
         <Pressable  style={styles.createButton} onPress={deleteGroup}>
             {fetching ?  <ActivityIndicator size="small" color="white" />
              : <Text style={styles.createButtonText}>Delete Group</Text> }
            </Pressable>
+           }
            
 
       </LinearGradient>

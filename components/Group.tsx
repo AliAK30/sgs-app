@@ -59,25 +59,10 @@ export default function Group({
   dim3,
   dim4,
 }: Props) {
-  const [showGD, setShowGD] = useState<number>(0);
-
-  if (showGD === 1)
-    return (
-      <GroupDetails
-        setShowGD={setShowGD}
-        id={id}
-        name={name}
-        dim1={dim1}
-        dim2={dim2}
-        dim3={dim3}
-        dim4={dim4}
-        uni_name={uni_name}
-        gender={gender}
-      />
-    );
+  
 
   return (
-    <Pressable onPress={() => setShowGD(1)}>
+    
       <LinearGradient
         style={styles.container}
         colors={["#0B0B0B", "rgba(23, 23, 23, 0.98)", "rgba(46, 46, 46, 0.95)"]}
@@ -93,7 +78,7 @@ export default function Group({
           </View>
         </View>
       </LinearGradient>
-    </Pressable>
+    
   );
 }
 
