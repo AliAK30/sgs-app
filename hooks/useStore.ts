@@ -1,8 +1,24 @@
 import { create } from "zustand";
-import { User } from "@/types";
+import { User, GroupType } from "@/types";
 import useAnswers from "./useAnswers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useSection from "./useSection";
+
+type GroupState = {
+  groups: GroupType[];
+  setGroups: (groups: GroupType[])=>void;
+  reset: () => void;
+}
+
+const initialGroupState = {
+  groups: []
+}
+
+export const useGroupStore = create<GroupState>()((set, get) => ({
+  ...initialGroupState,
+  setGroups: (groups) => set(() => ({ groups:groups })),
+  reset: () => set(() => ({...initialGroupState}))
+}))
 
 type SurveyState = {
   selectedSection: number;

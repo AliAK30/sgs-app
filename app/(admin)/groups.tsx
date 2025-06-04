@@ -1,22 +1,18 @@
 import { Text, View, TextInput } from "@/components/Themed";
 import { Pressable, StyleSheet, FlatList, ActivityIndicator } from "react-native";
-import Peer from "@/components/Peer";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import { Redirect, useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
-import {h, height, w} from '../_layout'
-import { useUserStore } from "@/hooks/useStore";
+import {h, w} from '../_layout'
+import { useUserStore, useGroupStore } from "@/hooks/useStore";
 import { GroupType } from "@/types";
 import Group from "@/components/Group";
 import CreateGroup from "@/components/CreateGroup";
-import GroupDetails from "@/components/GroupDetails";
-import debounce from 'lodash/debounce';
 
 function Seperator() {
   return <View style={{paddingVertical:h*6}}></View>
@@ -28,29 +24,77 @@ function Header({text}: any) {
 
 export default function Groups() {
   
-  const {Alert} = useAlert()
-  const router = useRouter();
-  const [results, setResults] = useState<Array<GroupType>>([]);
+  const {Alert, openAlert} = useAlert()
+  const {groups, setGroups} = useGroupStore();
   const [fetching, setFetching] = useState<boolean>(false);
-  const [fetchingMore, setFetchingMore] = useState<boolean>(false);
   const [click, setClick] = useState<number>(0);
   const { isConnected } = useNetInfo();
   const { token } = useUserStore();
-  const page = useRef<number>(1);
-  const hasMore = useRef<boolean>(true);
-  const totalCount = useRef<number>(0);
 
-  
-  
+  useEffect(()=> {
+      if(isConnected || isConnected===null)
+      {
+          fetchGroups();
+      }
+    }, [isConnected])
 
-  const handleEndReached = () => {
-    if (hasMore.current && !fetchingMore) {
+
+  const fetchGroups = async () => {
+    try {
       
-      //fetchStudents(value, page.current);
-      return;
-    }
-  };
+      if (isConnected || isConnected===null) {
+       
+        setFetching(true);
+        //FETCH GROUPS
+        let res: any = await axios.get(`${url}/admin/groups`, {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        timeout: 1000 * 25,
+        });
 
+        setGroups(res.data)
+        
+      } else {
+        await openAlert("fail", "Failed!", "No Internet Connection!");
+        return;
+      }
+    } catch (e: any) {
+      
+      if (!e.status) {
+        switch (e.code) {
+          case "ECONNABORTED":
+            await openAlert(
+              "fail",
+              "Failed!",
+              "Request TImed out\nPlease try again later!"
+            );
+            return;
+
+          case "ERR_NETWORK":
+            await openAlert(
+              "fail",
+              "Failed!",
+              "Server is not Responding\nPlease try again later!"
+            );
+            return;
+        }
+      }
+
+      if (e.status >= 500) {
+        await openAlert("fail", "Failed!", e.message);
+        return;
+      } else {
+        await openAlert("fail", "Failed!", e.response.data.message);
+        return;
+      }
+    } finally {
+      setFetching(false)
+    }
+  }
+
+  
 
   if(click===1) return <CreateGroup setClick={setClick}/>
   if(click===2) return <></>
@@ -77,7 +121,7 @@ export default function Groups() {
             ) : fetching ? <View style={{flex:1, justifyContent:'center'}}><ActivityIndicator size="large" color="grey"/></View> : 
               <FlatList
               
-                data={results}
+                data={groups}
                 renderItem={({ item }) => (
                   <Group
                     id={item._id}
@@ -92,9 +136,9 @@ export default function Groups() {
                 )}
                 keyExtractor={(item, index)=>item?._id ?? ""}
                 ItemSeparatorComponent={Seperator}
-                ListHeaderComponent={<Header text={`Total Results (${totalCount.current})`}/>}
-                ListFooterComponent={fetchingMore ? <ActivityIndicator size="small" color="gray" style={{paddingTop:h*15}}/> : <Seperator/>}
-                onEndReached={handleEndReached}
+                ListHeaderComponent={<Header text={`Total Groups (${groups.length})`}/>}
+                ListFooterComponent={<Seperator/>}
+                
                 //onEndReachedThreshold={0.01}
                 ListEmptyComponent={<Text style={[styles.notfound, {paddingTop:h*20}]}>No Groups found</Text>}
               />
@@ -117,7 +161,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     paddingHorizontal: 15*w,
     alignSelf:'center',
-    paddingTop:h*13
+    paddingTop:h*13,
+    justifyContent:'flex-end',
   },
 
    title: {
@@ -151,7 +196,8 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     color: "#565555",
     fontSize: h *8+w*8,
-    paddingLeft:w*4
+    paddingLeft:w*4,
+    paddingBottom:h*10,
   },
 
   notfound: {
@@ -172,6 +218,9 @@ const styles = StyleSheet.create({
     columnGap:w*8,
     justifyContent:'center',
     boxShadow: "2px 4px 7.4px 0px rgba(0, 0, 0, 0.35)",
+    position:"absolute",
+    marginRight:w*25,
+    marginBottom:h*25,
   },
 
   createButtonText: {

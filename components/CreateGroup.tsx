@@ -22,7 +22,7 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { WarnIcon } from "./Icons";
 import { User } from "@/types";
-import GroupDetails from "./GroupDetails";
+import Preview from "./Preview";
 
 type Props = {
   setClick: React.Dispatch<React.SetStateAction<number>>;
@@ -175,7 +175,7 @@ export default function CreateGroup({ setClick }: Props) {
     }
   };
 
-  if(showPreview === 1) return <GroupDetails results={results} setResults={setResults} setShowPreview={setShowPreview} preview={true} allValues={getValues()} setClick={setClick}/>
+  if(showPreview === 1) return <Preview results={results} setResults={setResults} setShowPreview={setShowPreview} allValues={getValues()} setClick={setClick}/>
 
   return (
     <ScrollView

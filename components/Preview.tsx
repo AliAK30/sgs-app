@@ -15,61 +15,78 @@ import { useAlert } from "@/hooks/useAlert";
 import { h, w } from "@/app/_layout";
 import Back from "./Back";
 import { useUserStore, useGroupStore } from "@/hooks/useStore";
-import { GroupType, User } from "@/types";
+import { User } from "@/types";
 import Student from "./Student";
 
-type Props = {
-    setShowGD: React.Dispatch<React.SetStateAction<number>>;
-  id:string;
+type FormValues = {
   name: string;
   dim1: string;
+  value1: string;
+  uni_id: string;
   dim2: string;
   dim3: string;
   dim4: string;
-  uni_name: string;
+  value2: string;
+  value3: string;
+  value4: string;
   gender: string;
+};
+
+type Props = {
+  setShowPreview: React.Dispatch<React.SetStateAction<number>>;
+  setClick: React.Dispatch<React.SetStateAction<number>>;
+  results: User[];
+  setResults: React.Dispatch<React.SetStateAction<User[]>>;
+  allValues: FormValues;
 };
 
 function Seperator() {
   return <View style={{ paddingVertical: h * 6 }}></View>;
 }
 
-export default function GroupDetails({
-  setShowGD,
-  id,
-  name,
-  uni_name,
+export default function Preview({
+  setShowPreview,
+  results,
+  setResults,
+  allValues,
+  setClick,
 }: Props) {
 
   const { Alert, openAlert } = useAlert();
   const { isConnected } = useNetInfo();
-  const [results, setResults] = useState<User[]>([])
   const [editable, setEditable] = useState<boolean>(false);
-  const [fetching, setFetching] = useState<boolean>(false);
-  const [deleting, setDeleting] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const { token } = useUserStore();
   const {groups, setGroups} = useGroupStore();
   const backup = useRef<User[]>(results);
 
-  useEffect(() => {
-    if (isConnected || isConnected === null) fetchGroup();
-  }, [isConnected]);
+  /* useEffect(() => {
+    if (isConnected || isConnected === null) fetchUniversities();
+  }, [isConnected]); */
 
-  const fetchGroup = async () => {
+  const createGroup = async () => {
     try {
       if (isConnected || isConnected === null) {
-        setFetching(true);
-        
+        setIsSubmitting(true);
+        const groupData = {
+        name: allValues.name,
+        gender: allValues.gender,
+        students: results.map(result=>result._id),
+        dim1: { name: allValues.dim1, preference: allValues.value1 },
+        dim2: { name: allValues.dim2, preference:  allValues.value2},
+        dim3: { name: allValues.dim3, preference: allValues.value3 },
+        dim4: { name: allValues.dim4, preference: allValues.value4 },
+        };
 
-        const res = await axios.get(`${url}/group/${id}`, {
+        const res = await axios.post(`${url}/admin/groups/create`, groupData, {
           timeout: 1000 * 15,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
         },
         });
-        setResults(res.data);
-        
+        setGroups([...groups, res.data]);
+        setClick(0);
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
@@ -103,61 +120,9 @@ export default function GroupDetails({
         return;
       }
     } finally {
-        setFetching(false);
+        setIsSubmitting(false);
     }
   };
-
-  const deleteGroup = async () => {
-    try {
-      if (isConnected || isConnected === null) {
-        setFetching(true);
-        
-
-        const res = await axios.delete(`${url}/groups/delete/${id}`, {
-          timeout: 1000 * 15,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
-        });
-        setGroups(groups.filter(group=>group._id!==res.data._id));
-        
-      } else {
-        openAlert("fail", "Failed!", "No Internet Connection!");
-        return;
-      }
-    } catch (e: any) {
-      if (!e.status) {
-        switch (e.code) {
-          case "ECONNABORTED":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Request TImed out\nPlease try again later!"
-            );
-            return;
-
-          case "ERR_NETWORK":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Server is not Responding\nPlease try again later!"
-            );
-            return;
-        }
-      }
-
-      if (e.status >= 500) {
-        await openAlert("fail", "Failed!", e.message);
-        return;
-      } else {
-        await openAlert("fail", "Failed!", e.response.data.message);
-        return;
-      }
-    } finally {
-        setDeleting(false);
-    }
-  }
 
 
   const handlePress = () => setEditable((prev) => !prev);
@@ -203,18 +168,18 @@ export default function GroupDetails({
         <Alert />
 
         <View style={{ justifyContent: "center" }}>
-          <Back onPress={() => setShowGD(0)} />
+          <Back onPress={() => setShowPreview(0)} />
           <View style={{ position: "absolute", alignSelf: "center" }}>
             <Text style={styles.title}>Preview</Text>
           </View>
         </View>
 
         
-          <Text style={styles.groupName}>{name} Group</Text>
+          <Text style={styles.groupName}>{allValues.name} Group</Text>
 
         {isConnected === false ? (
           <Text style={styles.notfound}>No Internet Connection</Text>
-        ) : fetching ? <View style={{flex:1, justifyContent:'center'}}><ActivityIndicator size="large" color="grey"/></View> : (
+        ) : (
           <FlatList
             data={results}
             renderItem={({ item }) => (
@@ -244,9 +209,9 @@ export default function GroupDetails({
 
         
         
-        <Pressable  style={styles.createButton} onPress={deleteGroup}>
-            {fetching ?  <ActivityIndicator size="small" color="white" />
-             : <Text style={styles.createButtonText}>Delete Group</Text> }
+        <Pressable  style={styles.createButton} onPress={createGroup}>
+            {isSubmitting ?  <ActivityIndicator size="small" color="white" />
+             : <Text style={styles.createButtonText}>Create Group</Text> }
            </Pressable>
            
 
@@ -264,6 +229,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15 * w,
     paddingTop: h * 20,
     alignSelf: "center",
+    justifyContent:'flex-end',
   },
 
   title: {
@@ -298,12 +264,12 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_600SemiBold",
     fontSize: 15 * h + 15 * w,
     textAlign: "center",
-    marginTop: h * 10,
+    marginVertical: h * 15,
   },
   createButton: {
-    backgroundColor: "#D41A10",
+    backgroundColor: "#539DF3",
     borderRadius:44,
-    alignSelf:'center',
+    alignSelf:'flex-end',
     paddingHorizontal:25*w,
     paddingVertical: 15*h,
     flexDirection:'row',
@@ -311,7 +277,9 @@ const styles = StyleSheet.create({
     columnGap:w*8,
     justifyContent:'center',
     boxShadow: "2px 4px 7.4px 0px rgba(0, 0, 0, 0.35)",
-    marginVertical:h*20,
+    position:'absolute',
+    marginRight:w*25,
+    marginBottom:h*25,
   },
 
   createButtonText: {
