@@ -40,7 +40,7 @@ export default function Groups() {
       }
     }, [isConnected])
 
-
+    
   const fetchGroups = async () => {
     try {
       

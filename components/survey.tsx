@@ -160,7 +160,7 @@ export default function Survey() {
             `${url}/student/identify/learningstyle`,
             {
               headers: { Authorization: `Bearer ${token}` },
-              timeout: 1000 * 35,
+              timeout: 1000 * 55,
             }
           );
           await openAlert(

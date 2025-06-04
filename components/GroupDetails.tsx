@@ -50,6 +50,7 @@ export default function GroupDetails({
   const { token, user } = useUserStore();
   const {groups, setGroups} = useGroupStore();
   const backup = useRef<User[]>(results);
+  const role = user?.role !== "student" ? "admin" : "student";
 
   useEffect(() => {
     if (isConnected || isConnected === null) fetchGroup();
@@ -59,8 +60,8 @@ export default function GroupDetails({
     try {
       if (isConnected || isConnected === null) {
         setFetching(true);
-      
-        const res = await axios.get(`${url}/admin/group/${id}`, {
+        
+        const res = await axios.get(`${url}/${role}/group/${id}`, {
           timeout: 1000 * 35,
           headers: {
             "Content-Type": "application/json",
@@ -108,7 +109,7 @@ export default function GroupDetails({
     }
   };
 
-  console.log(user?.role)
+  
 
   const deleteGroup = async () => {
     try {
@@ -125,6 +126,8 @@ export default function GroupDetails({
         });
 
         setGroups(groups.filter(group=>group._id!==res.data._id));
+        setShowGD(0);
+        //console.log(groups);
         
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
@@ -177,10 +180,10 @@ export default function GroupDetails({
           paddingBottom: h * 6,
         }}
       >
-
+        
         <Text style={styles.friends}>{text}</Text>
-        { user?.role !== 'student' && 
-        editable ? (
+        { role !== 'student' && 
+        (editable ? (
           <View style={{flexDirection:'row'}}>
             <Text onPress={handleUndo} style={styles.edit}>Undo | </Text>
             <Text onPress={handlePress} style={styles.edit}>Done</Text>
@@ -189,11 +192,11 @@ export default function GroupDetails({
           <Text onPress={handlePress} style={styles.edit}>
             Edit
           </Text>
-        )}
+        ))}
       </View>
     );
   }
-
+  
   return (
     <View
       style={{
@@ -249,7 +252,7 @@ export default function GroupDetails({
         
         {user?.role!== "student" && 
         <Pressable  style={styles.createButton} onPress={deleteGroup}>
-            {fetching ?  <ActivityIndicator size="small" color="white" />
+            {deleting ?  <ActivityIndicator size="small" color="white" />
              : <Text style={styles.createButtonText}>Delete Group</Text> }
            </Pressable>
            }
@@ -269,6 +272,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15 * w,
     paddingTop: h * 20,
     alignSelf: "center",
+    justifyContent:'flex-end',
   },
 
   title: {
@@ -308,15 +312,17 @@ const styles = StyleSheet.create({
   createButton: {
     backgroundColor: "#D41A10",
     borderRadius:44,
-    alignSelf:'center',
+    alignSelf:'flex-end',
     paddingHorizontal:25*w,
     paddingVertical: 15*h,
     flexDirection:'row',
     alignItems:'center',
     columnGap:w*8,
+    position:"absolute",
     justifyContent:'center',
     boxShadow: "2px 4px 7.4px 0px rgba(0, 0, 0, 0.35)",
-    marginVertical:h*20,
+    marginRight:h*20,
+    marginBottom:h*20,
   },
 
   createButtonText: {
