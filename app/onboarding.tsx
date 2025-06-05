@@ -1,21 +1,12 @@
 import { Text, View } from "@/components/Themed";
-import {
-  StyleSheet,
-  Pressable,
-  ScrollView,
-  Dimensions,
-  Image,
-  SafeAreaView,
-  Platform,
-} from "react-native";
+import { StyleSheet, Pressable, ScrollView,} from "react-native";
 import { useRouter } from "expo-router";
 import { useState, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DashedProgress from "@/components/DashedProgress";
 import NextButton from "@/components/NextButton";
 import LottieView from "lottie-react-native";
-import { w, h, width, base_height } from "../app/_layout";
+import { w, h, width, height} from "../app/_layout";
 
 
 const onboardingData = [
@@ -40,22 +31,22 @@ const onboardingData = [
 ];
 
 export default function onboarding() {
-  const insets = useSafeAreaInsets();
+  
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
-
-  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-
+ 
 
   const handleNext = () => {
+   
     if (currentPage < onboardingData.length - 1) {
       const nextPage = currentPage + 1;
-      setCurrentPage(nextPage);
       scrollViewRef.current?.scrollTo({
-        x: nextPage * screenWidth,
+        x: nextPage * (width*0.92),
         animated: true,
       });
+      
+      
     } else {
       router.replace("/(student)");
     }
@@ -66,16 +57,16 @@ export default function onboarding() {
   };
 
   const handleScroll = (event: any) => {
-    const contentOffsetX = event.nativeEvent.contentOffset.x;
-    const pageIndex = Math.round(contentOffsetX / screenWidth);
-    setCurrentPage(pageIndex);
+
+      const contentOffsetX = event.nativeEvent.contentOffset.x;
+      setCurrentPage(Math.ceil(contentOffsetX/width));
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+  
+      
       <LinearGradient
-        style={[styles.gradient, { width: Platform.OS === 'web' ? '92%' : '92%' }]}
+        style={styles.container}
         colors={["#ADD8E6", "#EAF5F8"]}
         locations={[0.27, 1]}
       >
@@ -86,21 +77,14 @@ export default function onboarding() {
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           onScroll={handleScroll}
-          scrollEventThrottle={16}
-          style={styles.scrollView}
-          contentContainerStyle={{ alignItems: 'center', minHeight: screenHeight * 0.85 }}
+          scrollEventThrottle={20}
+          contentContainerStyle={{ alignItems: 'center', flexGrow:1 }}
         >
           {onboardingData.map((item, index) => (
-            <View key={item.id} style={[styles.slide, { 
-              width: screenWidth * (Platform.OS === 'web' ? 0.92 : 0.92),
-              minHeight: screenHeight * 0.85,
-              paddingHorizontal: screenWidth * 0.04, 
-              }
-              ]}
+            <View key={item.id} style={styles.slide}
               >
               <View style={styles.imageContainer}>
-                    {/*<Image source={item.image} style={styles.image} resizeMode="contain"/>*/}
-                    <LottieView source={item.image} style={[styles.image, { maxHeight: screenHeight * 0.35 }]} resizeMode="contain" autoPlay={true} loop={true}/>
+                    <LottieView source={item.image} style={[styles.image, { maxHeight: height * 0.35 }]} resizeMode="contain" autoPlay={true} loop={true}/>
               </View>
 
               <View style={styles.contentContainer}>
@@ -116,7 +100,7 @@ export default function onboarding() {
             <DashedProgress
               totalDashes={onboardingData.length}
               focusedDash={currentPage+1}
-              onPress={() => {}}
+              onPress={()=> {}}
             />
           </View>
 
@@ -130,32 +114,25 @@ export default function onboarding() {
           </View>
         </View>
       </LinearGradient>
-    </View>
-    </SafeAreaView>
+    
   );
 }
 
 const styles = StyleSheet.create({
+  
   container: {
-    flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-  },
-  gradient: {
     flex: 1,
     alignSelf: 'center',
     backgroundColor: "rgba(173, 216, 230, 0.25)",
+    width: "92%",
     borderRadius: 24,
-    //paddingHorizontal: height * 0.024,
-  },
-  scrollView: {
-    flex: 1,
+    
   },
 
   slide: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    width:width*0.92,
   },
 
   imageContainer: {
@@ -177,9 +154,6 @@ const styles = StyleSheet.create({
     flex: 0.5,
     width: '100%',
     alignItems: 'center',
-    //paddingHorizontal: h * 10 + w * 10,
-    //marginBottom: h * 5,
-
   },
 
   title: {
