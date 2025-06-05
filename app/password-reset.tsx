@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useRouter, Link } from "expo-router";
-import { h, height, OS } from "./_layout";
+import { h, height } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState, useEffect, useRef } from "react";
@@ -427,7 +427,7 @@ export default function PasswordReset() {
       <ScrollView
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', height:height-(OS==='android'?0:insets.top)}}
+      contentContainerStyle={{alignItems:'center', flexGrow:1}}
       >
         <LinearGradient
           style={styles.container}
@@ -594,7 +594,7 @@ export default function PasswordReset() {
       //style={{borderWidth:10}}
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', height:height-(OS==='android'?0:insets.top)}}
+      contentContainerStyle={{alignItems:'center', flexGrow:1}}
       >
       <LinearGradient
         style={styles.container}

@@ -5,7 +5,6 @@ import { Text, View } from "@/components/Themed";
 import { Image, useImage } from "expo-image";
 import { height, w, h, width, OS} from "./_layout";
 import ContentLoader, { Rect, Circle } from "react-content-loader/native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const imgSource = require("@/assets/images/guy-reads.png");
 const eduMatch = require("@/assets/images/edumatch.png");
@@ -30,15 +29,8 @@ const MyLoader = ({ wi, hi }: any) => (
 //This is where redirection happens
 
 export default function Index() {
-  const insets = useSafeAreaInsets();
   const { user, token, setUser } = useUserStore();
-
-  if (token)
-  {
-    if(user?.role === 'student') return <Redirect href="/(student)" />;
-    else return <Redirect href="/(admin)" />;
-  } 
-    
+  
 
   const image = useImage(eduMatch, {
     maxWidth: 550,
@@ -49,18 +41,23 @@ export default function Index() {
   });
 
 
+  if (token)
+  {
+    if(user?.role === 'student') return <Redirect href="/(student)" />;
+    else return <Redirect href="/(admin)" />;
+  } 
+
   return (
     <View style={styles.container}>
       <Image
         source={imgSource}
         style={{
-          height: height * 0.41 - insets.top,
+          height: height * 0.41 ,
           width: width * 0.92,
           position: "absolute",
           zIndex: 0,
           borderBottomLeftRadius: 24*h,
           borderBottomRightRadius: 24*h,
-          top: h * 482,
         }}
         contentFit="fill"
       />
@@ -134,6 +131,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: h * 30,
     alignItems: "center",
     alignSelf: "center",
+    justifyContent:'flex-end'
   },
 
   mainContent: {

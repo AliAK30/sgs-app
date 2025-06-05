@@ -11,10 +11,10 @@ import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
 import { useUserStore } from "@/hooks/useStore";
-import { h, w , width, height, OS} from "@/app/_layout";
+import { h, w , width, height} from "@/app/_layout";
 import { User } from "@/types";
 import { PieChart, pieDataItem } from "react-native-gifted-charts";
-import {BlurView} from "expo-blur";
+import { ImageBackground } from "expo-image";
 
 type Props = {
     openProfile: boolean;
@@ -23,6 +23,7 @@ type Props = {
     similarity: number;
 }
 
+const blurImage = require("@/assets/images/blur.png")
 type ExtendedUser = User & {print?: string, age?: number};
 
 const obj: ExtendedUser = {
@@ -220,8 +221,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                     <Pressable style={styles.addFriend}><Text style={styles.addFriendText}>Add Friend</Text></Pressable>
                 </View>
                 <View style={{ marginTop:h*15, justifyContent:'center'}}>
-                <View style={[styles.details, {alignItems:'center', paddingVertical:h*20, filter:checkingLS !== 2 ? "blur(5px)": []}]}>
-                        
+                <View style={[styles.details, {alignItems:'center', paddingVertical:h*20}]}>
                         <PieChart
                         radius={25*h+25*w}
                         showGradient
@@ -239,18 +239,18 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                 
                 {checkingLS !== 2 &&  
                 
-                (<BlurView 
+                (<ImageBackground 
                 style={styles.blurview}
-                //tint="extraLight"
-                intensity={OS=== 'ios' ? 25 : 0}
-                
+                source={blurImage}
+                imageStyle={{borderRadius:8,}}
+                blurRadius={5}
                 >   
                     {checkingLS ? <ActivityIndicator size="large" color='grey'/> :
                     <Pressable style={styles.similarity} onPress={checkLS}>
                         <Text style={styles.similarityText}>Check Similarity</Text>
                     </Pressable>
                     }
-                </BlurView>)
+                </ImageBackground>)
                 }
 
 
@@ -324,7 +324,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(230, 236, 245, 0.96)',
         borderRadius:8,
         marginTop:h*6,
-        
         boxShadow: "0px 1px 4px 0px rgba(0, 0, 0, 0.25)",
         
     },
@@ -391,9 +390,11 @@ const styles = StyleSheet.create({
 
     blurview: {
         position:'absolute', 
-        backgroundColor: 'rgba(255, 255, 255, 0)',
+        //backgroundColor: 'rgba(230, 236, 245, 0)',
         width:'100%',
-        alignSelf:'center',
+        height:"100%",
+        //top:h*7, 
+        //left:w*3,       
         alignItems:'center',
         justifyContent:'center',      
     },

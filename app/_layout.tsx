@@ -61,7 +61,7 @@ export const unstable_settings = {
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-OS !== 'web' && SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 //Hide navigation bar on android
 OS==='android' && NavigationBar.setBehaviorAsync('overlay-swipe');
 
@@ -89,10 +89,6 @@ export default function RootLayout() {
 
   const {setSectionsCount} = useSurveyStore();
 
-  //we will pass this as a prop on the choose "admin" or student login screen
-  //const [role, setRole] = useState<string>("");
-
-  
 
   useEffect(() => {
     if (OS === 'android') {
@@ -106,7 +102,6 @@ export default function RootLayout() {
   }, [visibility]);
 
   useEffect(() => {
-    
     
     initialize();
 
@@ -126,6 +121,7 @@ export default function RootLayout() {
     }
   }, [loaded, isUserLoaded]);
 
+
   const initialize = async () => {
     
     try {
@@ -143,9 +139,6 @@ export default function RootLayout() {
     }
   };
 
-  if (!loaded || !isUserLoaded) {
-    return <Loader size="large" color="blue" />;
-  }
 
   return (
     <View style={styles.container}>
