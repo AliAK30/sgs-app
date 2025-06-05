@@ -14,7 +14,6 @@ const MyLoader = ({ wi, hi }: any) => (
     speed={2}
     width={wi}
     height={hi}
-    //viewBox={`0 0 ${229* (height / 817)} ${218* (height / 817)}`}
     backgroundColor="#ffffff"
     foregroundColor="#ecebeb"
   >
@@ -51,14 +50,7 @@ export default function Index() {
     <View style={styles.container}>
       <Image
         source={imgSource}
-        style={{
-          height: height * 0.41 ,
-          width: width * 0.92,
-          position: "absolute",
-          zIndex: 0,
-          borderBottomLeftRadius: 24*h,
-          borderBottomRightRadius: 24*h,
-        }}
+        style={styles.backgroundImage}
         contentFit="fill"
       />
 
@@ -159,6 +151,15 @@ const styles = StyleSheet.create({
   icon: {
     width: 48.86,
     height: 41.62,
+  },
+
+  backgroundImage: {
+          height: height * 0.41 ,
+          width: width * 0.92,
+          position: "absolute",
+          zIndex: 0,
+          borderBottomLeftRadius: 24*h,
+          borderBottomRightRadius: 24*h,
   },
 
   buttonTitle: {
