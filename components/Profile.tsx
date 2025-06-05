@@ -220,7 +220,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                     <Pressable style={styles.addFriend}><Text style={styles.addFriendText}>Add Friend</Text></Pressable>
                 </View>
                 <View style={{ marginTop:h*15, justifyContent:'center'}}>
-                <View style={[styles.details, {alignItems:'center', paddingVertical:h*20}]}>
+                <View style={[styles.details, {alignItems:'center', paddingVertical:h*20, filter:checkingLS !== 2 ? "blur(5px)": []}]}>
                         
                         <PieChart
                         radius={25*h+25*w}
@@ -238,20 +238,11 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                 </View>
                 
                 {checkingLS !== 2 &&  
-                OS === 'web' ?
-
-                (<View style={[styles.blurview, {backdropFilter: 'saturate(150%) blur(5px)'}]}>   
-                    {checkingLS ? <ActivityIndicator size="large" color='grey'/> :
-                    <Pressable style={styles.similarity} onPress={checkLS}>
-                        <Text style={styles.similarityText}>Check Similarity</Text>
-                    </Pressable>
-                    }
-                </View>)
-                :
+                
                 (<BlurView 
                 style={styles.blurview}
-                tint="extraLight"
-                intensity={25}
+                //tint="extraLight"
+                intensity={OS=== 'ios' ? 25 : 0}
                 
                 >   
                     {checkingLS ? <ActivityIndicator size="large" color='grey'/> :
@@ -400,11 +391,8 @@ const styles = StyleSheet.create({
 
     blurview: {
         position:'absolute', 
-        width:"99%", 
-        height:"95%", 
-        backgroundColor: 'rgba(239, 239, 239, 0.6)',
-        borderRadius:8,
-        marginTop:h*6,
+        backgroundColor: 'rgba(255, 255, 255, 0)',
+        width:'100%',
         alignSelf:'center',
         alignItems:'center',
         justifyContent:'center',      
