@@ -13,7 +13,7 @@ import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
 import { h, w } from "@/app/_layout";
-import Back from "./Back";
+import Back from "./buttons/Back";
 import { useUserStore, useGroupStore } from "@/hooks/useStore";
 import { GroupType, User } from "@/types";
 import Student from "./Student";

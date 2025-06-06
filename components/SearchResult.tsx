@@ -2,7 +2,7 @@ import { Text, View, TextInput } from "@/components/Themed";
 import { FlatList, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
-import Back from "./Back";
+import Back from "./buttons/Back";
 import { useState, useEffect,useMemo, useRef, useCallback } from "react";
 import { useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
     color: "#85878D",
     fontSize: w * 8.5 + h * 8,
-    outlineWidth: 0,
+    outlineColor: 'rgba(0,0,0,0)',
   },
 
   friends: {

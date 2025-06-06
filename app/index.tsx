@@ -3,27 +3,11 @@ import { Redirect, router } from "expo-router";
 import { StyleSheet, Pressable } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { Image, useImage } from "expo-image";
-import { height, w, h, width, OS} from "./_layout";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
+import { height, w, h, width} from "./_layout";
+import SkeletonLoader from "@/components/SkeletonLoader";
 
 const imgSource = require("@/assets/images/guy-reads.png");
 const eduMatch = require("@/assets/images/edumatch.png");
-
-const MyLoader = ({ wi, hi }: any) => (
-  <ContentLoader
-    speed={2}
-    width={wi}
-    height={hi}
-    backgroundColor="#ffffff"
-    foregroundColor="#ecebeb"
-  >
-    <Circle cx={wi / 2.6} cy={hi / 2} r={wi / 7} />
-    <Circle cx={wi / 2.6} cy={hi / 4} r={wi / 7} />
-    <Circle cx={wi / 1.65} cy={hi / 4} r={wi / 7} />
-    <Circle cx={wi / 1.65} cy={hi / 2} r={wi / 7} />
-    <Rect x={wi / 5.4} y={hi / 1.39} width={wi * 0.6} height={hi * 0.15} />
-  </ContentLoader>
-);
 
 //This is where redirection happens
 
@@ -55,7 +39,7 @@ export default function Index() {
       />
 
       {!image ? (
-        <MyLoader wi={229 * (height / 817)} hi={218 * (height / 817)} />
+        <SkeletonLoader w={229 * (height / 817)} h={218 * (height / 817)} />
       ) : (
         <Image
           source={image}
@@ -73,7 +57,7 @@ export default function Index() {
           style={[styles.button, { backgroundColor: "#50BFAF" }]}
           onPress={() => {
             setUser({ role: "student" });
-            router.push("/onboarding");
+            router.push("/login");
           }}
         >
           <Image

@@ -15,7 +15,7 @@ import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-import Back from "@/components/Back";
+import Back from "@/components/buttons/Back";
 import { LinearGradient } from "expo-linear-gradient";
 import { EyeIcon, WarnIcon } from "@/components/Icons";
 import { University } from "@/types";
@@ -30,6 +30,8 @@ import Checkbox from "expo-checkbox";
 import ServiceTerms from "@/components/ServiceTerms";
 import PrivacyPolicy from "@/components/PrivacyPolicy";
 import Modal from "react-native-modal";
+import FooterLink from "@/components/FooterLink";
+import SubmitButton from "@/components/buttons/SubmitButton";
 
 const firstSchema = yup
   .object()
@@ -264,11 +266,6 @@ export default function Registration() {
             }
           }
 
-          if(e.status === 429)
-          {
-            openAlert("fail", "Error", e.response.data.message);
-          }
-    
           if (e.status === 500) {
             openAlert("fail", "Failed!", e.message);
             return;
@@ -418,28 +415,9 @@ export default function Registration() {
               )}
             />
 
-            <Pressable
-              style={[
-                styles.button,
-                { backgroundColor: isValid ? "#007BFF" : "rgba(0, 0, 0, 0.4)" },
-              ]}
-              onPress={handleSubmit(checkEmail)}
-            >
-              {isSubmitting ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <Text
-                  style={{
-                    fontFamily: "Inter_600SemiBold",
-                    color: "#ffffff",
-                    fontSize: height * 0.0196,
-                    textAlign: "center",
-                  }}
-                >
-                  CONTINUE
-                </Text>
-              )}
-            </Pressable>
+           <View style={styles.button}>
+            <SubmitButton onPress={handleSubmit(checkEmail)} text="CONTINUE" isValid={isValid} isSubmitting={isSubmitting}/>
+           </View>
           </View>
         ) : (
           <View style={styles.inputView}>
@@ -811,59 +789,15 @@ export default function Registration() {
               >Privacy Policy</Text></Pressable></Text>
             
           </View>
-        
-    
-            <Pressable
-              style={[
-                styles.button,
-                {
-                  backgroundColor: secondForm.formState.isValid
-                    ? "#007BFF"
-                    : "rgba(0, 0, 0, 0.4)",
-                },
-              ]}
-
-              onPress={secondForm.handleSubmit(register)}
-            >
-              {secondForm.formState.isSubmitting ? (
-                <ActivityIndicator size="small" color="white" />
-              ) : (
-                <Text
-                  style={{
-                    fontFamily: "Inter_600SemiBold",
-                    color: "#ffffff",
-                    fontSize: height * 0.0196,
-                    textAlign: "center",
-                  }}
-                >
-                  SIGN UP
-                </Text>
-              )}
-            </Pressable>
+                
+             <View style={styles.button}> 
+              <SubmitButton onPress={secondForm.handleSubmit(register)} text="SIGN UP" isValid={secondForm.formState.isValid} isSubmitting={secondForm.formState.isSubmitting}/>
+              </View>
+            
           </View>
         )}
 
-<View style= {{ flexDirection: 'row', flex:1, padding:height*0.03, alignItems:'flex-end', alignSelf:'center'}}>
-          <Text style={[styles.inputLabel, { fontSize: height * 0.019 }]}>
-            {" "}
-            Already a user?
-          </Text>
-          <Link href="/login" asChild>
-            <Pressable hitSlop={20}>
-              <Text
-                style={{
-                  fontFamily: "Inter_600SemiBold",
-                  color: "#007BFF",
-                  textDecorationLine: "underline",
-                  fontSize: height * 0.019,
-                }}
-              >
-                {" "}
-                Log in
-              </Text>
-            </Pressable>
-          </Link>
-        </View>
+        <FooterLink footerText="Already a user?" linkText="Log in" link="/login"/>
       </LinearGradient>
     </ScrollView>
   );
@@ -878,7 +812,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(173, 216, 230, 0.25)",
     borderRadius: 24,
     paddingHorizontal: height * 0.024,
-    paddingVertical:h*20,
+    paddingTop:h*20,
   },
 
   heading: {
@@ -939,10 +873,6 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    marginBottom: height * 0.019,
-    boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-    borderRadius: 10,
-    paddingVertical: height * 0.0208,
     marginTop: height * 0.04161,
   },
 

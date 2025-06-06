@@ -2,7 +2,7 @@ import { Text, View } from "@/components/Themed";
 import { StyleSheet } from "react-native";
 import { height } from "../app/_layout";
 import { useUserStore } from "@/hooks/useStore";
-import Back from "@/components/Back";
+import Back from "@/components/buttons/Back";
 import LearningStyleComponent from "@/components/LearningStyle";
 import { useRouter } from "expo-router";
 

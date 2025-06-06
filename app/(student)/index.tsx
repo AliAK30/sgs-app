@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Image } from "expo-image";
 import SearchResult from "@/components/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import {w, h,} from "../_layout"
+import {w, h, OS} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/SimilarStudents";
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_500Medium',
         color:'#85878D',
         fontSize: w*8.5+h*8,
-        outlineWidth:0
+        outlineColor: 'rgba(0, 0, 0, 0)',
     },
 
     findTwin: {

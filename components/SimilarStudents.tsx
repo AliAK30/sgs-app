@@ -1,7 +1,7 @@
 import { Text, View, TextInput } from "@/components/Themed";
 import { FlatList, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Back from "./Back";
+import Back from "./buttons/Back";
 import { useState, useEffect, useRef,} from "react";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";

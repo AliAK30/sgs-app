@@ -1,12 +1,6 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import {
-  StyleSheet,
-  Pressable,
-  ActivityIndicator,
-  ScrollView,
-} from "react-native";
+import {StyleSheet, ScrollView } from "react-native";
 import { Image, useImage } from "expo-image";
-import ContentLoader, { Rect, Circle } from "react-content-loader/native";
 import { useRouter, Link, Redirect } from "expo-router";
 import { height, h, OS} from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
@@ -19,7 +13,12 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import { useState } from "react";
 import { WarnIcon, EyeIcon } from "@/components/Icons";
-import Back from "@/components/Back";
+import Back from "@/components/buttons/Back";
+import SubmitButton from "@/components/buttons/SubmitButton";
+import FooterLink from "@/components/FooterLink";
+import StyledInput from "@/components/inputs/StyledInput";
+import SkeletonLoader from "@/components/SkeletonLoader";
+import StyledPasswordInput from "@/components/inputs/StyledPasswordInput";
 
 const imgSource = require("@/assets/images/edumatch.png");
 
@@ -41,22 +40,7 @@ type User = yup.InferType<typeof schema>;
 
 const failedColor = "rgb(255, 0, 0)";
 
-const MyLoader = ({ w, h }: any) => (
-  <ContentLoader
-    speed={2}
-    width={w}
-    height={h}
-    //viewBox={`0 0 ${229* (height / 817)} ${218* (height / 817)}`}
-    backgroundColor="#ffffff"
-    foregroundColor="#ecebeb"
-  >
-    <Circle cx={w / 2.6} cy={h / 2} r={w / 7} />
-    <Circle cx={w / 2.6} cy={h / 4} r={w / 7} />
-    <Circle cx={w / 1.65} cy={h / 4} r={w / 7} />
-    <Circle cx={w / 1.65} cy={h / 2} r={w / 7} />
-    <Rect x={w / 5.4} y={h / 1.39} width={w * 0.6} height={h * 0.15} />
-  </ContentLoader>
-);
+
 
 
 
@@ -70,7 +54,6 @@ export default function Login() {
   const {setSectionsCount} = useSurveyStore();
 
   
-
   const {
     control,
     handleSubmit,
@@ -150,7 +133,7 @@ export default function Login() {
       }
     }
   };
-  
+
   //redirect back to index if user has not selected a role
   if(!user?.role) return <Redirect href='/'/>
   if(token) {
@@ -170,7 +153,7 @@ export default function Login() {
           </View>
       <Alert />
       {!image ? (
-        <MyLoader w={229 * (height / 817)} h={218 * (height / 817)} />
+        <SkeletonLoader w={229 * (height / 817)} h={218 * (height / 817)} />
       ) : (
         <Image
           source={image}
@@ -188,24 +171,7 @@ export default function Login() {
           control={control}
           name="email"
           render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ justifyContent: "center" }}>
-              <TextInput
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                style={[
-                  styles.input,
-                  { borderColor: errors.email ? failedColor : "#D8DADC" },
-                ]}
-                placeholder="abc@gmail.com"
-                placeholderTextColor="rgba(0, 0, 0, 0.30)"
-                inputMode="text"
-              />
-              {errors.email && <WarnIcon />}
-              {errors.email && (
-          <Text style={styles.inputError}>{errors.email.message}</Text>
-        )}
-            </View>
+            <StyledInput value={value} onChangeText={onChange} onBlur={onBlur} placeholder="johndoe@xyz.com" error={errors.email} inputMode="text" placeholderTextColor="rgba(0, 0, 0, 0.30)"/>
           )}
         />
         
@@ -215,50 +181,13 @@ export default function Login() {
           control={control}
           name="password"
           render={({ field: { onChange, onBlur, value } }) => (
-            <View style={{ justifyContent: "center" }}>
-              <TextInput
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                style={[
-                  styles.input,
-                  { borderColor: errors.password ? failedColor : "#D8DADC" },
-                ]}
-                inputMode="text"
-                secureTextEntry={!showPassword}
-              />
-              {errors.password && <WarnIcon />}
-              {errors.password && (
-          <Text style={styles.inputError}>{errors.password.message}</Text>
-        )}
-              {!errors.password && (showPassword ? <EyeIcon name="eye-outline" onTap={()=>setShowPassword(!showPassword)}/>: <EyeIcon name="eye-off-outline" onTap={()=>setShowPassword(!showPassword)}/>)}
-            </View>
+            <StyledPasswordInput value={value} onChangeText={onChange} onBlur={onBlur} error={errors.password} inputMode="text" onSubmitEditing={handleSubmit(onSubmit)}/>
           )}
         />
         
+          
+        <View style={styles.button}><SubmitButton onPress={handleSubmit(onSubmit)} text="LOGIN" isValid={isValid} isSubmitting={isSubmitting}/></View>
 
-        <Pressable
-          style={[
-            styles.button,
-            { backgroundColor: isValid ? "#007BFF" : "rgba(0, 0, 0, 0.4)" },
-          ]}
-          onPress={handleSubmit(onSubmit)}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator size="small" color="white" />
-          ) : (
-            <Text
-              style={{
-                fontFamily: "Inter_600SemiBold",
-                color: "#ffffff",
-                fontSize: height * 0.0196,
-                textAlign: "center",
-              }}
-            >
-              LOGIN
-            </Text>
-          )}
-        </Pressable>
       </View>
 
       <Link href="/password-reset">
@@ -268,24 +197,9 @@ export default function Login() {
       </Link>
 
 
-      {user?.role==='student' && <View style= {{ flexDirection: 'row', flex:1, padding:height*0.03, alignItems:'flex-end', alignSelf:'center'}}>
-              <Text style={[styles.inputLabel, {fontSize: height * 0.019}]}> Don't have an account?</Text>
-              <Link href="/registration" asChild>
-                <Pressable hitSlop={20}>
-                <Text
-                  style={{
-                    fontFamily: "Inter_600SemiBold",
-                    color: "#007BFF",
-                    textDecorationLine: "underline",
-                    fontSize: height * 0.019,
-                  }}
-                > {" "}Sign up</Text>
-                </Pressable>
-                </Link>
-              </View>
-      }
+      {user?.role==='student' && <FooterLink footerText="Don't have an account?" linkText="Sign up" link="/registration"/>}
 
-              </View>
+        </View>
     </ScrollView>
   );
 
@@ -344,9 +258,6 @@ const styles = StyleSheet.create({
 
   button: {
     marginBottom: height * 0.019,
-    boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-    borderRadius: 10,
-    paddingVertical: height * 0.0208,
     marginTop: height * 0.04161,
   },
 

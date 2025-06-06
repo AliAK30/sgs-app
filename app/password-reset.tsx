@@ -16,7 +16,7 @@ import { useAlert } from "@/hooks/useAlert";
 import { useBanner } from "@/hooks/useBanner";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-import Back from "@/components/Back";
+import Back from "@/components/buttons/Back";
 import { LinearGradient } from "expo-linear-gradient";
 import OTPInput from "@/components/OTPInput";
 import { EyeIcon, WarnIcon } from "@/components/Icons";

@@ -16,7 +16,7 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import { useRouter } from "expo-router";
 import { useUserStore } from "@/hooks/useStore";
 import axios from "axios";
-import Back from "@/components/Back";
+import Back from "@/components/buttons/Back";
 import { Redirect } from "expo-router";
 import useSection from "@/hooks/useSection";
 import { Answer } from "@/types";

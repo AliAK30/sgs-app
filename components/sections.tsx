@@ -6,8 +6,7 @@ import { height, h } from "../app/_layout";
 import { useAlert } from "@/hooks/useAlert";
 import useSection from "@/hooks/useSection";
 import { useSurveyStore } from "@/hooks/useStore";
-import Survey from "./survey";
-
+import Survey from "./Survey";
 /* const getAnswers = async () => {
   try {
     let tempAnswers = await AsyncStorage.getItem("answers");

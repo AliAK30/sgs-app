@@ -14,7 +14,7 @@ import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
 import { h, w, OS } from "@/app/_layout";
-import Back from "./Back";
+import Back from "./buttons/Back";
 import { useUserStore } from "@/hooks/useStore";
 import RNPickerSelect from "react-native-picker-select";
 import { University } from "@/types";
