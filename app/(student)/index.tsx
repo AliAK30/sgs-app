@@ -10,7 +10,8 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/SimilarStudents";
 import { formatTwoWordsName } from "@/utils";
-import * as Haptics from '@/components/Haptics';
+import * as Haptics from 'expo-haptics';
+import { triggerVibration } from "@/constants/Vibrations";
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
