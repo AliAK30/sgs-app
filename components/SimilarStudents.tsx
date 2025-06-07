@@ -1,5 +1,5 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { FlatList, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import { FlatList, Pressable, StyleSheet, ActivityIndicator, Vibration } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Back from "./Back";
 import { useState, useEffect, useRef,} from "react";
@@ -147,7 +147,7 @@ function SimilarStudents({
       >
         
         <View style={{justifyContent:'center'}}>
-          <Back onPress={() => setClick(0)} />
+          <Back onPress={() => {setClick(0),Vibration.vibrate(20);}} />
             <View style={{position:'absolute', alignSelf:'center'}}>
           <Text style={styles.title}>Similar to you</Text>
           </View>

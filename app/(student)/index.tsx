@@ -1,7 +1,7 @@
 import { View, Text, TextInput } from "@/components/Themed";
-import { StyleSheet, ScrollView, Pressable, } from "react-native";
+import { StyleSheet, ScrollView, Pressable} from "react-native";
 import { useUserStore } from "@/hooks/useStore";
-import { useState } from "react";
+import { useState, useEffect, } from "react";
 import { Image } from "expo-image";
 import SearchResult from "@/components/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
@@ -10,6 +10,15 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/SimilarStudents";
 import { formatTwoWordsName } from "@/utils";
+import * as Haptics from 'expo-haptics';
+import { triggerVibration } from "@/constants/Vibrations";
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withTiming,
+    interpolateColor,
+    withSequence,
+    } from 'react-native-reanimated';
 
 
 const imgSource2 = require("@/assets/images/bino.svg");
@@ -23,6 +32,85 @@ export default function Index() {
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
     
+     // Typewriter effect state
+    const [displayedText, setDisplayedText] = useState("");
+    const [showEmoji, setShowEmoji] = useState(false);
+
+    // Animation values
+    const searchPressed = useSharedValue(0);
+    const cardScale = useSharedValue(1);
+    const emojiRotation = useSharedValue(0);
+
+    
+
+    // Typewriter effect
+    useEffect(() => {
+        const fullText = `Hey ${formatTwoWordsName(user?.first_name ?? "")} `;
+        let currentIndex = 0;
+
+        const typeInterval = setInterval(() => {
+        if (currentIndex <= fullText.length) {
+            setDisplayedText(fullText.slice(0, currentIndex));
+            currentIndex++;
+        } else {
+            clearInterval(typeInterval);
+            setShowEmoji(true);
+            // Start emoji wave animation after typewriter finishes
+            emojiRotation.value = withSequence(
+            withTiming(20, { duration: 200 }),
+            withTiming(-20, { duration: 200 }),
+            withTiming(20, { duration: 200 }),
+            withTiming(0, { duration: 200 })
+            );
+        }
+        }, 80);
+
+        return () => clearInterval(typeInterval);
+    }, [user?.first_name]);
+
+    // Animated styles
+    const searchAnimatedStyle = useAnimatedStyle(() => {
+        const backgroundColor = interpolateColor(
+        searchPressed.value,
+        [0, 1],
+        ['transparent', '#E8F4FD']
+        );
+        return { backgroundColor };
+    });
+
+    const cardAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: cardScale.value }],
+    }));
+
+    const emojiAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ rotate: `${emojiRotation.value}deg` }],
+    }));
+
+    
+
+    // Vibration function
+    // const triggerVibration = (data: number) => {
+    //     switch (data) {
+    //         case 1:
+    //             Vibration.vibrate(15);
+    //             break;
+    //         case 2:
+    //             Vibration.vibrate(25);
+    //             break;
+    //         case 3:
+    //             Vibration.vibrate(35);
+    //             break;
+    //         case 4:
+    //             Vibration.vibrate(45);
+    //             break;
+    //         case 5:
+    //             Vibration.vibrate(55);
+    //             break;
+    //         default:
+    //             Vibration.vibrate(5);
+    //             break;
+    //     }
+    // };
     
     if(click === 1)
         return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
@@ -37,10 +125,23 @@ export default function Index() {
       style={{backgroundColor: '#FFFFFF'}}>
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
             
-            <View>
+            {/*<View>
             <Text style={styles.title}>Hey {formatTwoWordsName(user?.first_name??"")} 👋</Text>
             <Text style={styles.belowTitle}>Connect, Collaborate, Learn in your style!</Text>
+            </View>*/}
+
+            <View>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text style={styles.title}>{displayedText}</Text>
+                {showEmoji && (
+                <Animated.Text style={[styles.title, emojiAnimatedStyle]}>
+                    👋
+                </Animated.Text>
+                )}
             </View>
+            <Text style={styles.belowTitle}>Connect, Collaborate, Learn in your style!</Text>
+            </View>
+
             <Image source={imgSource} style={{width:h*26+w*26, height:h*26+w*26, borderRadius:50}}/>
             
             
@@ -48,28 +149,98 @@ export default function Index() {
         <View style={{flexDirection:'row', columnGap:w*8}}>
             <View style={styles.searchView}>
                 <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
-                <Pressable onPress={()=>{setFetching(true); setClick(1);}} hitSlop={15}><Feather name="search" color="black" size={19}/></Pressable>
+                {/*<Pressable onPress={()=>{setFetching(true); setClick(1); Vibration.vibrate(10);}} hitSlop={15}><Feather name="search" color="black" size={19}/></Pressable>*/}
+                <Pressable
+                onPressIn={() => {
+                searchPressed.value = withTiming(0.96, { duration: 80 });
+                }}
+                onPressOut={() => {
+                searchPressed.value = withTiming(0, { duration: 120 });
+                }}
+                onPress={() => {
+                triggerVibration(1);
+                setFetching(true);
+                setClick(1);
+                }}
+                hitSlop={15}
+            >
+            <Animated.View style={[styles.searchIcon, searchAnimatedStyle]}>
+              <Feather name="search" color="black" size={19} />
+            </Animated.View>
+          </Pressable>
             </View>
             <View style={styles.bell}>
                 <Ionicons name="notifications-outline" color="black" size={19} />
             </View>
         </View>
-        <Pressable onPress={()=>setClick(2)}>
+        {/*<Pressable
+          onPress={() => {
+            setClick(2);
+            Vibration.vibrate(25);
+        }}
+          style={{
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.30,
+            elevation: 20,
+            borderRadius: 20,
+          }}
+        >
         <LinearGradient
-              style={{flexDirection:'row',borderRadius:20}}
-              colors={["#0B0B0B", "rgba(23, 23, 23, 0.98)", "rgba(46, 46, 46, 0.95)" ]}
-              locations={[0.17, 0.34, 0.70]}
+              style={{flexDirection:'row',borderRadius:20, height: h*40+w*40}}
+              colors={["rgba(46, 46, 46, 0.95)", "rgba(23, 23, 23, 0.98)","#0B0B0B" ]}
+              locations={[0.17, 0.60, 0.70]}
               start={{ x: 0.5, y: 0 }}
             >
-                <Image source={imgSource2} style={{width:152*w, height:68*h}}/>
-                <View style={{justifyContent:'center', rowGap:h*4,}}>
-                    <Text style={styles.findTwin}>Find your Study Twin</Text>
-                    <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
-                </View>
-                    
+            <View style={{justifyContent:'flex-end', rowGap:h,}}>
+                <Image source={imgSource2} style={{width:135*w, height:68*h}}/>
+            </View>
+            <View style={{justifyContent:'center', rowGap:h,}}>
+                <Text style={styles.findTwin}>Find your Study Twin</Text>
+                <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
+            </View>
+                
         </LinearGradient>
-        </Pressable>
+        </Pressable>*/}
         
+        <Pressable
+        onPressIn={() => {
+          cardScale.value = withTiming(0.96, { duration: 80 });
+        }}
+        onPressOut={() => {
+          cardScale.value = withTiming(1, { duration: 120 });
+        }}
+        onPress={() => {
+            triggerVibration(3);
+            setTimeout(() => setClick(2), 150);
+        }}
+        style={{
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.30,
+          elevation: 20,
+          borderRadius: 20,
+        }}
+      >
+        <Animated.View style={[{ borderRadius: 20 }, cardAnimatedStyle]}>
+          <LinearGradient
+            style={{ flexDirection: 'row', borderRadius: 20, height: h * 40 + w * 40 }}
+            colors={["rgba(60, 60, 60, 1)", "rgba(35, 35, 35, 1)", "#1A1A1A"]}
+            locations={[0.17, 0.60, 0.70]}
+            start={{ x: 0.5, y: 0 }}
+          >
+            <View style={{ justifyContent: 'flex-end', rowGap: h }}>
+              <Image source={imgSource2} style={{ width: 135 * w, height: 68 * h }} />
+            </View>
+            <View style={{ justifyContent: 'center', rowGap: h }}>
+              <Text style={styles.findTwin}>Find your Study Twin</Text>
+              <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
+            </View>
+          </LinearGradient>
+        </Animated.View>
+      </Pressable>
+
+
     </ScrollView>
   );
 }
@@ -111,6 +282,11 @@ const styles = StyleSheet.create({
         
     },
 
+    searchIcon: {
+        padding: 5,
+        borderRadius: 5,
+    },
+
     bell: {
         backgroundColor:'#FFFFFF',
         borderRadius:9.4,
@@ -126,19 +302,19 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_500Medium',
         color:'#85878D',
         fontSize: w*8.5+h*8,
-        outlineWidth:0
+        //outlineWidth:0
     },
 
     findTwin: {
         color: '#ADD8E6',
         fontFamily:'Inter_600SemiBold',
-        fontSize: 8.5*w+8.5*h,
+        fontSize: 8.5*w+8*h,
     },
 
     findTwinSubText: {
         color: "#FFFEFE",
         fontFamily:'Inter_400Regular',
-        fontSize:5*h+5*w,
+        fontSize:4.5*h+5*w,
     }
 });
 
