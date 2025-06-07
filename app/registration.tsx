@@ -266,6 +266,11 @@ export default function Registration() {
             }
           }
 
+          if(e.status === 429)
+          {
+            openAlert("fail", "Error", e.response.data.message);
+          }
+    
           if (e.status === 500) {
             openAlert("fail", "Failed!", e.message);
             return;
@@ -433,14 +438,12 @@ export default function Registration() {
                     style={{
                       inputIOS: {
                         ...styles.input,
+
                         borderColor: secondForm.formState.errors.uni_name
                           ? failedColor
                           : "#D8DADC",
                       },
-                      iconContainer: {
-                        right: 0.01199 * height,
-                        top: 0.013 * height,
-                      },
+                      
                       inputAndroid: {
                         ...styles.input,
                         borderColor: secondForm.formState.errors.uni_name
@@ -448,22 +451,42 @@ export default function Registration() {
                           : "#D8DADC",
                       },
                       inputWeb: {
+                        
                         ...styles.input,
                         borderColor: secondForm.formState.errors.uni_name
                           ? failedColor
                           : "#D8DADC",
-                        paddingVertical: height*0.010
+                        
                       },
-                      inputIOSContainer: { pointerEvents: "none" },
+                      iconContainer: {
+                        paddingRight: w*3,
+                      },
+                      
+                      viewContainer:{
+                          justifyContent:'center',
+                          paddingBottom:h*15,
+                      },
+                      inputAndroidContainer: {
+                        justifyContent:'center',
+                        marginBottom:h*15.5,
+                      },
+                      inputIOSContainer: { 
+                        pointerEvents: "none", 
+                        justifyContent:'center',
+                        marginBottom:h*15.5,
+                        },
                     }}
+
+                    
                     Icon={() =>
-                      OS !== "web" && (
+                      
                         <EvilIcons
                           name="chevron-down"
-                          size={height * 0.04}
+                          size={h*16+w*16}
                           color="#539DF3"
+                          
                         />
-                      )
+                      
                     }
                     useNativeAndroidPickerStyle={false}
                     placeholder={{ label: "Select your university", value: "" }}
@@ -489,7 +512,7 @@ export default function Registration() {
             
 
             <View style={{ flexDirection: "row",  columnGap:w*10}}>
-                <View style={{rowGap:height*0.008, flex:1}}>
+                <View style={{rowGap:height*0.008, flex:0.7}}>
                 <Text style={styles.inputLabel}>Date of Birth</Text>
                 
               <Controller
@@ -498,25 +521,37 @@ export default function Registration() {
                 render={({ field: { value, onChange} }) => (
                   OS==='web' ? 
                     (<View>
+                    <View style={{flexDirection:'row',
+                    borderStyle: "solid",
+                      borderWidth: 1,
+                      backgroundColor: "#ffffff",
+                      borderRadius: 10,
+                      borderColor: secondForm.formState.errors.dob ? failedColor: "#D8DADC",
+                      alignItems:'center',
+                      justifyContent:'space-between',
+                      paddingRight:w*3,
+                      }}>
                     <input 
                     type="date" 
                     value={value?.toISOString().split('T')[0] ?? (new Date(2025, 1, 1)).toISOString().split('T')[0]} 
                     max={(new Date).toISOString().split('T')[0]}
                     onChange={(e)=> {onChange(e.target.valueAsDate)}} 
-                    style={{backgroundColor: "#ffffff",
-                      borderRadius: 10,
+                    style={{
+                      
                       fontFamily: "Inter_400Regular",
-                      fontSize: height * 0.0196,
+                      fontSize: h*8+w*8,
                       color: "rgba(0, 0, 0, 1)",
                       paddingLeft: w*9,
                       paddingRight: w*9,
-                      paddingTop: height * 0.010,
-                      paddingBottom: height * 0.010,
-                      borderStyle: "solid",
-                      borderWidth: 1,
-                      borderColor: secondForm.formState.errors.dob ? failedColor: "#D8DADC"}}
+                      paddingTop: h*9,
+                      paddingBottom: h*9}}
                       />
-
+                      <EvilIcons
+                        name="chevron-down"
+                        size={h*16+w*16}
+                        color="#539DF3"
+                      />
+                      </View>
                       {secondForm.formState.errors.dob && (
                       <Text style={[styles.inputError, {paddingTop:height*0.015}]}>
                         {secondForm.formState.errors.dob.message}
@@ -549,17 +584,17 @@ export default function Registration() {
                         style={{
                           fontFamily: "Inter_400Regular",
                           flex:1,
-                          fontSize: height * 0.0196,
+                          fontSize: h*8+w*8,
                           color: "rgba(0, 0, 0, 1)",
                           paddingHorizontal:w*9,
-                          paddingVertical: height * 0.011,
+                          paddingVertical: h*9,
                         }}
                       >
                         {value.toLocaleDateString()}
                       </Text>
                       <EvilIcons
                         name="chevron-down"
-                        size={height * 0.04}
+                        size={h*16+w*16}
                         color="#539DF3"
                       />
                     </Pressable>
@@ -615,9 +650,14 @@ export default function Registration() {
                           ? failedColor
                           : "#D8DADC",
                       },
+
                       iconContainer: {
-                        right: 0.019 * width,
-                        top: 0.009 * height,
+                        paddingRight: w*3,
+                      },
+                      
+                      viewContainer:{
+                          justifyContent:'center',
+                          paddingBottom:h*15,
                       },
                       inputAndroid: {
                         ...styles.input,
@@ -635,19 +675,27 @@ export default function Registration() {
                         borderColor: secondForm.formState.errors.uni_name
                           ? failedColor
                           : "#D8DADC",
-                        paddingVertical: height*0.010,
+                        
                       },
-                      inputIOSContainer: { pointerEvents: "none"},
+                      inputAndroidContainer: {
+                        justifyContent:'center',
+                        marginBottom:h*15.5,
+                      },
+                      inputIOSContainer: { 
+                        pointerEvents: "none", 
+                        justifyContent:'center',
+                        marginBottom:h*15.5,
+                        },
                       
                     }}
                     Icon={() =>
-                      OS !== "web" && (
+                     
                         <EvilIcons
                           name="chevron-down"
-                          size={height * 0.04}
+                          size={h*16+w*16}
                           color="#539DF3"
                         />
-                      )
+                      
                     }
                     
                     useNativeAndroidPickerStyle={false}
@@ -841,13 +889,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 10,
     fontFamily: "Inter_400Regular",
-    fontSize: height * 0.0196,
+    fontSize: h*8+w*8,
     color: "rgba(0, 0, 0, 1)",
-    paddingHorizontal: w*9,
-    paddingVertical: height * 0.011,
+    paddingLeft: w*9,
+    paddingVertical: h*9,
     borderStyle: "solid",
     borderWidth: 1,
-    marginBottom: height * 0.019,
   },
 
   inputError: {
@@ -868,7 +915,7 @@ const styles = StyleSheet.create({
 
   inputLabel: {
     fontFamily: "Inter_400Regular",
-    fontSize: height * 0.0171,
+    fontSize: h*7+w*7,
     color: "rgba(0, 0, 0, 0.70)",
   },
 

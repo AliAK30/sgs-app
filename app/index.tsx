@@ -56,7 +56,7 @@ export default function Index() {
         <Pressable
           style={[styles.button, { backgroundColor: "#50BFAF" }]}
           onPress={() => {
-            setUser({ role: "student" });
+            setUser({ role: "student", email:'ali' });
             router.push("/login");
           }}
         >

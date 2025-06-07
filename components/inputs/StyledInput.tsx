@@ -3,10 +3,11 @@ import {
   StyleSheet,
   TextInputProps,
 } from "react-native";
+import { useRef } from "react";
 import { WarnIcon } from "@/components/Icons";
 import { h, w, OS } from "@/app/_layout";
 
-if(OS==='web') require("@/assets/global.css");
+
 
 export type StyledInputProps = {
   error?: any | undefined;
@@ -15,6 +16,8 @@ export type StyledInputProps = {
 } & TextInputProps;
 
 export default function StyledInput({error, Icon=WarnIcon, iconRenderingCondition, ...props}: StyledInputProps) {
+
+  const TextInputRef = useRef<typeof TextInput | null>(null)
 
   return (
     <View>
@@ -26,6 +29,7 @@ export default function StyledInput({error, Icon=WarnIcon, iconRenderingConditio
       >
         <TextInput
           {...props}
+          
           style={styles.input}
         />
         {(iconRenderingCondition || error) && <Icon/>}

@@ -1,8 +1,8 @@
-import { Text, View, TextInput } from "@/components/Themed";
-import {StyleSheet, ScrollView } from "react-native";
+import { Text, View } from "@/components/Themed";
+import { StyleSheet, ScrollView } from "react-native";
 import { Image, useImage } from "expo-image";
 import { useRouter, Link, Redirect } from "expo-router";
-import { height, h, OS} from "./_layout";
+import { height, h, OS } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -11,14 +11,13 @@ import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
-import { useState } from "react";
-import { WarnIcon, EyeIcon } from "@/components/Icons";
 import Back from "@/components/buttons/Back";
 import SubmitButton from "@/components/buttons/SubmitButton";
 import FooterLink from "@/components/FooterLink";
 import StyledInput from "@/components/inputs/StyledInput";
 import SkeletonLoader from "@/components/SkeletonLoader";
 import StyledPasswordInput from "@/components/inputs/StyledPasswordInput";
+import { handleError } from "@/errors";
 
 const imgSource = require("@/assets/images/edumatch.png");
 
@@ -38,27 +37,14 @@ const schema = yup
 
 type User = yup.InferType<typeof schema>;
 
-const failedColor = "rgb(255, 0, 0)";
-
-
-
-
-
 export default function Login() {
-
   const { openAlert, Alert } = useAlert();
-  const { type, isConnected } = useNetInfo();
+  const { isConnected } = useNetInfo();
   const router = useRouter();
   const { initializeUser, user, token } = useUserStore();
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const {setSectionsCount} = useSurveyStore();
+  const { setSectionsCount } = useSurveyStore();
 
-  
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid, isSubmitting },
-  } = useForm({
+  const {control, handleSubmit, formState: { errors, isValid, isSubmitting }, } = useForm({
     mode: "onSubmit",
     resolver: yupResolver(schema),
     defaultValues: {
@@ -67,15 +53,11 @@ export default function Login() {
     },
   });
 
-  const image = useImage(imgSource, {
-    maxWidth: 800,
-    onError(error, retry) {
-      console.error("Loading failed:", error.message);
+  const image = useImage(imgSource, { maxWidth: 800, onError(error, retry) {
+    console.error("Loading failed:", error.message);
       retry();
     },
   });
-
-  
 
   const onSubmit: SubmitHandler<User> = async (data) => {
     try {
@@ -84,127 +66,122 @@ export default function Login() {
           timeout: 1000 * 25,
         });
 
-        //await openAlert("success", "Login Successful!", `This app is under development, so login feature will be available in future releases. A password is auto generated for you: ${res.data.user.password}!`);
         await initializeUser(res.data.user, res.data.token);
         setSectionsCount();
 
-        user?.role === 'student' ? router.replace("/(student)") : router.replace("/(admin)");
+        user?.role === "student"
+          ? router.replace("/(student)")
+          : router.replace("/(admin)");
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
       }
     } catch (e: any) {
-      if (!e.status) {
-        switch (e.code) {
-          case "ECONNABORTED":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Request TImed out\nPlease try again later!"
-            );
-            return;
-
-          case "ERR_NETWORK":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Server is not Responding\nPlease try again later!"
-            );
-            return;
-        }
-      }
-
-      if (e.status === 401) {
-        switch (e.response.data.code) {
-          case "UNAUTHORIZED":
-            openAlert("fail", "Failed!", e.response.data.message);
-            return;
-        }
-      }
-
-      if(e.status === 429)
-      {
-        openAlert("fail", "Error", e.response.data.message);
-      }
-
-      if (e.status === 500) {
-        openAlert("fail", "Failed!", e.message);
-        return;
-      }
+      handleError(e, openAlert);
     }
   };
 
   //redirect back to index if user has not selected a role
-  if(!user?.role) return <Redirect href='/'/>
-  if(token) {
-    if(user.role === "student") return <Redirect href='/(student)'/>
-    else return <Redirect href='/(admin)'/>
+  if (!user?.role) return <Redirect href="/" />;
+  if (token) {
+    if (user.role === "student") return <Redirect href="/(student)" />;
+    else return <Redirect href="/(admin)" />;
   }
-  
+
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
-      contentContainerStyle={{alignItems:'center', flexGrow:1}}
+      contentContainerStyle={{ alignItems: "center", flexGrow: 1 }}
     >
       <View style={styles.container}>
-        <View style={{position:'absolute', alignSelf:'flex-start', marginTop:h*20, marginLeft: OS==='web' ? 0 : height*0.024}}>
-        <Back onPress={()=>router.replace('/')}/>
-          </View>
-      <Alert />
-      {!image ? (
-        <SkeletonLoader w={229 * (height / 817)} h={218 * (height / 817)} />
-      ) : (
-        <Image
-          source={image}
+        <View
           style={{
-            width: (image.width * height) / 817,
-            height: (image.height * height) / 817,
+            position: "absolute",
+            alignSelf: "flex-start",
+            marginTop: h * 20,
+            marginLeft: OS === "web" ? 0 : height * 0.024,
           }}
-        />
-      )}
-      <Text style={styles.heading}>Log in</Text>
-
-      <View style={styles.inputView}>
-        <Text style={[styles.inputLabel]}>Email address</Text>
-        <Controller
-          control={control}
-          name="email"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <StyledInput value={value} onChangeText={onChange} onBlur={onBlur} placeholder="johndoe@xyz.com" error={errors.email} inputMode="text" placeholderTextColor="rgba(0, 0, 0, 0.30)"/>
-          )}
-        />
-        
-
-        <Text style={[styles.inputLabel]}>Password</Text>
-        <Controller
-          control={control}
-          name="password"
-          render={({ field: { onChange, onBlur, value } }) => (
-            <StyledPasswordInput value={value} onChangeText={onChange} onBlur={onBlur} error={errors.password} inputMode="text" onSubmitEditing={handleSubmit(onSubmit)}/>
-          )}
-        />
-        
-          
-        <View style={styles.button}><SubmitButton onPress={handleSubmit(onSubmit)} text="LOGIN" isValid={isValid} isSubmitting={isSubmitting}/></View>
-
-      </View>
-
-      <Link href="/password-reset">
-        <Text style={[styles.inputLabel, { textDecorationLine: "underline" }]}>
-          Forgot Password?
-        </Text>
-      </Link>
-
-
-      {user?.role==='student' && <FooterLink footerText="Don't have an account?" linkText="Sign up" link="/registration"/>}
-
+        >
+          <Back onPress={() => router.replace("/")} />
         </View>
+        <Alert />
+        {!image ? (
+          <SkeletonLoader w={229 * (height / 817)} h={218 * (height / 817)} />
+        ) : (
+          <Image
+            source={image}
+            style={{
+              width: (image.width * height) / 817,
+              height: (image.height * height) / 817,
+            }}
+          />
+        )}
+        <Text style={styles.heading}>Log in</Text>
+
+        <View style={styles.inputView}>
+          <Text style={[styles.inputLabel]}>Email address</Text>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <StyledInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="johndoe@xyz.com"
+                error={errors.email}
+                inputMode="text"
+                placeholderTextColor="rgba(0, 0, 0, 0.30)"
+              />
+            )}
+          />
+
+          <Text style={[styles.inputLabel]}>Password</Text>
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onChange, onBlur, value } }) => (
+              <StyledPasswordInput
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                error={errors.password}
+                inputMode="text"
+                onSubmitEditing={handleSubmit(onSubmit)}
+              />
+            )}
+          />
+
+          <View style={styles.button}>
+            <SubmitButton
+              onPress={handleSubmit(onSubmit)}
+              text="LOGIN"
+              isValid={isValid}
+              isSubmitting={isSubmitting}
+            />
+          </View>
+        </View>
+
+        <Link href="/password-reset">
+          <Text
+            style={[styles.inputLabel, { textDecorationLine: "underline" }]}
+          >
+            Forgot Password?
+          </Text>
+        </Link>
+
+        {user?.role === "student" && (
+          <FooterLink
+            footerText="Don't have an account?"
+            linkText="Sign up"
+            link="/registration"
+          />
+        )}
+      </View>
     </ScrollView>
   );
-
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -229,27 +206,6 @@ const styles = StyleSheet.create({
     marginTop: height * 0.0428,
   },
 
-  input: {
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    fontFamily: "Inter_400Regular",
-    fontSize: height * 0.0196,
-    color: "rgba(0, 0, 0, 1)",
-    paddingHorizontal: height * 0.0171,
-    paddingVertical: height * 0.011,
-    borderStyle: "solid",
-    borderWidth: 1,
-    marginBottom: height*0.019
-  },
-
-  inputError: {
-    fontFamily: "Inter_400Regular",
-    fontSize: height * 0.015,
-    color: "rgb(255, 0, 0)",
-    position: 'absolute',
-    top:"80%"
-  },
-
   inputLabel: {
     fontFamily: "Inter_400Regular",
     fontSize: height * 0.0171,
@@ -259,13 +215,5 @@ const styles = StyleSheet.create({
   button: {
     marginBottom: height * 0.019,
     marginTop: height * 0.04161,
-  },
-
-  note: {
-    fontFamily: "Inter_400Regular",
-    fontSize: height * 0.0151,
-    color: "rgba(0, 0, 0, 0.70)",
-    textDecorationLine: "underline",
-    textAlign: "center",
   },
 });

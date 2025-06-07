@@ -24,8 +24,6 @@ import Loader from "@/components/Loader";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import * as NavigationBar from "expo-navigation-bar"
 
-
-
 const dims = Dimensions.get("window");
 export const height = dims.height;
 export const width = dims.width>480 ? 480 : dims.width
@@ -38,7 +36,7 @@ export const {OS} = Platform
 //export const width = dims.width>dims.height?dims.height:dims.width
 export const h = height/base_height;
 export const w = width/base_width;
-
+if(OS==='web') require("@/assets/global.css");
 
 
 /* if(width>height){
