@@ -1,5 +1,5 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { FlatList, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import { FlatList, Pressable, StyleSheet, ActivityIndicator, Vibration } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
 import Back from "./buttons/Back";
@@ -175,7 +175,7 @@ function SearchResult({
       >
         
         <View style={{justifyContent:'center'}}>
-          <Back onPress={() => setClick(0)} />
+          <Back onPress={() => {setClick(0), Vibration.vibrate(10);}} />
             <View style={{position:'absolute', alignSelf:'center'}}>
               <Text style={styles.title}>Search Results</Text>
            </View>

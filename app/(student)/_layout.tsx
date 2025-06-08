@@ -1,7 +1,7 @@
 import { Tabs, Redirect } from "expo-router";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
-import { StyleSheet, Pressable, PressableProps, GestureResponderEvent } from "react-native"
+import { StyleSheet, Pressable, PressableProps, GestureResponderEvent, Vibration } from "react-native"
 import { w, h, width,height, base_height } from "../_layout";
 import { Feather, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUserStore } from "@/hooks/useStore";
@@ -36,6 +36,7 @@ export default function StudentLayout() {
                 e.preventDefault();
               setFocusedTab(route.name)
               props.onPress?.(e);
+              Vibration.vibrate(10);
             }}
           />
         ),
@@ -63,7 +64,7 @@ export default function StudentLayout() {
           options={{
             title: "Groups",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons size={iconSize} name="groups" color={color} />
+              <Feather size={iconSize} name="grid" color={color} />
             ),
             tabBarItemStyle: focusedTab === "groups" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
           }}
