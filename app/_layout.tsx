@@ -20,7 +20,6 @@ import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
 import { StatusBar,  } from "expo-status-bar";
-import Loader from "@/components/Loader";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import * as NavigationBar from "expo-navigation-bar"
 

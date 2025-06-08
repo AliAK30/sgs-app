@@ -5,6 +5,9 @@ import { Text, View } from "@/components/Themed";
 import { Image, useImage } from "expo-image";
 import { height, w, h, width} from "./_layout";
 import SkeletonLoader from "@/components/SkeletonLoader";
+import * as Haptics from "expo-haptics";
+
+
 
 const imgSource = require("@/assets/images/guy-reads.png");
 const eduMatch = require("@/assets/images/edumatch.png");
@@ -56,8 +59,8 @@ export default function Index() {
         <Pressable
           style={[styles.button, { backgroundColor: "#50BFAF" }]}
           onPress={() => {
-            setUser({ role: "student", email:'ali' });
-            router.push("/login");
+            setUser({ role: "student"});
+            router.push("/registration");
           }}
         >
           <Image

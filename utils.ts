@@ -51,5 +51,12 @@ export function formatTwoWordsName(fullName: string): string {
 }
 
 export function formatCode(code:string) {
-  return code.charAt(0)+code.substring(1).toLowerCase();
+  const parts = code.split('_');
+  if(parts.length>1)
+  {
+    return parts.map(part=>part.charAt(0)+part.substring(1).toLowerCase()).join(' ');
+  } else {
+    return code.charAt(0)+code.substring(1).toLowerCase();
+  }
+  
 }

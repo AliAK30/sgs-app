@@ -6,7 +6,6 @@ export default function Loader(props: ActivityIndicatorProps) {
     <View
       style={{
         flex: 1,
-        backgroundColor: "#FFFFFF",
         alignItems: "center",
         justifyContent: "center",
       }}

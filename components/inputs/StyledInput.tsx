@@ -3,21 +3,24 @@ import {
   StyleSheet,
   TextInputProps,
 } from "react-native";
-import { useRef } from "react";
+//import { useRef } from "react";
 import { WarnIcon } from "@/components/Icons";
 import { h, w, OS } from "@/app/_layout";
+import inputStyles from "./styles";
+import { FieldError } from "react-hook-form";
 
 
 
 export type StyledInputProps = {
-  error?: any | undefined;
+  error?: FieldError | undefined;
   Icon?: ()=>JSX.Element | undefined;
   iconRenderingCondition?: any | undefined;
 } & TextInputProps;
 
 export default function StyledInput({error, Icon=WarnIcon, iconRenderingCondition, ...props}: StyledInputProps) {
 
-  const TextInputRef = useRef<typeof TextInput | null>(null)
+  //const TextInputRef = useRef<typeof TextInput | null>(null)
+  //console.log(props.onChangeText && props.onChangeText('ali'))
 
   return (
     <View>
@@ -30,12 +33,12 @@ export default function StyledInput({error, Icon=WarnIcon, iconRenderingConditio
         <TextInput
           {...props}
           
-          style={styles.input}
+          style={inputStyles.input}
         />
         {(iconRenderingCondition || error) && <Icon/>}
       </View>
-      <Text style={[styles.inputError, { opacity: error ? 100 : 0 }]}>
-        {error ? error.message : "as"}
+      <Text style={[inputStyles.inputError, { opacity: error ? 100 : 0 }]}>
+        {error?.message ?? "as"}
       </Text>
     </View>
   );
@@ -53,17 +56,4 @@ const styles = StyleSheet.create({
     marginBottom: h * 1.5,
     alignItems: "center",
   },
-  input: {
-    fontFamily: "Inter_400Regular",
-    fontSize: h * 8 + w * 8,
-    color: "rgba(0, 0, 0, 1)",
-    outlineColor: "rgba(0,0,0,0)",
-  },
-
-  inputError: {
-    fontFamily: "Inter_400Regular",
-    fontSize: h * 6 + w * 6,
-    color: "rgb(255, 0, 0)",
-  },
-  
 });

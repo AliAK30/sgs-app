@@ -1,6 +1,6 @@
 import { h, w, OS } from "@/app/_layout"
 import { View, Text } from "./Themed"
-import { Link, Href } from "expo-router"
+import { Link, Href, useRouter } from "expo-router"
 import { StyleSheet } from "react-native"
 
 type Link = Href
@@ -12,13 +12,12 @@ type Props = {
 }
 
 export default function FooterLink({footerText, linkText, link}:Props) {
+    const router = useRouter();
 
     return (
         <View style={styles.container}>
             <Text style={styles.text}>{footerText} </Text>
-            <Link href={link} asChild>
-            <Text style={styles.linkText}>{linkText}</Text>
-            </Link>
+            <Text style={styles.linkText} onPress={()=>router.replace(link)}>{linkText}</Text>
         </View>
     )
 

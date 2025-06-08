@@ -25,130 +25,130 @@ import PickerSelect from "@/components/inputs/PickerSelect";
 import { handleError } from "@/errors";
 import DateTimePicker from "@/components/inputs/DateTimePicker";
 
-// Combined schema for all fields
-const fullSchema = yup.object().shape({
-  // Step 1 fields
-  first_name: yup
-    .string()
-    .required("First Name is Required")
-    .min(2, "First name must contain at least 2 letters"),
-  last_name: yup
-    .string()
-    .required("Last Name is Required")
-    .min(2, "Last name must contain at least 2 letters"),
-  email: yup
-    .string()
-    .required("Email is required")
-    .matches(
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      "Please enter a valid email"
-    ),
-  
-  // Step 2 fields - made optional for step 1 validation
-  uni_name: yup.string().when('$step', {
-    is: 2,
-    then: (schema) => schema.required("University is required"),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  dob: yup.date().when('$step', {
-    is: 2,
-    then: (schema) => schema
-      .required("Date of Birth is required")
-      .max(new Date(), "Date cannot be in the future")
-      .test("is-old-enough", "You must be at least 10 years old", (date) => {
-        if (!date) return false;
-        const today = new Date();
-        const minDate = new Date(
-          today.getFullYear() - 10,
-          today.getMonth(),
-          today.getDate()
-        );
-        return date <= minDate;
-      }),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  gender: yup.string().when('$step', {
-    is: 2,
-    then: (schema) => schema.required("Gender is required"),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  password: yup.string().when('$step', {
-    is: 2,
-    then: (schema) => schema
-      .required("Password is required")
+
+const firstSchema = yup
+  .object()
+  .shape({
+    first_name: yup
+      .string()
+      .required("First Name is Required")
+      .min(2, "First name must contain at least 2 letters"),
+    last_name: yup
+      .string()
+      .required("Last Name is Required")
+      .min(2, "Last name must contain at least 2 letters"),
+    email: yup
+      .string()
+      .required("Email is required")
       .matches(
-        /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?=.{8,})/,
-        "Password must contain at least 8 characters including at least 1 special character, and at least 1 digit"
+        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        "Please enter a valid email"
       ),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-  confirmPassword: yup.string().when('$step', {
-    is: 2,
-    then: (schema) => schema
-      .required("Please re-enter Password")
-      .oneOf([yup.ref("password")], "Passwords must match"),
-    otherwise: (schema) => schema.notRequired(),
-  }),
+  })
+  .required("Please fill all the above fields");
+
+const secondSchema = yup.object().shape({
+  uni_name: yup.string().required("University is required"),
+  dob: yup
+    .date()
+    .required("Date of Birth is required")
+    .max(new Date(), "Date cannot be in the future")
+    .test("is-old-enough", "You must be at least 10 years old", (date) => {
+      if (!date) return false;
+      const today = new Date();
+      const minDate = new Date(
+        today.getFullYear() - 10,
+        today.getMonth(),
+        today.getDate()
+      );
+      return date <= minDate;
+    }),
+  gender: yup.string().required("Gender is required"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .matches(
+      /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])(?=.{8,})/,
+      "Password must contain at least 8 characters including at least 1 special character, and at least 1 digit"
+    ),
+  confirmPassword: yup
+    .string()
+    .required("Please re-enter Password")
+    .oneOf([yup.ref("password")], "Passwords must match"),
 });
 
-type FormData = yup.InferType<typeof fullSchema>;
+type FirstSchema = yup.InferType<typeof firstSchema>;
+type SecondSchema = yup.InferType<typeof secondSchema>;
+
 
 export default function Registration() {
+
   const { openAlert, Alert } = useAlert();
   const { isConnected } = useNetInfo();
   const router = useRouter();
   const { user, setUser, token } = useUserStore();
-  const [openToS, setOpenToS] = useState<boolean>(false);
-  const [openPP, setOpenPP] = useState<boolean>(false);
+  const [openToS, setOpenToS] = useState<boolean>(false); //Terms of Service
+  const [openPP, setOpenPP] = useState<boolean>(false); // Privacy Policy
   const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
-  const [currentStep, setCurrentStep] = useState<1 | 2>(1);
-  const universitiesRef = useRef<University[] | null>([]);
 
+
+  const universitiesRef = useRef<University[] | null>([]);
 
   const {
     control,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
     reset,
-    getValues,
   } = useForm({
     mode: "onSubmit",
-    resolver: yupResolver(fullSchema),
-    context:{step:currentStep},
+    resolver: yupResolver(firstSchema),
     defaultValues: {
       first_name: "",
       last_name: "",
       email: "",
+    },
+  });
+
+
+  const secondForm = useForm({
+    mode: "onSubmit",
+    resolver: yupResolver(secondSchema),
+    defaultValues: {
       uni_name: "",
-      dob: new Date(2025, 0, 1),
+      dob: new Date(2025, 1, 1),
       gender: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  const checkEmail: SubmitHandler<FormData> = async (data) => {
+  // Add this effect to reset when user changes
+useEffect(() => {
+  if (user?.email) {
+    secondForm.reset({
+      uni_name: "",
+      dob: new Date(2000, 0, 1),
+      gender: "",
+      password: "",
+      confirmPassword: "",
+    });
+  }
+}, [user?.email]);
+
+  const checkEmail: SubmitHandler<FirstSchema> = async (data) => {
     try {
-
-      const firstStepData = {
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-        role: user?.role,
-      };
-
+      const dataReplica = { ...data, role: user?.role };
       if (isConnected) {
-        await axios.post(`${url}/student/preregister`, firstStepData, {
+        await axios.post(`${url}/student/preregister`, dataReplica, {
           timeout: 1000 * 15,
         });
 
         const res = await axios.get(`${url}/universities`, {
           timeout: 1000 * 15,
         });
-
+        reset();
         universitiesRef.current = res.data;
-        setUser(firstStepData);
-        setCurrentStep(2); // Move to step 2
+        setUser(dataReplica);
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
@@ -158,10 +158,10 @@ export default function Registration() {
     }
   };
 
-  const register: SubmitHandler<FormData> = async (data) => {
+  const register: SubmitHandler<SecondSchema> = async (data) => {
+
     console.log(data);
     return;
-    
     try {
       if (!agreeTerms) {
         await openAlert(
@@ -171,24 +171,21 @@ export default function Registration() {
         );
         return;
       }
-      
       if (isConnected) {
         const uni_id = universitiesRef.current?.find(
           (university) => university.name === data.uni_name
         )?._id;
-        
         const replicaData = {
           role: user?.role,
-          email: data.email,
-          first_name: data.first_name,
-          last_name: data.last_name,
+          email: user?.email,
+          first_name: user?.first_name,
+          last_name: user?.last_name,
           password: data.password,
           dob: data.dob,
           gender: data.gender,
           uni_name: data.uni_name,
           uni_id: uni_id,
         };
-        
         const res: any = await axios.post(
           `${url}/student/register`,
           replicaData,
@@ -205,7 +202,7 @@ export default function Registration() {
         router.replace("/login");
         setUser({ role: "student" });
         reset();
-        setCurrentStep(1);
+        secondForm.reset();
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
@@ -216,21 +213,17 @@ export default function Registration() {
   };
 
   const handleBack = () => {
-    if (currentStep === 2) {
-      // Go back to step 1
-      setCurrentStep(1);
-      setUser({ role: user?.role });
+    console.log("here");
+    if (user?.email) {
+      secondForm.reset();
+      setUser({ role: user.role });
     } else {
-      // Go back to login
       router.replace("/login");
-      reset();
     }
   };
 
-  // Determine if we're on step 1 or 2
-  const isStepOne = currentStep === 1;
 
-  // Redirect to home screen if user already logged in
+  //redirect to home screen if user already logged in
   if (token) {
     if (user?.role === "student") return <Redirect href="/(student)" />;
     else return <Redirect href="/(admin)" />;
@@ -254,70 +247,70 @@ export default function Registration() {
         <Back onPress={handleBack} />
 
         <Text style={styles.heading}>
-          {isStepOne
+          {user?.email === undefined
             ? "Sign up"
-            : `Hello there, ${getValues('first_name')}!`}
+            : `Hello there, ${user?.first_name}!`}
         </Text>
 
-        {isStepOne ? (
-          // Step 1: Basic Information
+        {user?.email === undefined ? (
           <View style={styles.inputView}>
+
             <View style={styles.inputContainer}>
-              <Text style={[styles.inputLabel]}>First name</Text>
-              <Controller
-                control={control}
-                name="first_name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <StyledInput
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    placeholder="John"
-                    error={errors.first_name}
-                    inputMode="text"
-                    placeholderTextColor="rgba(0, 0, 0, 0.30)"
-                  />
-                )}
-              />
+            <Text style={[styles.inputLabel]}>First name</Text>
+            <Controller
+              control={control}
+              name="first_name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <StyledInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="John"
+                  error={errors.first_name}
+                  inputMode="text"
+                  placeholderTextColor="rgba(0, 0, 0, 0.30)"
+                />
+              )}
+            />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={[styles.inputLabel]}>Last name</Text>
-              <Controller
-                control={control}
-                name="last_name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <StyledInput
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    placeholder="Doe"
-                    error={errors.last_name}
-                    inputMode="text"
-                    placeholderTextColor="rgba(0, 0, 0, 0.30)"
-                  />
-                )}
-              />
+            <Text style={[styles.inputLabel]}>Last name</Text>
+            <Controller
+              control={control}
+              name="last_name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <StyledInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="Doe"
+                  error={errors.last_name}
+                  inputMode="text"
+                  placeholderTextColor="rgba(0, 0, 0, 0.30)"
+                />
+              )}
+            />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={[styles.inputLabel]}>Email</Text>
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <StyledInput
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    placeholder="johndoe@xyz.com"
-                    error={errors.email}
-                    inputMode="text"
-                    placeholderTextColor="rgba(0, 0, 0, 0.30)"
-                    onSubmitEditing={handleSubmit(checkEmail)}
-                  />
-                )}
-              />
+            <Text style={[styles.inputLabel]}>Email</Text>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <StyledInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  placeholder="johndoe@xyz.com"
+                  error={errors.email}
+                  inputMode="text"
+                  placeholderTextColor="rgba(0, 0, 0, 0.30)"
+                  onSubmitEditing={handleSubmit(checkEmail)}
+                />
+              )}
+            />
             </View>
 
             <View style={styles.button}>
@@ -330,106 +323,115 @@ export default function Registration() {
             </View>
           </View>
         ) : (
-          // Step 2: Additional Information
           <View style={styles.inputView}>
+
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>University</Text>
-              <Controller
-                control={control}
-                name="uni_name"
-                render={({ field: { onChange } }) => (
-                  <PickerSelect
-                    onValueChange={onChange}
-                    placeholder={{ label: "Select your university", value: "" }}
-                    items={
-                      universitiesRef.current
-                        ? universitiesRef.current.map((uni) => ({
-                            key: uni._id,
-                            label: uni.name,
-                            value: uni.name,
-                          }))
-                        : [{ label: "ali", value: "ali" }]
-                    }
-                    error={errors.uni_name}
-                  />
-                )}
-              />
+            <Text style={styles.inputLabel}>University</Text>
+            <Controller
+              control={secondForm.control}
+              name="uni_name"
+              render={({ field: { onChange } }) => (
+
+                <PickerSelect
+                  onValueChange={onChange}
+                  placeholder={{ label: "Select your university", value: "" }}
+                  items={
+                    universitiesRef.current
+                      ? universitiesRef.current.map((uni) => ({
+                          key: uni._id,
+                          label: uni.name,
+                          value: uni.name,
+                        }))
+                      : [{ label: "ali", value: "ali" }]
+                  }
+                  error={secondForm.formState.errors.uni_name}
+                />
+                  
+              )}
+            />
             </View>
 
             <View style={{ flexDirection: "row", columnGap: w * 10 }}>
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Date of Birth</Text>
+
                 <Controller
-                  control={control}
+                  control={secondForm.control}
                   name="dob"
-                  render={({ field: { value, onChange } }) => (
-                    <DateTimePicker
-                      value={value??new Date()}
+                  render={({ field: { value, onChange } }) =>
+                    
+                      <DateTimePicker
+                      value={value}
                       onChange={onChange}
                       maximumDate={new Date()}
-                      error={errors.dob}
-                    />
-                  )}
+                      error={secondForm.formState.errors.dob}
+                      />
+                }
                 />
               </View>
 
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Gender</Text>
                 <Controller
-                  control={control}
+                  control={secondForm.control}
                   name="gender"
                   render={({ field: { onChange } }) => (
-                    <PickerSelect
-                      onValueChange={onChange}
-                      placeholder={{ label: "Select gender", value: "" }}
-                      items={[
-                        { label: "Male", value: "Male" },
-                        { label: "Female", value: "Female" },
-                        { label: "Other", value: "Other" },
-                      ]}
-                      error={errors.gender}
-                    />
+
+                      <PickerSelect
+                        onValueChange={onChange}
+                        placeholder={{ label: "Select gender", value: "" }}
+                        items={[
+                          { label: "Male", value: "Male" },
+                          { label: "Female", value: "Female" },
+                          { label: "Other", value: "Other" },
+                        ]}
+                        error={secondForm.formState.errors.gender}
+                      />
                   )}
                 />
               </View>
             </View>
-
+              
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Password</Text>
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <StyledPasswordInput
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    error={errors.password}
-                    inputMode="text"
-                  />
-                )}
-              />
+            <Text style={styles.inputLabel}>Password</Text>
+            <Controller
+              control={secondForm.control}
+              name="password"
+              render={({ field}) => {
+                console.log(field.name);
+                //console.log(field.onChange())
+                return <StyledPasswordInput
+                  value={field.value}
+                  //onChangeText={(val)=>{secondForm.setValue('password', val)}}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={secondForm.formState.errors.password}
+                  inputMode="text"
+                />
+              }}
+            />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Confirm Password</Text>
-              <Controller
-                control={control}
-                name="confirmPassword"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <StyledPasswordInput
-                    value={value}
-                    onChangeText={onChange}
-                    onBlur={onBlur}
-                    error={errors.confirmPassword}
-                    inputMode="text"
-                    onSubmitEditing={handleSubmit(register)}
-                  />
-                )}
-              />
+            <Text style={styles.inputLabel}>Confirm Password</Text>
+            <Controller
+              control={secondForm.control}
+              name="confirmPassword"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <StyledPasswordInput
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  error={secondForm.formState.errors.confirmPassword}
+                  inputMode="text"
+                  onSubmitEditing={secondForm.handleSubmit(register)}
+                />
+              )}
+            />
             </View>
 
             {/* Terms Agreement */}
+
             <View style={{ flexDirection: "row", marginTop: height * 0.007 }}>
               <Checkbox
                 value={agreeTerms}
@@ -470,10 +472,10 @@ export default function Registration() {
 
             <View style={styles.button}>
               <SubmitButton
-                onPress={handleSubmit(register)}
+                onPress={secondForm.handleSubmit(register)}
                 text="SIGN UP"
-                isValid={isValid}
-                isSubmitting={isSubmitting}
+                isValid={secondForm.formState.isValid}
+                isSubmitting={secondForm.formState.isSubmitting}
               />
             </View>
           </View>
@@ -500,7 +502,7 @@ const styles = StyleSheet.create({
   },
 
   inputContainer: {
-    rowGap: h * 6,
+    rowGap: h*6, 
     flex: 1,
   },
 
@@ -522,7 +524,7 @@ const styles = StyleSheet.create({
   inputView: {
     alignSelf: "stretch",
     marginTop: height * 0.0428,
-    rowGap: h * 2,
+    rowGap: h*2,
   },
 
   input: {

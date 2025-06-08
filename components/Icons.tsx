@@ -10,7 +10,6 @@ export const WarnIcon = () => {
       name="warning-outline"
       color="red"
       size={height * 0.02447}
-      //style={{ position: "absolute"}}
     />
   );
 };
