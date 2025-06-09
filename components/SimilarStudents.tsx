@@ -10,6 +10,7 @@ import { useAlert } from "@/hooks/useAlert";
 import { useUserStore } from "@/hooks/useStore";
 import { h, w } from "@/app/_layout";
 import { User } from "@/types";
+import Loader from "./Loader";
 import Peer from "./Peer";
 
 type Props = {
@@ -157,7 +158,7 @@ function SimilarStudents({
         
         {isConnected===false ? (
           <Text style={styles.notfound}>No Internet Connection</Text>
-        ) : fetching ? <View style={{flex:1, justifyContent:'center'}}><ActivityIndicator size="large" color="grey"/></View> : 
+        ) : fetching ? <Loader size="large" color="grey"/> : 
           <FlatList
             data={results}
             renderItem={({ item }) => (

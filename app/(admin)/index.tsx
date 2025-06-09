@@ -9,7 +9,7 @@ import { w, h, OS } from "../_layout";
 import { url } from "@/constants/Server";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { formatTwoWordsName } from "@/utils";
+import { formatFirstName } from "@/utils";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useAlert } from "@/hooks/useAlert";
 import CreateGroup from "@/components/CreateGroup";
@@ -143,7 +143,7 @@ export default function Index() {
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         <View>
           <Text style={styles.title}>
-            Hey {formatTwoWordsName(user?.first_name ?? "")} 👋
+            Hey {formatFirstName(user?.first_name)} 👋
           </Text>
           <Text style={styles.belowTitle}>{user?.uni_name}</Text>
         </View>
@@ -352,7 +352,6 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
     color: "#85878D",
     fontSize: w * 8.5 + h * 8,
-    outlineWidth: 0,
   },
 
   quickInsights: {

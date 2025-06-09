@@ -4,5 +4,5 @@ const maju = "http://10.23.43.173:8080";
 
 const server = "https://edumatch.southeastasia.cloudapp.azure.com";
 
-export const url: string = ali;
+export const url: string = server;
 

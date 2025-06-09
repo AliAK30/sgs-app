@@ -9,7 +9,7 @@ import {w, h, OS} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/SimilarStudents";
-import { formatTwoWordsName } from "@/utils";
+import { formatFirstName } from "@/utils";
 
 
 const imgSource2 = require("@/assets/images/bino.svg");
@@ -38,7 +38,7 @@ export default function Index() {
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
             
             <View>
-            <Text style={styles.title}>Hey {formatTwoWordsName(user?.first_name??"")} 👋</Text>
+            <Text style={styles.title}>Hey {formatFirstName(user?.first_name)} 👋</Text>
             <Text style={styles.belowTitle}>Connect, Collaborate, Learn in your style!</Text>
             </View>
             <Image source={imgSource} style={{width:h*26+w*26, height:h*26+w*26, borderRadius:50}}/>

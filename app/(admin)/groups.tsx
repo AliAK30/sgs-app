@@ -1,5 +1,5 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { Pressable, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { Pressable, StyleSheet, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect, useRef } from "react";
 import Feather from "@expo/vector-icons/Feather";
@@ -14,6 +14,7 @@ import { GroupType } from "@/types";
 import Group from "@/components/Group";
 import CreateGroup from "@/components/CreateGroup";
 import GroupDetails from "@/components/GroupDetails";
+import Loader from "@/components/Loader";
 
 function Seperator() {
   return <View style={{paddingVertical:h*6}}></View>
@@ -136,7 +137,7 @@ export default function Groups() {
 
     {isConnected===false ? (
               <Text style={styles.notfound}>No Internet Connection</Text>
-            ) : fetching ? <View style={{flex:1, justifyContent:'center'}}><ActivityIndicator size="large" color="grey"/></View> : 
+            ) : fetching ? <Loader size="large" color="grey"/> : 
               <FlatList
               
                 data={groups}
@@ -209,7 +210,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_500Medium',
         color:'#85878D',
         fontSize: w*8.5+h*8,
-        outlineWidth:0
     },
 
     friends : {

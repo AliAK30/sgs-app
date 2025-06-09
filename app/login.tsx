@@ -38,6 +38,7 @@ const schema = yup
 type User = yup.InferType<typeof schema>;
 
 export default function Login() {
+  
   const { openAlert, Alert } = useAlert();
   const { isConnected } = useNetInfo();
   const router = useRouter();
