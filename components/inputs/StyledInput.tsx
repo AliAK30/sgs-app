@@ -21,7 +21,7 @@ export type StyledInputProps = {
 export default function StyledInput({error, Icon=WarnIcon, iconRenderingCondition, errorClone="as", ...props}: StyledInputProps) {
 
   //const TextInputRef = useRef<typeof TextInput | null>(null)
- 
+  
 
   return (
     <View>

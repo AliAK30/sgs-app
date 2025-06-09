@@ -122,7 +122,7 @@ export default function DateTimePicker({error, onChange, value, maximumDate}: Pr
         <EvilIcons
           name="chevron-down"
           size={h * 16 + w * 16}
-          color="#539DF3"
+          color={error ? failedColor : "#539DF3"}
         />
       </Pressable>  
       )
