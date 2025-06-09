@@ -50,6 +50,21 @@ export function formatTwoWordsName(fullName: string): string {
   return formattedParts.join(' ');
 }
 
+export function formatFirstName(name:string | undefined): string {
+  if(name){
+    const parts = name.split(" ");
+    if(parts.length > 1 )
+    {
+      return parts[0].charAt(0).toUpperCase()+parts[0].substring(1);
+    } else {
+      return name.charAt(0).toUpperCase()+name.substring(1);
+    }
+  } else {
+    return "";
+  }
+  
+}
+
 export function formatCode(code:string) {
   const parts = code.split('_');
   if(parts.length>1)

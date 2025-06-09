@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { height } from "@/app/_layout";
+import {h,w } from "@/app/_layout";
 import { Pressable } from "react-native";
 
 
@@ -9,7 +9,7 @@ export const WarnIcon = () => {
     <Ionicons
       name="warning-outline"
       color="red"
-      size={height * 0.02447}
+      size={h*10+w*10}
     />
   );
 };
@@ -20,7 +20,7 @@ export const EyeIcon = ({name, onTap}: any) => {
     <Ionicons
       name={name}
       color="black"
-      size={height * 0.02447}
+      size={h*10+w*10}
       
     />
     </Pressable>

@@ -1,19 +1,19 @@
 import { Text, View } from "@/components/Themed";
-import { StyleSheet, Pressable, ScrollView } from "react-native";
+import { StyleSheet, ScrollView } from "react-native";
 import { useRouter, Redirect } from "expo-router";
-import { height, width, w, h } from "./_layout";
+import { height, w, h } from "./_layout";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useState, useRef, useEffect } from "react";
-import * as yup from "yup";
-import axios from "axios";
+import { useState, useRef } from "react";
 import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-import Back from "@/components/buttons/Back";
+import { handleError } from "@/errors";
 import { LinearGradient } from "expo-linear-gradient";
 import { University } from "@/types";
 import { useUserStore } from "@/hooks/useStore";
+import { formatFirstName } from "@/utils";
+import Back from "@/components/buttons/Back";
 import Checkbox from "expo-checkbox";
 import ServiceTerms from "@/components/ServiceTerms";
 import PrivacyPolicy from "@/components/PrivacyPolicy";
@@ -22,8 +22,10 @@ import SubmitButton from "@/components/buttons/SubmitButton";
 import StyledInput from "@/components/inputs/StyledInput";
 import StyledPasswordInput from "@/components/inputs/StyledPasswordInput";
 import PickerSelect from "@/components/inputs/PickerSelect";
-import { handleError } from "@/errors";
 import DateTimePicker from "@/components/inputs/DateTimePicker";
+import * as yup from "yup";
+import axios from "axios";
+
 
 // Combined schema for all fields
 const fullSchema = yup.object().shape({
@@ -101,9 +103,8 @@ export default function Registration() {
   const [openToS, setOpenToS] = useState<boolean>(false);
   const [openPP, setOpenPP] = useState<boolean>(false);
   const [agreeTerms, setAgreeTerms] = useState<boolean>(false);
-  const [currentStep, setCurrentStep] = useState<1 | 2>(1);
-  const universitiesRef = useRef<University[] | null>([]);
-
+  const universitiesRef = useRef<University[] | null>(null);
+  const currentStep = user?.email ? 2 : 1;
 
   const {
     control,
@@ -113,6 +114,7 @@ export default function Registration() {
     getValues,
   } = useForm({
     mode: "onSubmit",
+    reValidateMode:"onChange",
     resolver: yupResolver(fullSchema),
     context:{step:currentStep},
     defaultValues: {
@@ -148,7 +150,7 @@ export default function Registration() {
 
         universitiesRef.current = res.data;
         setUser(firstStepData);
-        setCurrentStep(2); // Move to step 2
+        
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
@@ -158,12 +160,10 @@ export default function Registration() {
     }
   };
 
-  const register: SubmitHandler<FormData> = async (data) => {
-    console.log(data);
-    return;
-    
+  const register: SubmitHandler<FormData> = async (data) => {  
     try {
       if (!agreeTerms) {
+
         await openAlert(
           "fail",
           "Error",
@@ -173,52 +173,57 @@ export default function Registration() {
       }
       
       if (isConnected) {
-        const uni_id = universitiesRef.current?.find(
-          (university) => university.name === data.uni_name
-        )?._id;
+
+        //data.uni_name is actually uni_id, so we are finding uni name by uni id
+        const uni_name = universitiesRef.current?.find(
+          (university) => university._id === data.uni_name
+        )?.name;
         
         const replicaData = {
           role: user?.role,
-          email: data.email,
-          first_name: data.first_name,
-          last_name: data.last_name,
+          email: user?.email,
+          first_name: user?.first_name,
+          last_name: user?.last_name,
           password: data.password,
           dob: data.dob,
           gender: data.gender,
-          uni_name: data.uni_name,
-          uni_id: uni_id,
+          uni_name: uni_name,
+          uni_id: data.uni_name,
         };
-        
-        const res: any = await axios.post(
+
+        await axios.post(
           `${url}/student/register`,
           replicaData,
           {
             timeout: 1000 * 15,
           }
         );
-
+        
         await openAlert(
           "success",
           "Registration Successful!",
           "Lets transform your Learning Experience!"
         );
+
+        
         router.replace("/login");
         setUser({ role: "student" });
         reset();
-        setCurrentStep(1);
+        
+
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
       }
     } catch (e: any) {
+      
       await handleError(e, openAlert);
     }
   };
 
   const handleBack = () => {
     if (currentStep === 2) {
-      // Go back to step 1
-      setCurrentStep(1);
+      //Go back to step 1
       setUser({ role: user?.role });
     } else {
       // Go back to login
@@ -256,7 +261,7 @@ export default function Registration() {
         <Text style={styles.heading}>
           {isStepOne
             ? "Sign up"
-            : `Hello there, ${getValues('first_name')}!`}
+            : `Hello there, ${formatFirstName(user?.first_name)}!`}
         </Text>
 
         {isStepOne ? (
@@ -341,15 +346,11 @@ export default function Registration() {
                   <PickerSelect
                     onValueChange={onChange}
                     placeholder={{ label: "Select your university", value: "" }}
-                    items={
-                      universitiesRef.current
-                        ? universitiesRef.current.map((uni) => ({
+                    items={ universitiesRef.current ? universitiesRef.current.map((uni) => ({
                             key: uni._id,
                             label: uni.name,
-                            value: uni.name,
-                          }))
-                        : [{ label: "ali", value: "ali" }]
-                    }
+                            value: uni._id,
+                          }))  : [] }
                     error={errors.uni_name}
                   />
                 )}
@@ -411,7 +412,7 @@ export default function Registration() {
               />
             </View>
 
-            <View style={styles.inputContainer}>
+            <View style={[styles.inputContainer, {marginTop:h*9}]}>
               <Text style={styles.inputLabel}>Confirm Password</Text>
               <Controller
                 control={control}
@@ -430,41 +431,18 @@ export default function Registration() {
             </View>
 
             {/* Terms Agreement */}
-            <View style={{ flexDirection: "row", marginTop: height * 0.007 }}>
+            <View style={{ flexDirection: "row", marginTop: h*5.5, columnGap:w*7}}>
               <Checkbox
                 value={agreeTerms}
                 onValueChange={setAgreeTerms}
                 color={agreeTerms ? "#007AFF" : undefined}
-                style={{ marginTop: height * 0.002 }}
+                style={{ marginTop: h*2 }}
                 hitSlop={10}
               />
-              <Text style={[styles.inputLabel, { paddingLeft: width * 0.025 }]}>
-                I agree to the{" "}
-                <Pressable hitSlop={20} onPress={() => setOpenToS(true)}>
-                  <Text
-                    style={{
-                      fontFamily: "Inter_600SemiBold",
-                      color: "#007BFF",
-                      textDecorationLine: "underline",
-                      fontSize: height * 0.019,
-                    }}
-                  >
-                    Terms of Service
-                  </Text>
-                </Pressable>{" "}
-                and{" "}
-                <Pressable hitSlop={20} onPress={() => setOpenPP(true)}>
-                  <Text
-                    style={{
-                      fontFamily: "Inter_600SemiBold",
-                      color: "#007BFF",
-                      textDecorationLine: "underline",
-                      fontSize: height * 0.019,
-                    }}
-                  >
-                    Privacy Policy
-                  </Text>
-                </Pressable>
+              <Text style={styles.inputLabel}>I agree to the{" "}
+              <Text style={styles.ppAndTos} onPress={() => setOpenToS(true)}>Terms of Service</Text>  
+              {" "}and{" "}
+              <Text style={styles.ppAndTos} onPress={() => setOpenPP(true)}>Privacy Policy</Text>
               </Text>
             </View>
 
@@ -525,30 +503,11 @@ const styles = StyleSheet.create({
     rowGap: h * 2,
   },
 
-  input: {
-    backgroundColor: "#ffffff",
-    borderRadius: 10,
-    fontFamily: "Inter_400Regular",
-    fontSize: h * 8 + w * 8,
-    color: "rgba(0, 0, 0, 1)",
-    paddingLeft: w * 9,
-    paddingVertical: h * 9,
-    borderStyle: "solid",
-    borderWidth: 1,
-  },
-
-  inputError: {
-    fontFamily: "Inter_400Regular",
-    fontSize: height * 0.015,
-    color: "rgb(255, 0, 0)",
-    position: "absolute",
-    top: "80%",
-  },
-
-  backdrop: {
-    flex: 1,
-    backgroundColor: "black",
-    opacity: 0.4,
+  ppAndTos: {
+    fontFamily: "Inter_600SemiBold",
+    color: "#007BFF",
+    textDecorationLine: "underline",
+    fontSize: h*7.6+w*7.6,
   },
 
   inputLabel: {
@@ -561,11 +520,4 @@ const styles = StyleSheet.create({
     marginTop: height * 0.04161,
   },
 
-  note: {
-    fontFamily: "Inter_400Regular",
-    fontSize: height * 0.0151,
-    color: "rgba(0, 0, 0, 0.70)",
-    textDecorationLine: "underline",
-    textAlign: "center",
-  },
 });

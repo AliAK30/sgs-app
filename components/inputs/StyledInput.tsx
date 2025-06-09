@@ -15,12 +15,13 @@ export type StyledInputProps = {
   error?: FieldError | undefined;
   Icon?: ()=>JSX.Element | undefined;
   iconRenderingCondition?: any | undefined;
+  errorClone?: string;
 } & TextInputProps;
 
-export default function StyledInput({error, Icon=WarnIcon, iconRenderingCondition, ...props}: StyledInputProps) {
+export default function StyledInput({error, Icon=WarnIcon, iconRenderingCondition, errorClone="as", ...props}: StyledInputProps) {
 
   //const TextInputRef = useRef<typeof TextInput | null>(null)
-  //console.log(props.onChangeText && props.onChangeText('ali'))
+ 
 
   return (
     <View>
@@ -38,7 +39,7 @@ export default function StyledInput({error, Icon=WarnIcon, iconRenderingConditio
         {(iconRenderingCondition || error) && <Icon/>}
       </View>
       <Text style={[inputStyles.inputError, { opacity: error ? 100 : 0 }]}>
-        {error?.message ?? "as"}
+        {error?.message ?? errorClone}
       </Text>
     </View>
   );
