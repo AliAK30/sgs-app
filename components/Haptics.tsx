@@ -29,11 +29,6 @@ export const triggerHaptic = (type: 'impact-1' | 'impact-2' | 'impact-3'| 'impac
     case 'select':
       Haptics.selectionAsync();
       break;
-    case 'rythmic-pattern':
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-      break;
     default:
       console.warn('Unknown haptic type:', type);
   }

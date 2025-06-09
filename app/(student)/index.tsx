@@ -86,31 +86,6 @@ export default function Index() {
     }));
 
     
-
-    // Vibration function
-    // const triggerVibration = (data: number) => {
-    //     switch (data) {
-    //         case 1:
-    //             Vibration.vibrate(15);
-    //             break;
-    //         case 2:
-    //             Vibration.vibrate(25);
-    //             break;
-    //         case 3:
-    //             Vibration.vibrate(35);
-    //             break;
-    //         case 4:
-    //             Vibration.vibrate(45);
-    //             break;
-    //         case 5:
-    //             Vibration.vibrate(55);
-    //             break;
-    //         default:
-    //             Vibration.vibrate(5);
-    //             break;
-    //     }
-    // };
-    
     if(click === 1)
         return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
 
@@ -123,12 +98,6 @@ export default function Index() {
       contentContainerStyle={styles.container}
       style={{backgroundColor: '#FFFFFF'}}>
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
-            
-            {/*<View>
-            <Text style={styles.title}>Hey {formatTwoWordsName(user?.first_name??"")} 👋</Text>
-            <Text style={styles.belowTitle}>Connect, Collaborate, Learn in your style!</Text>
-            </View>*/}
-
             <View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={styles.title}>{displayedText}</Text>
@@ -154,7 +123,6 @@ export default function Index() {
         <View style={{flexDirection:'row', columnGap:w*8}}>
             <View style={styles.searchView}>
                 <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
-                {/*<Pressable onPress={()=>{setFetching(true); setClick(1); Vibration.vibrate(10);}} hitSlop={15}><Feather name="search" color="black" size={19}/></Pressable>*/}
                 <Pressable
                 onPressIn={() => {
                 searchPressed.value = withTiming(0.96, { duration: 80 });
@@ -178,35 +146,7 @@ export default function Index() {
                 <Ionicons name="notifications-outline" color="black" size={19} />
             </View>
         </View>
-        {/*<Pressable
-          onPress={() => {
-            setClick(2);
-            Vibration.vibrate(25);
-        }}
-          style={{
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.30,
-            elevation: 20,
-            borderRadius: 20,
-          }}
-        >
-        <LinearGradient
-              style={{flexDirection:'row',borderRadius:20, height: h*40+w*40}}
-              colors={["rgba(46, 46, 46, 0.95)", "rgba(23, 23, 23, 0.98)","#0B0B0B" ]}
-              locations={[0.17, 0.60, 0.70]}
-              start={{ x: 0.5, y: 0 }}
-            >
-            <View style={{justifyContent:'flex-end', rowGap:h,}}>
-                <Image source={imgSource2} style={{width:135*w, height:68*h}}/>
-            </View>
-            <View style={{justifyContent:'center', rowGap:h,}}>
-                <Text style={styles.findTwin}>Find your Study Twin</Text>
-                <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
-            </View>
-                
-        </LinearGradient>
-        </Pressable>*/}
+        
         
         <Pressable
         onPressIn={() => {

@@ -1,6 +1,13 @@
 import { Text } from "../Themed";
 import { StyleSheet, Pressable, ActivityIndicator, GestureResponderEvent } from "react-native";
 import {h, w} from "@/app/_layout"
+import * as Haptics from '@/components/Haptics';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withTiming,
+    } from 'react-native-reanimated';
+
 
 type Props = {
  onPress : ((event: GestureResponderEvent) => void) | null | undefined;
@@ -12,14 +19,40 @@ type Props = {
 }
 
 export default function SubmitButton({onPress, text, validBackgroundColor="#007BFF", isValid=true, invalidBackgroundColor="rgba(0, 0, 0, 0.4)", isSubmitting=true}:Props) {
+    const buttonScale = useSharedValue(1);   
 
+    const btnAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: buttonScale.value }],
+    }));
+
+    const handlePressIn = () => {
+        buttonScale.value = withTiming(0.95, { duration: 80 });
+      };
+    
+      const handlePressOut = () => {
+        buttonScale.value = withTiming(1, { duration: 80 });
+      };
+    
     return (
+      <Animated.View style={[btnAnimatedStyle]}>
         <Pressable
                   style={[
                     styles.button,
                     { backgroundColor: isValid ? validBackgroundColor : invalidBackgroundColor },
                   ]}
-                  onPress={onPress}
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                  onPress={(event) => {
+                    if (!isValid) {
+                      Haptics.triggerHaptic('feedback-warn');
+                      return;
+                    } else {
+                      Haptics.triggerHaptic('impact-1');
+                      setTimeout(() => {
+                        if (onPress) onPress(event);
+                      }, 150);
+                    }
+                  }}
                 >
                   {isSubmitting ? (
                     <ActivityIndicator size="small" color="white" />
@@ -33,7 +66,9 @@ export default function SubmitButton({onPress, text, validBackgroundColor="#007B
                       }}
                     >{text}</Text>
                   )}
-                </Pressable>
+                  
+          </Pressable>
+        </Animated.View>
     )
 
 }
