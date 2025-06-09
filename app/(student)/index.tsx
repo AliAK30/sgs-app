@@ -1,5 +1,5 @@
 import { View, Text, TextInput } from "@/components/Themed";
-import { StyleSheet, ScrollView, Pressable} from "react-native";
+import { StyleSheet, ScrollView, Pressable, } from "react-native";
 import { useUserStore } from "@/hooks/useStore";
 import { useState, useEffect, } from "react";
 import { Image } from "expo-image";
