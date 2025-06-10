@@ -61,7 +61,7 @@ export default function AdminLayout() {
           options={{
             title: "Groups",
             tabBarIcon: ({ color }) => (
-              <MaterialIcons size={iconSize} name="groups" color={color} />
+              <Feather size={iconSize} name="grid" color={color} />
             ),
             tabBarItemStyle: focusedTab === "groups" ? {borderTopColor:'#539DF3', borderTopWidth:2, marginHorizontal:gap}: {marginHorizontal:gap}
           }}

@@ -30,8 +30,8 @@ const center = labelsContainer / 2;
 const radius = center * 0.8;
 const bw = base_width; //base figma screen width
 const bh = base_height; //base figma screen height
-const labelsPositionXOffset = [3, 16, 0, -15, 5, -19, 6, 9].map((a)=>a/bw*width);
-const labelsPositionYOffset = [-18, 2, 1, 2, -18, -30, -42, -30].map((a)=>a/bw*width);
+const labelsPositionXOffset = [-1.5, 16, -5, -20, 5, -19, 6, 9].map((a)=>a/bw*width);
+const labelsPositionYOffset = [-22, 2, -2, 2, -23, -30, -42, -30].map((a)=>a/bw*width);
 
 
 export default function LearningStyleComponent({ user }: Props) {
@@ -99,7 +99,7 @@ export default function LearningStyleComponent({ user }: Props) {
                   left: x,
                   paddingVertical: width*0.0118,
                   paddingHorizontal: width*0.0218,
-                  boxShadow: "0px 2px 5.5px -1px rgba(0, 0, 0, 0.15), 0px 7px 6.4px 1px rgba(244, 162, 97, 0.38) inset", 
+                  boxShadow: "0px 2px 7px -1px rgba(0, 0, 0, 0.25), 0px 7px 0px 1px rgb(248, 132, 37) inset", 
                 }}
                 onPress={() => showDimensionInfo(index)}
                 hitSlop={10}

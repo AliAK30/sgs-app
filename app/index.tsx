@@ -60,7 +60,7 @@ export default function Index() {
           style={[styles.button, { backgroundColor: "#50BFAF" }]}
           onPress={() => {
             setUser({ role: "student"});
-            router.push("/registration");
+            router.push("/login");
           }}
         >
           <Image
