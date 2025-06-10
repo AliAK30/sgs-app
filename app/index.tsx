@@ -5,7 +5,6 @@ import { Text, View } from "@/components/Themed";
 import { Image, useImage } from "expo-image";
 import { height, w, h, width} from "./_layout";
 import SkeletonLoader from "@/components/SkeletonLoader";
-import * as Haptics from "expo-haptics";
 
 
 

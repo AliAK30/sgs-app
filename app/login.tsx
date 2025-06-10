@@ -95,6 +95,7 @@ export default function Login() {
       keyboardDismissMode="none"
       contentContainerStyle={{ alignItems: "center", flexGrow: 1 }}
     >
+      <Alert />
       <View style={styles.container}>
         <View
           style={{
@@ -106,7 +107,7 @@ export default function Login() {
         >
           <Back onPress={() => router.replace("/")} />
         </View>
-        <Alert />
+        
         {!image ? (
           <SkeletonLoader w={229 * (height / 817)} h={218 * (height / 817)} />
         ) : (

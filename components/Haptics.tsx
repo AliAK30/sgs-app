@@ -16,7 +16,7 @@ export const triggerHaptic = (type: 'impact-1' | 'impact-2' | 'impact-3'| 'impac
       break;
     case 'impact-5':
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
-      break;        
+      break;
     case 'feedback-success':
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       break;

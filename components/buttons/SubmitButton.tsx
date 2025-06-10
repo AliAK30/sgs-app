@@ -10,7 +10,7 @@ import Animated, {
 
 
 type Props = {
- onPress : ((event: GestureResponderEvent) => void) | null | undefined;
+ onPress : ((event: GestureResponderEvent) => void);
  text: string;
  validBackgroundColor?: string;
  isValid?: boolean
@@ -19,7 +19,7 @@ type Props = {
 }
 
 export default function SubmitButton({onPress, text, validBackgroundColor="#007BFF", isValid=true, invalidBackgroundColor="rgba(0, 0, 0, 0.4)", isSubmitting=true}:Props) {
-    const buttonScale = useSharedValue(1);   
+    const buttonScale = useSharedValue(1);
 
     const btnAnimatedStyle = useAnimatedStyle(() => ({
         transform: [{ scale: buttonScale.value }],
@@ -32,9 +32,22 @@ export default function SubmitButton({onPress, text, validBackgroundColor="#007B
       const handlePressOut = () => {
         buttonScale.value = withTiming(1, { duration: 80 });
       };
+
+      const handlePress = (event: GestureResponderEvent) => {
+
+        if (!isValid) {
+            Haptics.triggerHaptic('feedback-warn');
+            return;
+          } else {
+            Haptics.triggerHaptic('impact-1');
+            onPress(event);
+          }
+
+        }
     
     return (
-      <Animated.View style={[btnAnimatedStyle]}>
+
+      <Animated.View style={btnAnimatedStyle}>
         <Pressable
                   style={[
                     styles.button,
@@ -42,17 +55,7 @@ export default function SubmitButton({onPress, text, validBackgroundColor="#007B
                   ]}
                   onPressIn={handlePressIn}
                   onPressOut={handlePressOut}
-                  onPress={(event) => {
-                    if (!isValid) {
-                      Haptics.triggerHaptic('feedback-warn');
-                      return;
-                    } else {
-                      Haptics.triggerHaptic('impact-1');
-                      setTimeout(() => {
-                        if (onPress) onPress(event);
-                      }, 150);
-                    }
-                  }}
+                  onPress={handlePress}
                 >
                   {isSubmitting ? (
                     <ActivityIndicator size="small" color="white" />

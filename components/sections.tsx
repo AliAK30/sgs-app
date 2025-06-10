@@ -6,7 +6,7 @@ import { height, h } from "../app/_layout";
 import { useAlert } from "@/hooks/useAlert";
 import useSection from "@/hooks/useSection";
 import { useSurveyStore } from "@/hooks/useStore";
-import Survey from "./survey";
+import Survey from "./Survey";
 /* const getAnswers = async () => {
   try {
     let tempAnswers = await AsyncStorage.getItem("answers");
@@ -42,7 +42,7 @@ export default function Sections() {
       <Alert/>
       
 
-      <View style={styles.main}>
+      
         <Text style={styles.heading}>Questions</Text>
         <Text style={styles.paragraph}>
           Answer these questions to discover your learning styles
@@ -76,7 +76,7 @@ export default function Sections() {
         </View>
         
         
-      </View>
+      
     </LinearGradient>
   );
 }
@@ -99,10 +99,6 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.0257,
     alignSelf: "flex-start",
     padding: height *0.01
-  },
-
-  main: {
-    paddingLeft: height * 0.00734,
   },
 
   heading: {

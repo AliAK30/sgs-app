@@ -176,7 +176,7 @@ function SearchResult({
       >
         
         <View style={{justifyContent:'center'}}>
-          <Back onPress={() => {setClick(0), Vibration.vibrate(10);}} />
+          <Back onPress={() => {setClick(0)}} />
             <View style={{position:'absolute', alignSelf:'center'}}>
               <Text style={styles.title}>Search Results</Text>
            </View>

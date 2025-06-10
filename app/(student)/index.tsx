@@ -44,7 +44,7 @@ export default function Index() {
 
     // Typewriter effect
     useEffect(() => {
-        const fullText = `Hey ${formatTwoWordsName(user?.first_name ?? "")} `;
+        const fullText = `Hey ${formatFirstName(user?.first_name)} `;
         let currentIndex = 0;
 
         const typeInterval = setInterval(() => {
@@ -253,13 +253,13 @@ const styles = StyleSheet.create({
     findTwin: {
         color: '#ADD8E6',
         fontFamily:'Inter_600SemiBold',
-        fontSize: 8.5*w+8*h,
+        fontSize: 8.25*w+8.25*h,
     },
 
     findTwinSubText: {
         color: "#FFFEFE",
         fontFamily:'Inter_400Regular',
-        fontSize:4.5*h+5*w,
+        fontSize:4.75*h+4.75*w,
     }
 });
 

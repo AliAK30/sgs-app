@@ -7,8 +7,6 @@ import Animated, {
     useAnimatedStyle,
     withTiming,
     } from 'react-native-reanimated';
-
-
     
 export default function Back({onPress}: any) {
   const buttonScale = useSharedValue(1);   
@@ -27,7 +25,7 @@ export default function Back({onPress}: any) {
 
   const handlePress = () => {
     Haptics.triggerHaptic('impact-1');
-    if (onPress) onPress();
+    onPress();
   };
 
   return (
@@ -52,12 +50,9 @@ const styles = StyleSheet.create({
         borderColor: "#565555",
         borderWidth: 1,
         paddingHorizontal:w*2.5,
-        //paddingRight:w*1.5,
         paddingVertical:h*2.5,
         alignItems:'center',
         justifyContent:'center',
-        //marginTop: h*0,
-        //backgroundColor:'white',
         alignSelf: "flex-start",
       },
 })
