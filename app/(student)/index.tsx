@@ -1,5 +1,5 @@
 import { View, Text, TextInput } from "@/components/Themed";
-import { StyleSheet, ScrollView, Pressable} from "react-native";
+import { StyleSheet, ScrollView, Pressable, RefreshControl} from "react-native";
 import { useUserStore } from "@/hooks/useStore";
 import { useState, useEffect, } from "react";
 import { Image } from "expo-image";
@@ -30,7 +30,19 @@ export default function Index() {
     const {user} = useUserStore();
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
+    const [refreshing, setRefreshing] = useState(false);
     
+
+    const onRefresh = async () => {
+        setRefreshing(true);
+        // Refresh user data and any other relevant data here
+        // Example: await refetchUser();
+        // Example: await refetchPeers();
+        // If you have API calls or store actions, trigger them here
+        // For demonstration, we'll just log:
+        setTimeout(() => setRefreshing(false), 1000); // Simulate refresh
+    };
+
      // Typewriter effect state
     const [displayedText, setDisplayedText] = useState("");
     const [showEmoji, setShowEmoji] = useState(false);
@@ -82,7 +94,11 @@ export default function Index() {
     automaticallyAdjustKeyboardInsets={true}
       keyboardDismissMode="none"
       contentContainerStyle={styles.container}
-      style={{backgroundColor: '#FFFFFF'}}>
+      style={{backgroundColor: '#FFFFFF'}}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        >
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
             <View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -148,7 +164,7 @@ export default function Index() {
             start={{ x: 0.5, y: 0 }}
           >
             <View style={{ justifyContent: 'flex-end', rowGap: h }}>
-              <Image source={imgSource2} style={{ width: 135 * w, height: 68 * h }} />
+              <Image source={imgSource2} style={{ width: 130 * w, height: 67 * h }} />
             </View>
             <View style={{ justifyContent: 'center', rowGap: h }}>
               <Text style={styles.findTwin}>Find your Study Twin</Text>
@@ -225,7 +241,7 @@ const styles = StyleSheet.create({
     findTwin: {
         color: '#ADD8E6',
         fontFamily:'Inter_600SemiBold',
-        fontSize: 8.25*w+8.25*h,
+        fontSize: 8.15*w+8.18*h,
     },
 
     findTwinSubText: {
