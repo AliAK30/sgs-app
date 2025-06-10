@@ -1,7 +1,10 @@
 import * as Haptics from 'expo-haptics';
+import { OS } from '@/app/_layout';
 
 export const triggerHaptic = (type: 'impact-1' | 'impact-2' | 'impact-3'| 'impact-4'| 'impact-5'| 'feedback-success' | 'feedback-error'| 'feedback-warn'| 'select' | 'rythmic-pattern') => {
-  switch (type) {
+  if(OS !== 'web')
+  {
+    switch (type) {
     case 'impact-1':
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
       break;
@@ -32,4 +35,6 @@ export const triggerHaptic = (type: 'impact-1' | 'impact-2' | 'impact-3'| 'impac
     default:
       console.warn('Unknown haptic type:', type);
   }
+  }
+  
 };

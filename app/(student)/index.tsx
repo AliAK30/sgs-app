@@ -9,13 +9,13 @@ import {w, h, OS} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/SimilarStudents";
+import AnimatedPressable from "@/components/AnimatedPressable";
 import { formatFirstName } from "@/utils";
 import * as Haptics from '@/components/Haptics';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withTiming,
-    interpolateColor,
     withSequence,
     } from 'react-native-reanimated';
 
@@ -36,8 +36,6 @@ export default function Index() {
     const [showEmoji, setShowEmoji] = useState(false);
 
     // Animation values
-    const searchPressed = useSharedValue(0);
-    const cardScale = useSharedValue(1);
     const emojiRotation = useSharedValue(0);
 
     
@@ -68,18 +66,6 @@ export default function Index() {
     }, [user?.first_name]);
 
     // Animated styles
-    const searchAnimatedStyle = useAnimatedStyle(() => {
-        const backgroundColor = interpolateColor(
-        searchPressed.value,
-        [0, 1],
-        ['transparent', '#E8F4FD']
-        );
-        return { backgroundColor };
-    });
-
-    const cardAnimatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: cardScale.value }],
-    }));
 
     const emojiAnimatedStyle = useAnimatedStyle(() => ({
         transform: [{ rotate: `${emojiRotation.value}deg` }],
@@ -123,24 +109,17 @@ export default function Index() {
         <View style={{flexDirection:'row', columnGap:w*8}}>
             <View style={styles.searchView}>
                 <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
-                <Pressable
-                onPressIn={() => {
-                searchPressed.value = withTiming(0.96, { duration: 80 });
-                }}
-                onPressOut={() => {
-                searchPressed.value = withTiming(0, { duration: 120 });
-                }}
-                onPress={() => {
+                <AnimatedPressable
+                onPress ={() => {
                 Haptics.triggerHaptic('impact-2');
                 setFetching(true);
                 setClick(1);
                 }}
                 hitSlop={15}
+                style={styles.searchIcon}
             >
-            <Animated.View style={[styles.searchIcon, searchAnimatedStyle]}>
               <Feather name="search" color="black" size={19} />
-            </Animated.View>
-          </Pressable>
+          </AnimatedPressable>
             </View>
             <View style={styles.bell}>
                 <Ionicons name="notifications-outline" color="black" size={19} />
@@ -148,17 +127,12 @@ export default function Index() {
         </View>
         
         
-        <Pressable
-        onPressIn={() => {
-          cardScale.value = withTiming(0.96, { duration: 80 });
-        }}
-        onPressOut={() => {
-          cardScale.value = withTiming(1, { duration: 120 });
-        }}
+        <AnimatedPressable
         onPress={() => {
             Haptics.triggerHaptic('impact-3');
-            setTimeout(() => setClick(2), 150);
+            setClick(2);
         }}
+
         style={{
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 8 },
@@ -167,7 +141,6 @@ export default function Index() {
           borderRadius: 20,
         }}
       >
-        <Animated.View style={[{ borderRadius: 20 }, cardAnimatedStyle]}>
           <LinearGradient
             style={{ flexDirection: 'row', borderRadius: 20, height: h * 40 + w * 40 }}
             colors={["rgba(60, 60, 60, 1)", "rgba(35, 35, 35, 1)", "#1A1A1A"]}
@@ -182,8 +155,7 @@ export default function Index() {
               <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
             </View>
           </LinearGradient>
-        </Animated.View>
-      </Pressable>
+      </AnimatedPressable>
 
 
     </ScrollView>

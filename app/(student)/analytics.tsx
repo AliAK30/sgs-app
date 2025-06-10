@@ -1,7 +1,8 @@
 import { View } from "@/components/Themed";
 import { useUserStore} from "@/hooks/useStore";
-import Statistics from "@/components/statistics";
-import Sections from "@/components/sections";
+import Statistics from "@/components/Statistics";
+import Sections from "@/components/Sections";
+
 
 
 export default function Analytics() {

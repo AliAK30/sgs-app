@@ -1,9 +1,8 @@
 import { Text } from "../Themed";
-import { StyleSheet, ActivityIndicator, GestureResponderEvent, InteractionManager } from "react-native";
+import { StyleSheet, ActivityIndicator, GestureResponderEvent } from "react-native";
 import AnimatedPressable from "../AnimatedPressable";
 import { h, w } from "@/app/_layout";
 import * as Haptics from "@/components/Haptics";
-import { useSharedValue, withTiming } from "react-native-reanimated";
 
 type Props = {
   onPress: (event: GestureResponderEvent) => void;
@@ -23,15 +22,6 @@ export default function SubmitButton({
   isSubmitting = false,
 }: Props) {
 
-  const scale = useSharedValue(1);
-
-  const handlePressIn = () => {
-    scale.value = withTiming(0.95, { duration: 80 });
-  };
-
-  const handlePressOut = () => {
-    scale.value = withTiming(1, { duration: 80 });
-  };
 
   const handlePress = (event: GestureResponderEvent) => {
     if (!isValid) {
@@ -39,7 +29,7 @@ export default function SubmitButton({
       return;
     } else {
       Haptics.triggerHaptic("impact-1");
-      InteractionManager.runAfterInteractions(() => {onPress(event)});
+      onPress(event);
     }
   };
 
@@ -48,14 +38,11 @@ export default function SubmitButton({
       style={[
         styles.button,
         {
-          transform: [{scale: scale}],
           backgroundColor: isValid
             ? validBackgroundColor
             : invalidBackgroundColor,
         },
       ]}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
       onPress={handlePress}
     >
       {isSubmitting ? (
