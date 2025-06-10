@@ -14,19 +14,19 @@ export async function handleError(
     if (e.code) {
       switch (e.code) {
         case "ECONNABORTED":
-          await openAlert(
+          return openAlert(
             "fail",
             "Failed!",
             "Request TImed out\nPlease try again later!"
           );
-          return;
+          
 
         case "ERR_NETWORK":
-          await openAlert("fail", "Failed!", "Server address not found!");
-          return;
+          return openAlert("fail", "Failed!", "Server address not found!");
+          
       }
     } else {
-      await openAlert(
+      return openAlert(
         "fail",
         "Failed!",
         "Unknown client side error occured\nPlease contact the developers!"
@@ -36,17 +36,15 @@ export async function handleError(
 
   //Server Error
   if (e.status === 500) {
-    await openAlert("fail", "Failed!", e.message);
+    return openAlert("fail", "Failed!", e.message);
   } else {
     
-    await openAlert(
+    if(codeToCheck && (codeToCheck===e.response.data.code)) codeToRun && codeToRun();
+    return openAlert(
       "fail",
       formatCode(e.response.data.code),
       e.response.data.message
     );
 
-    if(codeToCheck && (codeToCheck===e.response.data.code)) codeToRun && codeToRun();
   }
-
-  return;
 }

@@ -78,16 +78,13 @@ export default function Login() {
         return;
       }
     } catch (e: any) {
-      handleError(e, openAlert);
+      await handleError(e, openAlert);
     }
   };
 
   //redirect back to index if user has not selected a role
   if (!user?.role) return <Redirect href="/" />;
-  if (token) {
-    if (user.role === "student") return <Redirect href="/(student)" />;
-    else return <Redirect href="/(admin)" />;
-  }
+  if (token) return <Redirect href={user.role === "student" ? "/(student)" : "/(admin)"} />;
 
   return (
     <ScrollView
@@ -119,6 +116,8 @@ export default function Login() {
             }}
           />
         )}
+
+        
         <Text style={styles.heading}>Log in</Text>
 
         <View style={styles.inputView}>

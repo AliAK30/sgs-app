@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { View, Text } from "@/components/Themed";
 import Modal from "react-native-modal";
 import { StyleSheet, Pressable } from "react-native";
@@ -33,6 +33,7 @@ export function useAlert() {
   ): Promise<void> => {
     return new Promise((resolve) => {
       //promise state will remain pending unless resolve() is called, so you can use await
+      
       setState({
         isVisible: true,
         type,
@@ -40,6 +41,7 @@ export function useAlert() {
         resolvePromise: resolve,
         message,
       });
+    
     });
   };
 
@@ -48,7 +50,9 @@ export function useAlert() {
     setState({ ...state, isVisible: false });
   };
 
-  function Alert() {
+  const Alert = useMemo( ()=> {
+
+    return function AlertComponent() {
     const { isVisible, type, message, title } = state;
 
     const Icon = () => {
@@ -83,6 +87,7 @@ export function useAlert() {
     };
 
     return (
+      <View>
       <Modal
         isVisible={isVisible}
         hasBackdrop={true}
@@ -106,8 +111,9 @@ export function useAlert() {
           </Pressable>
         </View>
       </Modal>
+      </View>
     );
-  }
+  }}, [state]);
 
   return { ...state, openAlert, closeAlert, Alert };
 }
