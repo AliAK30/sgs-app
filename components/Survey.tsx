@@ -1,10 +1,11 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet, ActivityIndicator } from "react-native";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback} from "react";
+import { debounce } from "lodash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { questions } from "@/constants/Questions";
-import { height, h } from "@/app/_layout";
+import { height, h, w } from "@/app/_layout";
 import { useSurveyStore } from "@/hooks/useStore";
 import LottieView from "lottie-react-native";
 import DashedProgress from "@/components/DashedProgress";
@@ -12,7 +13,6 @@ import useAnswers from "@/hooks/useAnswers";
 import { useAlert } from "@/hooks/useAlert";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
-import { useRouter } from "expo-router";
 import { useUserStore } from "@/hooks/useStore";
 import axios from "axios";
 import Back from "@/components/buttons/Back";
@@ -21,6 +21,7 @@ import useSection from "@/hooks/useSection";
 import { Answer } from "@/types";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { getAnimationForQuestion } from "@/constants/Animations";
+import { handleError } from "@/errors";
 
 //USE OF WITHAUTH TO PROTECT ROUTE
 
@@ -49,9 +50,8 @@ export default function Survey() {
   const checksumRef = useRef({hash: 0, index:-1}); 
   //numbering questions from 1 to 44, so total 44
   const realQuestionCount = (selectedSection - 1) * 11 + count;
-  const [answer, setAnswer] = useState<string>(
-    getAnswersRef(realQuestionCount - 1)
-  );
+
+  const [answer, setAnswer] = useState<string>(getAnswersRef(realQuestionCount - 1));
 
   const currentAnimationSource = getAnimationForQuestion(realQuestionCount);
 
@@ -60,62 +60,53 @@ export default function Survey() {
     updateQuestion([answers.current[checksumRef.current.index]]);
   }, [checksumRef.current.hash])
 
-/*   const animationRef = useRef<LottieView>(null);
-
-  useEffect(() => {
-    animationRef.current?.play();
-    animationRef.current?.play(0, 222);
-  }, []);
- */
-  const next = async () => {
-    
-
-    //this is what saves the selected answer to the async storage
-    if (getAnswersRef(realQuestionCount - 1) !== answer) {
-      try {
+  const debouncedNext = useCallback(
+    debounce((shouldSubmit: boolean) => {
+      // Original next logic without the async parts that need immediate response
+      if (getAnswersRef(realQuestionCount - 1) !== answer) {
         updateAnswersRef(realQuestionCount - 1, {
           q: realQuestionCount,
           answer: answer,
         }, checksumRef);
         setSectionsCount();
-        await AsyncStorage.setItem("answers", JSON.stringify(answers.current));
-        
-      } catch (e: any) {
-        console.log(e.message);
+        AsyncStorage.setItem("answers", JSON.stringify(answers.current)).catch(console.error);
       }
-    }
 
-    if (realQuestionCount !== 44) {
-      //first set the answer state to reflect change on users screen
-      
-      setAnswer(getAnswersRef(realQuestionCount));
-  
-      //then change the questions and options
-      if (count === 11) {
-        setSelectedSection(selectedSection + 1);
-        setCount(1);
-      } else setCount(count=>count + 1);
-      
-    }
-    
-    //submit if last question
-    realQuestionCount === 44 && submit();
-  };
+      if (realQuestionCount !== 44) {
+        setAnswer(getAnswersRef(realQuestionCount));
+        if (count === 11) {
+          setSelectedSection(selectedSection + 1);
+          setCount(1);
+        } else {
+          setCount(count => count + 1);
+        }
+      } else if (shouldSubmit) {
+        submit();
+      }
+    }, 300, { leading: true, trailing: false }) // 300ms debounce, execute on leading edge
+  , [count, answer]);
 
-  const previous = () => {
-    //first set the answer state to reflect change on users screen
+  const debouncedPrevious = useCallback(
+    debounce(() => {
+      setAnswer(getAnswersRef(realQuestionCount - 2));
+      if (count === 1) {
+        setSelectedSection(selectedSection - 1);
+        setCount(11);
+        return;
+      }
+      setCount(count => count - 1);
+    }, 300, { leading: true, trailing: false })
+  , [count, answer]);
 
-    setAnswer(getAnswersRef(realQuestionCount - 2));
-    //then change the questions and options
-    if (count === 1) {
-      setSelectedSection(selectedSection - 1);
-      setCount(11);
-      return;
-    }
-    setCount(count=>count - 1);
-  };
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      debouncedNext.cancel();
+      debouncedPrevious.cancel();
+    };
+  }, []);
 
-  const skipTo = (num: number) => {
+   const skipTo = (num: number) => {
     //used to skip to any previous answered question
     const real = (selectedSection - 1) * 11 + num;
     if (getAnswersRef(real - 1) !== "") {
@@ -123,6 +114,8 @@ export default function Survey() {
       setCount(num);
     }
   };
+
+
 
   const updateQuestion = async (oneAnswer: Array<Answer>) => {
     try {
@@ -135,11 +128,8 @@ export default function Survey() {
         },
         timeout: 1000 * 15,
         });
-        console.log('done')
       } 
-    } catch (e: any) {
-      console.log(e);
-    } 
+    } catch (e: any) {} 
   }
 
   const submit = async () => {
@@ -181,66 +171,36 @@ export default function Survey() {
 
         } else await openAlert('info', 'Already submitted', `Dear ${user.first_name}, you have already submitted the answers.`)
         
-        
-
-
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
         return;
       }
     } catch (e: any) {
-      if (!e.status) {
-        switch (e.code) {
-          case "ECONNABORTED":
-            openAlert("fail", "Failed!", "Request TImed out\nPlease try again later!");
-            return;
-
-          case "ERR_NETWORK":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Server is not Responding\nPlease try again later!"
-            );
-            return;
-        }
-      }
-
-      if (e.status === 400) {
-        switch (e.response.data.code) {
-
-          case "VALIDATION_ERROR":
-            openAlert("fail", "Failed!", e.response.data.message);
-            return;
-
-          case "RESUBMISSION":
-            openAlert("info", "Already Submitted!", e.response.data.message);
-            return;
-        }
-      }
-
-      if(e.status === 429)
-      {
-        openAlert("fail", "Error", e.response.data.message);
-      }
-
-      if (e.status === 500) {
-        openAlert("fail", "Failed!", e.message);
-        return;
-      }
+      handleError(e, openAlert);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  
+  // Update your button handlers
+  const handleNext = () => {
+    triggerHaptic("impact-1");
+    debouncedNext(realQuestionCount === 44);
+  };
 
+  const handlePrevious = () => {
+    triggerHaptic("impact-1");
+    debouncedPrevious();
+  };
+
+  
   return (
     <View
       style={[
         styles.container,
         {
           backgroundColor:
-            questions[selectedSection - 1][count - 1].containerColor,
+            questions[selectedSection-1][count-1].containerColor,
         },
       ]}
     >
@@ -262,7 +222,7 @@ export default function Survey() {
           },
         ]}
       >
-        {/*{(count !== 8 || selectedSection !== 1) && (*/}
+        
         {currentAnimationSource && (
           <LinearGradient
             // Background Linear Gradient
@@ -362,10 +322,7 @@ export default function Survey() {
               styles.button,
               { display: realQuestionCount === 1 ? "none" : "flex" },
             ]}
-            onPress={() => {
-              triggerHaptic("impact-1");
-              previous()
-            }}
+            onPress={handlePrevious}
           >
             <Text style={[styles.buttonText]}>Previous</Text>
           </AnimatedPressable>
@@ -378,10 +335,7 @@ export default function Survey() {
                 //display: realQuestionCount === 44 ? "none" : "flex",
               },
             ]}
-            onPress={() => {
-              triggerHaptic("impact-1");
-              next()
-            }}
+            onPress={handleNext}
             disabled={answer === ""}
           >
             {isSubmitting ? (
@@ -419,7 +373,7 @@ const styles = StyleSheet.create({
   heading: {
     fontFamily: "Poppins_700Bold",
     color: "#4D3E3E",
-    fontSize: height * 0.0244,
+    fontSize: h*10+w*10,
     paddingLeft: height * 0.009,
     marginTop: height * 0.0257
   },
@@ -437,16 +391,13 @@ const styles = StyleSheet.create({
 
   main: {
     marginTop: height * 0.025,
-    //borderWidth: 0.5,
-    //borderColor: "black",
     paddingHorizontal: height * 0.0292,
     rowGap: height * 0.012,
-    // minHeight: height * 0.317,
   },
 
   question: {
     fontFamily: "Inter_600SemiBold",
-    fontSize: height * 0.01958,
+    fontSize: h*8+w*8,
     color: "#1f2429",
     lineHeight: height * 0.0244,
     textAlign: "left",
@@ -456,8 +407,8 @@ const styles = StyleSheet.create({
 
   options: {
     fontFamily: "Inter_500Medium",
-    fontSize: height * 0.01835,
-    lineHeight: height * 0.0244,
+    fontSize: h*7.5+w*7.5,
+    lineHeight: h*20,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "rgba(31, 36, 41, 0.2)",
@@ -466,10 +417,7 @@ const styles = StyleSheet.create({
 
   buttonsquestionContainer: {
     flexDirection: "row",
-    //alignSelf: "stretch",
     paddingHorizontal: height * 0.028,
-    //borderWidth: 1,
-    //borderColor: "black",
     position: "absolute",
     bottom: height * 0.03,
     width: "100%",
@@ -483,8 +431,8 @@ const styles = StyleSheet.create({
 
   buttonText: {
     fontFamily: "Inter_500Medium",
-    fontSize: height * 0.01835,
+    fontSize: h*7.5+w*7.5,
     paddingHorizontal: height * 0.00489,
-    lineHeight: height * 0.0244,
+    lineHeight: h*20,
   },
 });
