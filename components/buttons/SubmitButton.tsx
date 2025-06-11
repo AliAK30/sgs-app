@@ -1,25 +1,30 @@
 import { Text } from "../Themed";
-import { StyleSheet, ActivityIndicator, GestureResponderEvent } from "react-native";
-import AnimatedPressable from "../AnimatedPressable";
+import { StyleSheet, ActivityIndicator, GestureResponderEvent, TextStyle, StyleProp } from "react-native";
+import AnimatedPressable, {AnimatedPressableProps} from "../AnimatedPressable";
 import { h, w } from "@/app/_layout";
 import * as Haptics from "@/components/Haptics";
 
-type Props = {
-  onPress: (event: GestureResponderEvent) => void;
+type Props = AnimatedPressableProps & {
   text: string;
   validBackgroundColor?: string;
   isValid?: boolean;
   invalidBackgroundColor?: string;
   isSubmitting?: boolean;
+  textStyle?: StyleProp<TextStyle> | undefined;
+  Icon?: ()=>JSX.Element | undefined;
 };
 
 export default function SubmitButton({
   onPress,
   text,
+  style,
+  textStyle,
+  Icon,
   validBackgroundColor = "#007BFF",
   isValid = true,
   invalidBackgroundColor = "rgba(0, 0, 0, 0.4)",
   isSubmitting = false,
+  ...props
 }: Props) {
 
 
@@ -33,31 +38,28 @@ export default function SubmitButton({
     }
   };
 
-  return (
-    <AnimatedPressable
-      style={[
+  const styleForPressable = style ? style : [
         styles.button,
         {
           backgroundColor: isValid
             ? validBackgroundColor
             : invalidBackgroundColor,
         },
-      ]}
+      ];
+
+  const styleForText = textStyle ? textStyle : styles.text;
+
+  return (
+    <AnimatedPressable
+      {...props}
+      style={styleForPressable}
       onPress={handlePress}
     >
+      {Icon && <Icon/>}
       {isSubmitting ? (
         <ActivityIndicator size="small" color="white" />
       ) : (
-        <Text
-          style={{
-            fontFamily: "Inter_600SemiBold",
-            color: "#ffffff",
-            fontSize: h * 8 + w * 8,
-            textAlign: "center",
-          }}
-        >
-          {text}
-        </Text>
+        <Text style={styleForText}>{text}</Text>
       )}
     </AnimatedPressable>
   );
@@ -69,4 +71,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: h * 17,
   },
+
+  text: {
+    fontFamily: "Inter_600SemiBold",
+    color: "#ffffff",
+    fontSize: h * 8 + w * 8,
+    textAlign: "center",
+  }
 });

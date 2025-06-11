@@ -1,5 +1,5 @@
 import { Text, View } from "@/components/Themed";
-import { StyleSheet, ActivityIndicator } from "react-native";
+import { StyleSheet } from "react-native";
 import { useState, useRef, useEffect, useCallback} from "react";
 import { debounce } from "lodash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,11 +19,11 @@ import Back from "@/components/buttons/Back";
 import {triggerHaptic} from "@/components/Haptics";
 import useSection from "@/hooks/useSection";
 import { Answer } from "@/types";
-import AnimatedPressable from "@/components/AnimatedPressable";
 import { getAnimationForQuestion } from "@/constants/Animations";
 import { handleError } from "@/errors";
+import SubmitButton from "./buttons/SubmitButton";
+import AnimatedPressableText from "./AnimatedPressableText";
 
-//USE OF WITHAUTH TO PROTECT ROUTE
 
 export default function Survey() {
 
@@ -32,11 +32,9 @@ export default function Survey() {
   const { selectedSection, getStartQuestion, setSelectedSection, setSectionsCount} =
     useSurveyStore((state) => state);
   
-
   const {section} = useSection();
   const { openAlert, Alert } = useAlert();
   const { isConnected } = useNetInfo();
-  //const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, token, setUser } = useUserStore();
 
@@ -106,7 +104,7 @@ export default function Survey() {
     };
   }, []);
 
-   const skipTo = (num: number) => {
+  const skipTo = (num: number) => {
     //used to skip to any previous answered question
     const real = (selectedSection - 1) * 11 + num;
     if (getAnswersRef(real - 1) !== "") {
@@ -151,7 +149,7 @@ export default function Survey() {
             `${url}/student/identify/learningstyle`,
             {
               headers: { Authorization: `Bearer ${token}` },
-              timeout: 1000 * 55,
+              timeout: 1000 * 60,
             }
           );
           await openAlert(
@@ -163,7 +161,6 @@ export default function Survey() {
           //update the user state so statistics screen is displayed
           if (token){
             setUser(res.data.student);
-            await AsyncStorage.setItem("user", JSON.stringify(res.data.student));
           }
           }
         
@@ -182,7 +179,6 @@ export default function Survey() {
     }
   };
 
-  // Update your button handlers
   const handleNext = () => {
     triggerHaptic("impact-1");
     debouncedNext(realQuestionCount === 44);
@@ -263,14 +259,12 @@ export default function Survey() {
             </Text>
           </View>
 
-          <AnimatedPressable
+          <AnimatedPressableText
             onPress={() => {
               setAnswer("a");
               triggerHaptic("impact-1");
             }}
-          >
-            <Text
-              style={[
+            style={[
                 styles.options,
                 {
                   color: answer === "a" ? "white" : "#1f2429",
@@ -280,18 +274,16 @@ export default function Survey() {
                       : "rgba(31, 36, 41, 0.05)",
                 },
               ]}
-            >
+          >
               {questions[selectedSection - 1][count - 1].a}
-            </Text>
-          </AnimatedPressable>
-          <AnimatedPressable
+          </AnimatedPressableText>
+
+          <AnimatedPressableText
             onPress={() => {
               triggerHaptic("impact-1");
               setAnswer("b");
             }}
-          >
-            <Text
-              style={[
+            style={[
                 styles.options,
                 {
                   color: answer === "b" ? "white" : "#1f2429",
@@ -301,10 +293,10 @@ export default function Survey() {
                       : "rgba(31, 36, 41, 0.05)",
                 },
               ]}
-            >
+          >
               {questions[selectedSection - 1][count - 1].b}
-            </Text>
-          </AnimatedPressable>
+          </AnimatedPressableText>
+
         </View>
         <View
           style={[
@@ -317,43 +309,22 @@ export default function Survey() {
             },
           ]}
         >
-          <AnimatedPressable
-            style={[
-              styles.button,
-              { display: realQuestionCount === 1 ? "none" : "flex" },
-            ]}
+          <SubmitButton
+            style={[styles.button, { display: realQuestionCount === 1 ? "none" : "flex" }]}
             onPress={handlePrevious}
-          >
-            <Text style={[styles.buttonText]}>Previous</Text>
-          </AnimatedPressable>
+            textStyle={styles.buttonText}
+            text="Previous"
+          />
 
-          <AnimatedPressable
-            style={[
-              styles.button,
-              {
-                backgroundColor: "#1f2429",
-                //display: realQuestionCount === 44 ? "none" : "flex",
-              },
-            ]}
+          <SubmitButton
+            style={[styles.button,{backgroundColor: "#1f2429"}]}
             onPress={handleNext}
             disabled={answer === ""}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <Text
-                style={[
-                  styles.buttonText,
-                  {
-                    paddingHorizontal: height * 0.009,
-                    color: "#ffffff",
-                  },
-                ]}
-              >
-                {realQuestionCount === 44 ? "Submit" : "Next"}
-              </Text>
-            )}
-          </AnimatedPressable>
+            isSubmitting={isSubmitting}
+            text={realQuestionCount === 44 ? "Submit" : "Next"}
+            textStyle={[styles.buttonText, {paddingHorizontal: height * 0.009, color: "#ffffff"}]}
+          />
+
         </View>
       </View>
     </View>
@@ -368,7 +339,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: height * 0.024,
     alignSelf:'center',
   },
-
 
   heading: {
     fontFamily: "Poppins_700Bold",
@@ -402,7 +372,6 @@ const styles = StyleSheet.create({
     lineHeight: height * 0.0244,
     textAlign: "left",
     marginTop: height * 0.015,
-    //paddingRight: height*0.0003
   },
 
   options: {

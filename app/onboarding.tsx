@@ -1,12 +1,15 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet, Pressable, ScrollView,} from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, Redirect } from "expo-router";
 import { useState, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import DashedProgress from "@/components/DashedProgress";
 import NextButton from "@/components/NextButton";
 import LottieView from "lottie-react-native";
+import { useUserStore } from "@/hooks/useStore";
 import { w, h, width, height} from "../app/_layout";
+import { url } from "@/constants/Server";
+import axios from "axios";
 
 
 const onboardingData = [
@@ -35,6 +38,7 @@ export default function onboarding() {
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
+  const {user, token, setUser} = useUserStore();
  
 
   const handleNext = () => {
@@ -48,11 +52,13 @@ export default function onboarding() {
       
       
     } else {
+      updateUserNewStatus();
       router.replace("/(student)");
     }
   };
 
   const handleSkip = () => {
+    updateUserNewStatus();
     router.replace("/(student)");
   };
 
@@ -61,6 +67,27 @@ export default function onboarding() {
       const contentOffsetX = event.nativeEvent.contentOffset.x;
       setCurrentPage(Math.ceil(contentOffsetX/width));
   };
+
+  const updateUserNewStatus = async () => {
+    try {
+      const res = await axios.patch(`${url}/student/update/self`, {newUser: false}, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        timeout: 1000 * 15,
+      });
+
+      setUser({...user, newUser: res.data.newUser});
+    } catch (e:any) {}
+  }
+
+  //redirect back to index if user has not selected a role
+  if (!user?.role) return <Redirect href="/" />;
+  //redirect back to login if user is not authenticated
+  else if (!token) return <Redirect href="/login" />;
+  //redirect to student or admin if not a new user
+  else if (!user?.newUser) return <Redirect href={user.role === 'student' ? "/(student)" : "/(admin)"}/>
 
   return (
   

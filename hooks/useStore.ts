@@ -37,25 +37,26 @@ export const useSurveyStore = create<SurveyState>()((set, get) => ({
   setSelectedSection: (num) => set(() => ({ selectedSection: num })),
   getStartQuestion: () => {
 
+    const {getUnansweredQuestionIndex} = useAnswers();
     const { selectedSection } = get();
     const {section} = useSection();
 
     switch (selectedSection) {
       case 1: {
         if (section.one === 11) return 0;
-        else return section.one;
+        else return getUnansweredQuestionIndex(1);
       }
       case 2: {
         if (section.two === 11) return 0;
-        else return section.two;
+        else return getUnansweredQuestionIndex(2);
       }
       case 3: {
         if (section.three === 11) return 0;
-        else return section.three;
+        else return getUnansweredQuestionIndex(3);
       }
       case 4: {
         if (section.four === 11) return 0;
-        else return section.four;
+        else return getUnansweredQuestionIndex(4);
       }
       default:
         return 0;
@@ -93,14 +94,15 @@ const initialUserState = {
 export const useUserStore = create<UserState>()((set, get) => ({
 
   ...initialUserState,
-  setUser: (user) => set(() => ({ user: user })),
-  setToken: (token) => set(() => ({ token: token })),
+  setUser: (user) => {AsyncStorage.setItem("user", JSON.stringify(user)); set(() => ({ user: user }))},
+  setToken: (token) => {token && AsyncStorage.setItem("token", token); set(() => ({ token: token }))},
   initializeUser: async (userToSet: User, tokenToSet: string)  => {
     
     
     const { initializeAnswers } = useAnswers();
     const { setUser, setToken } = get();
     //get answers from local storage if user has not completed survey
+    //console.log(userToSet);
     if(!userToSet.isSurveyCompleted)
     {
       const temp = await AsyncStorage.getItem("answers");
@@ -124,14 +126,9 @@ export const useUserStore = create<UserState>()((set, get) => ({
           initializeAnswers(JSON.parse(temp))
         }
     }
-    
-    
-    await AsyncStorage.setItem("user", JSON.stringify(userToSet));
-    await AsyncStorage.setItem("token", tokenToSet);
+
     setUser(userToSet);
     setToken(tokenToSet);
-    
-
   },
   resetUserState: () => set(() => ({...initialUserState}))
 

@@ -122,12 +122,22 @@ export default function RootLayout() {
   const initialize = async () => {
     
     try {
+      
+      //check if user is stored in local storage
       const newUser = await AsyncStorage.getItem("user");
-      if (newUser) {
-        
+      if (newUser && newUser !== "null") {
+        //if yes then check if user is logged in
         const tok = await AsyncStorage.getItem("token");
-        await initializeUser(JSON.parse(newUser), tok ? tok : "");
-        setSectionsCount();
+        if(tok)
+        {
+          //if yes initialize the rest of the app
+          await initializeUser(JSON.parse(newUser), tok);
+          setSectionsCount();
+        } else {
+          //if user is not logged in then only set user
+          setUser(JSON.parse(newUser));
+        }
+        
       } 
     } catch (e: any) {
       console.log(e.message);

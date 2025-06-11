@@ -28,7 +28,7 @@ const schema = yup
       .string()
       .required("Email is required")
       .matches(
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+        /^\s*\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+\s*$/,
         "Please enter a valid email"
       ),
     password: yup.string().required("Password is required"),

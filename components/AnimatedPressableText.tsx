@@ -1,7 +1,6 @@
 import Animated from "react-native-reanimated";
 import {
-  Pressable,
-  PressableProps,
+  TextProps,
   InteractionManager,
   GestureResponderEvent,
 } from "react-native";
@@ -11,7 +10,7 @@ import {
   AnimatedProps,
 } from "react-native-reanimated";
 
-export type AnimatedPressableProps = AnimatedProps<PressableProps> & {
+export type AnimatedPressableTextProps = AnimatedProps<TextProps> & {
   onPress: (event: GestureResponderEvent) => void;
   animationInValue?: number;
   animationInTiming?: number;
@@ -19,9 +18,8 @@ export type AnimatedPressableProps = AnimatedProps<PressableProps> & {
   animationOutTiming?: number;
 };
 
-const AP = Animated.createAnimatedComponent(Pressable);
 
-export default function AnimatedPressable({
+export default function AnimatedPressableText({
   children,
   onPress,
   animationInTiming=80,
@@ -29,15 +27,15 @@ export default function AnimatedPressable({
   animationInValue=0.95,
   animationOutValue=1,
   ...props
-}: AnimatedPressableProps) {
-  const buttonScale = useSharedValue(1);
+}: AnimatedPressableTextProps) {
+  const textScale = useSharedValue(1);
 
   const handlePressIn = () => {
-    buttonScale.value = withTiming(animationInValue, { duration: animationInTiming });
+    textScale.value = withTiming(animationInValue, { duration: animationInTiming });
   };
 
   const handlePressOut = () => {
-    buttonScale.value = withTiming(animationOutValue, { duration: animationOutTiming });
+    textScale.value = withTiming(animationOutValue, { duration: animationOutTiming });
   };
 
   const handlePress = (event: GestureResponderEvent) => {
@@ -48,14 +46,14 @@ export default function AnimatedPressable({
   };
 
   return (
-    <AP
+    <Animated.Text
     {...props}
-      style={[{transform: [{scale: buttonScale}]}, props.style]}
+      style={[{transform: [{scale: textScale}]}, props.style]}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       onPress={handlePress}
     >
       {children}
-    </AP>
+    </Animated.Text>
   );
 }

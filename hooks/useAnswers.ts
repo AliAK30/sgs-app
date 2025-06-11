@@ -12,7 +12,7 @@ const initializeAnswers = (data: Array<Answer>|undefined) => {
 }
 
 // Provide a way to update the ref
-const updateAnswersRef = (index: number, answer: Answer, ref:React.RefObject<{
+const updateAnswersRef = (index: number, answer: Answer, ref:React.MutableRefObject<{
     hash: number;
     index: number;
 }>) => {
@@ -41,8 +41,21 @@ const getQuestionsCount = (section: number): number => {
   return count;
 };
 
+const getUnansweredQuestionIndex = (section: number): number => {
+  //takes section number from 1 to 4 and returns the first unanswered question by user
+  let count = 0;
+  if(answers.current)
+  {
+    for (let i = 0; i < 11; i++) {
+      if (answers.current[(section - 1) * 11 + i].answer === "") break;
+      count++;
+    }
+  }
+  return count;
+}
+
 const useAnswers = () => {
-  return { answers, updateAnswersRef, getAnswersRef, getQuestionsCount, initializeAnswers };
+  return { answers, updateAnswersRef, getAnswersRef, getQuestionsCount, initializeAnswers, getUnansweredQuestionIndex };
 };
 
 export default useAnswers;

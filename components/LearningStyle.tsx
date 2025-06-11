@@ -6,6 +6,7 @@ import {StyleSheet, Pressable, } from "react-native";
 import { useState } from "react";
 import DimensionInfo from "@/components/DimensionInfo";
 import { Label } from "@/types";
+import AnimatedPressableText from "./AnimatedPressableText";
 
 type Props = {
   user: User | null;
@@ -89,9 +90,9 @@ export default function LearningStyleComponent({ user }: Props) {
             y += labelsPositionYOffset[index];
 
             return (
-              <Pressable
+              <AnimatedPressableText
                 key={`label-${index}`}
-                style={{
+                style={[styles.labels, {
                   position: "absolute",
                   backgroundColor: "#EBD7C9",
                   borderRadius: 10.5,
@@ -100,12 +101,11 @@ export default function LearningStyleComponent({ user }: Props) {
                   paddingVertical: width*0.0118,
                   paddingHorizontal: width*0.0218,
                   boxShadow: "0px 2px 7px -1px rgba(0, 0, 0, 0.25), 0px 7px 0px 1px rgb(248, 132, 37) inset", 
-                }}
+                }]}
                 onPress={() => showDimensionInfo(index)}
-                hitSlop={10}
               >
-                <Text style={styles.labels}>{category} <Text style={[styles.labels, {fontFamily: "Poppins_400Regular"}]}>{`(${dataArray[index]})`}</Text></Text>
-              </Pressable>
+                {category} <Text style={[styles.labels, {fontFamily: "Poppins_400Regular"}]}>{`(${dataArray[index]})`}</Text>
+              </AnimatedPressableText>
             );
           })}
       </View>

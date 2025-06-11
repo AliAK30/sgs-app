@@ -22,7 +22,7 @@ export async function handleError(
           
 
         case "ERR_NETWORK":
-          return openAlert("fail", "Failed!", "Server address not found!");
+          return openAlert("fail", "Failed!", "Server is not reachable\n Please try again later!");
           
       }
     } else {
