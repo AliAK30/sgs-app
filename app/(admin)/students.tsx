@@ -75,7 +75,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_500Medium',
         color:'#85878D',
         fontSize: w*8.5+h*8,
-        outlineWidth:0
     },
 
     friends : {

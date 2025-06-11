@@ -58,7 +58,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   searchView: {
-        
         flexDirection:'row',
         backgroundColor:'#FFFFFF',
         borderRadius:9.4,
@@ -75,7 +74,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_500Medium',
         color:'#85878D',
         fontSize: w*8.5+h*8,
-        outlineWidth:0
     },
 
     friends : {
