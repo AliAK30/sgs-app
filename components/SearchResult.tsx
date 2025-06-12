@@ -46,7 +46,7 @@ function SearchResult({
   const [fetchingMore, setFetchingMore] = useState<boolean>(false);
   const { Alert, openAlert } = useAlert();
   const { isConnected } = useNetInfo();
-  const { token } = useUserStore();
+  const { token, user } = useUserStore();
   const page = useRef<number>(1);
   const hasMore = useRef<boolean>(true);
   const totalCount = useRef<number>(0);
@@ -68,6 +68,7 @@ function SearchResult({
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
+              "userid": user?._id
             },
             timeout: 1000 * 25,
           });

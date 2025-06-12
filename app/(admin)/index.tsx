@@ -50,6 +50,7 @@ export default function Index() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });
@@ -61,6 +62,7 @@ export default function Index() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });
@@ -72,6 +74,7 @@ export default function Index() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });

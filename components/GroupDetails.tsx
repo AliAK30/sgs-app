@@ -66,6 +66,7 @@ export default function GroupDetails({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         });
         //console.log(2)
@@ -122,6 +123,7 @@ export default function GroupDetails({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         });
 

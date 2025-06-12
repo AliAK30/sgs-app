@@ -62,7 +62,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
     const [checkingLS, setCheckingLS] = useState<number>(similarity===-1 ? 0 : 2);
     const { isConnected } = useNetInfo();
     const user = useRef<ExtendedUser>({});
-    const { token } = useUserStore();
+    const userStore = useUserStore();
     const pieDatas = [ {value: similarity === -1 ? 70 : similarity, color: '#50BFAF', gradientCenterColor: '#0A594E'}, {value: similarity === -1 ? 30 : 100-similarity, color: '#F8F8F8'},];
     const pieData = useRef<pieDataItem[]|null>(pieDatas);
 
@@ -83,7 +83,8 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
           const res: any = await axios.get(`${url}/student/${id}`, {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${userStore.token}`,
+              "userid": userStore.user?._id
             },
             timeout: 1000 * 25,
           });
@@ -137,7 +138,8 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
             const {data} = await axios.get(`${url}/student/similarity/${id}`, {
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${userStore.token}`,
+                "userid": userStore.user?._id
             },
             timeout: 1000 * 25,
             });

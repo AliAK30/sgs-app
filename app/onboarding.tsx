@@ -74,10 +74,11 @@ export default function onboarding() {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "userid": user?._id
         },
         timeout: 1000 * 15,
       });
-
+      console.log(res.data.newUser);
       setUser({...user, newUser: res.data.newUser});
     } catch (e:any) {}
   }

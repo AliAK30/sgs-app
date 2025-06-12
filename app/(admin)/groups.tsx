@@ -32,7 +32,7 @@ export default function Groups() {
   const [click, setClick] = useState<number>(0);
   const indexRef = useRef<number>(0);
   const { isConnected } = useNetInfo();
-  const { token } = useUserStore();
+  const { token, user } = useUserStore();
 
   useEffect(()=> {
       if(isConnected || isConnected===null)
@@ -53,6 +53,7 @@ export default function Groups() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });

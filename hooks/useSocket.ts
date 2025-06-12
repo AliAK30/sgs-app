@@ -1,70 +1,52 @@
 import { useEffect, useCallback, useRef } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { useUserStore, useSocketStore } from './useStore';
 import socketService from '@/SocketService';
-import { Events, EventData, SocketEventListener } from '@/SocketService'; // Assuming these types are exported from your SocketService file
+import { Events, SocketEventListener } from '@/SocketService'; // Assuming these types are exported from your SocketService file
 
-export const useSocket = (userId: string | null, authToken: string | null) => {
+export const useSocket = () => {
 
-  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
-  const isInitialized = useRef(false);
+  const {isConnected, setIsConnected} = useSocketStore();
+  const {user, token} = useUserStore();
 
   // Initialize socket connection
   const initializeSocket = useCallback(async () => {
-    if (!userId || !authToken || isInitialized.current) return;
-
+    
+    if (socketService.isInitialized()) return;
+    if (!user?._id || !token) {
+      console.warn('Skipping socket init: Missing user or token');
+      return;
+    }
+    
     try {
-      await socketService.initialize(userId, authToken);
-      isInitialized.current = true;
+      await socketService.initialize(user?._id, token, setIsConnected);
       console.log('Socket initialized successfully');
     } catch (error) {
       console.error('Failed to initialize socket:', error);
-    }
-  }, [userId, authToken]);
-
-  // Handle app state changes
-  const handleAppStateChange = useCallback((nextAppState: AppStateStatus) => {
-    if (appStateRef.current.match(/inactive|background/) && nextAppState === 'active') {
-      // App came to foreground
-      console.log('App came to foreground');
-      if (userId && socketService.isSocketConnected()) {
-        socketService.setUserOnline(userId);
-      }
-    } else if (appStateRef.current === 'active' && nextAppState.match(/inactive|background/)) {
-      // App went to background
-      console.log('App went to background');
-      if (userId && socketService.isSocketConnected()) {
-        socketService.setUserOffline(userId);
-      }
-    }
-    appStateRef.current = nextAppState;
-  }, [userId]);
+    } 
+  }, [user?._id, token]);
 
   // Setup socket connection and app state listeners
   useEffect(() => {
-    if (userId && authToken) {
+
+    if(user?._id && token && !socketService.isInitialized() && !socketService.isInitializing()){
       initializeSocket();
     }
+  
+    if(!user?._id || !token) socketService.disconnect();
 
-    // Listen for app state changes
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
-
-    return () => {
-      subscription?.remove();
-    };
-  }, [userId, authToken, initializeSocket, handleAppStateChange]);
+  }, [user?._id, token]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (isInitialized.current) {
+      if (socketService.isInitialized()) {
         socketService.disconnect();
-        isInitialized.current = false;
       }
     };
   }, []);
 
   return {
-    isConnected: socketService.isSocketConnected(),
+    isConnected,
     socketService,
     // Expose common methods with proper typing
     addEventListener: <T extends Events>(

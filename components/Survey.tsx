@@ -123,6 +123,7 @@ export default function Survey() {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "userId": user?._id,
         },
         timeout: 1000 * 15,
         });
@@ -142,6 +143,7 @@ export default function Survey() {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
+                "userId": user?._id,
               },
               timeout: 1000 * 15,
             });

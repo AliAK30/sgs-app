@@ -52,6 +52,7 @@ export default function Groups() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });
@@ -207,7 +208,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_500Medium',
         color:'#85878D',
         fontSize: w*8.5+h*8,
-        outlineWidth:0
     },
 
     friends : {

@@ -5,7 +5,9 @@ import { StyleSheet, Pressable, PressableProps, GestureResponderEvent, Vibration
 import { w, h, width,height, base_height } from "../_layout";
 import { Feather, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUserStore } from "@/hooks/useStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSocket } from "@/hooks/useSocket";
+import { useAppStateSocketSync } from "@/hooks/useAppStateSocketSync";
 
 const iconSize: number = 24;
 const gap: number = w*5;
@@ -19,7 +21,14 @@ type TabBarButtonProps = PressableProps & {
 export default function StudentLayout() {
 
     const {token, user} = useUserStore();
-    const [focusedTab, setFocusedTab] = useState<string>("index")
+    const [focusedTab, setFocusedTab] = useState<string>("index");
+    const {isConnected} = useSocket();
+    useAppStateSocketSync();
+
+    useEffect(()=> {
+      console.log("STATUS: ", isConnected);
+    }, [isConnected]);
+
 
     if(!token) return <Redirect href="/login"/>
     if(user?.role === "admin") return <Redirect href="/(admin)"/>

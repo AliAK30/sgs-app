@@ -10,6 +10,7 @@ import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/SimilarStudents";
 import AnimatedPressable from "@/components/AnimatedPressable";
+import { useAlert } from "@/hooks/useAlert";
 import { formatFirstName } from "@/utils";
 import * as Haptics from '@/components/Haptics';
 import Animated, {
@@ -18,6 +19,7 @@ import Animated, {
     withTiming,
     withSequence,
     } from 'react-native-reanimated';
+import { useSocket } from "@/hooks/useSocket";
 
 
 const imgSource2 = require("@/assets/images/bino.svg");
@@ -27,10 +29,22 @@ export default function Index() {
     const [click, setClick] = useState<number>(0);
     const [fetching, setFetching] = useState<boolean>(false)
     const router = useRouter();
-    const {user} = useUserStore();
+    const {user, token} = useUserStore();
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
     const [refreshing, setRefreshing] = useState(false);
+    const {Alert, openAlert} = useAlert();
+    const {addEventListener, removeEventListener}= useSocket();
+
+    useEffect(()=> {
+        
+        const callback = addEventListener("user_status_change", (data)=>{  
+            console.log(typeof data.lastSeen);
+            openAlert("info", "User Status", `user name: ${data.user.first_name} ${data.user.last_name}\nuser is ${data.isOnline ? "online" : "offline"}\nuser was last seen at ${data.lastSeen}`)
+        })
+
+        return ()=> removeEventListener("user_status_change", callback);
+    }, [])
     
 
     const onRefresh = async () => {
@@ -99,6 +113,7 @@ export default function Index() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         >
+            <Alert/>
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
             <View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>

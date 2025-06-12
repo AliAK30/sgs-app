@@ -134,3 +134,16 @@ export const useUserStore = create<UserState>()((set, get) => ({
 
 
 }))
+
+
+interface SocketState {
+  isConnected: boolean | null;
+  setIsConnected: (value: boolean | null) => void;
+  resetSocketState: ()=>void;
+}
+
+export const useSocketStore = create<SocketState>((set) => ({
+  isConnected: null,
+  setIsConnected: (value) => set({ isConnected: value }),
+  resetSocketState: () => set({isConnected:null})
+}));
