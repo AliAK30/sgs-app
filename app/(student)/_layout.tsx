@@ -1,8 +1,6 @@
-import { Tabs, Redirect } from "expo-router";
-import { View } from "@/components/Themed";
-import UnsafeArea from "@/components/UnsafeArea";
-import { StyleSheet, Pressable, PressableProps, GestureResponderEvent, Vibration } from "react-native"
-import { w, h, width,height, base_height } from "../_layout";
+import { Tabs, Redirect, usePathname } from "expo-router";
+import { StyleSheet,PressableProps, GestureResponderEvent} from "react-native"
+import { w, h, height, base_height } from "../_layout";
 import { Feather, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useUserStore } from "@/hooks/useStore";
 import { useEffect, useState } from "react";
@@ -23,11 +21,22 @@ export default function StudentLayout() {
     const {token, user} = useUserStore();
     const [focusedTab, setFocusedTab] = useState<string>("index");
     const {isConnected} = useSocket();
+    const pathname = usePathname();
+
     useAppStateSocketSync();
 
     useEffect(()=> {
       console.log("STATUS: ", isConnected);
     }, [isConnected]);
+
+    
+
+    useEffect(() => {
+      // Extracting tab name from path, assuming tabs are directly under root
+      const pathParts = pathname.split("/").filter(Boolean); //filter(Boolean) removes falsy values
+      const currentTab = pathParts[0] || "index";
+      setFocusedTab(currentTab);
+    }, [pathname]);
 
 
     if(!token) return <Redirect href="/login"/>
@@ -36,19 +45,7 @@ export default function StudentLayout() {
     return (
         
         <Tabs
-        screenOptions={({route}) => ({
-        tabBarButton: (props: TabBarButtonProps)=> (
-          <Pressable
-            {...props}
-            
-            onPress={(e) => {
-                e.preventDefault();
-              setFocusedTab(route.name)
-              props.onPress?.(e);
-              Vibration.vibrate(10);
-            }}
-          />
-        ),
+        screenOptions={{
         tabBarStyle: styles.tab,
         headerShown: false,
         tabBarLabelPosition: "below-icon", 
@@ -56,7 +53,7 @@ export default function StudentLayout() {
         tabBarActiveTintColor: "#539DF3",
         tabBarInactiveTintColor: "#000000",
         tabBarIconStyle: styles.tabBarIcon,
-      })}
+        }}
       >
         <Tabs.Screen
           name="index"
