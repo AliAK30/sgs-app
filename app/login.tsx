@@ -92,6 +92,7 @@ export default function Login() {
       keyboardDismissMode="none"
       contentContainerStyle={{ alignItems: "center", flexGrow: 1 }}
     >
+      
       <Alert />
       <View style={styles.container}>
         <View

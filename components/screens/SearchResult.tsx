@@ -1,8 +1,10 @@
 import { Text, View, TextInput } from "@/components/Themed";
 import { FlatList, Pressable, StyleSheet, ActivityIndicator, Vibration } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Back from "./buttons/Back";
-import { useState, useEffect, useRef,} from "react";
+import Feather from "@expo/vector-icons/Feather";
+import Back from "../buttons/Back";
+import { useState, useEffect,useMemo, useRef, useCallback } from "react";
+import { useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";
@@ -10,45 +12,50 @@ import { useAlert } from "@/hooks/useAlert";
 import { useUserStore } from "@/hooks/useStore";
 import { h, w } from "@/app/_layout";
 import { User } from "@/types";
-import Loader from "./Loader";
-import Peer from "./Peer";
+import Loader from "../Loader";
+import debounce from 'lodash/debounce';
+import Peer from "../Peer";
 
 type Props = {
+  value: string;
   fetching: boolean;
-  id: string;
   setFetching: React.Dispatch<React.SetStateAction<boolean>>;
   setClick: React.Dispatch<React.SetStateAction<number>>;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
 };
 
-type ExtendedUser = { full_name: string, similarity: number } & User;
+type ExtendedUser = { full_name: string } & User;
 
 function Seperator() {
   return <View style={{paddingVertical:h*6}}></View>
 }
 
-function Header() {
-  return <Text style={styles.friends}>Recommendations</Text>
+function Header({text}: any) {
+  return <Text style={styles.friends}>{text}</Text>
 }
 
-function SimilarStudents({
-  id,
+function SearchResult({
+  value,
   setClick,
+  setValue,
   fetching, setFetching
 }: Props) {
 
   const [results, setResults] = useState<Array<ExtendedUser>>([]);
+  
   const [fetchingMore, setFetchingMore] = useState<boolean>(false);
   const { Alert, openAlert } = useAlert();
   const { isConnected } = useNetInfo();
   const { token, user } = useUserStore();
   const page = useRef<number>(1);
   const hasMore = useRef<boolean>(true);
+  const totalCount = useRef<number>(0);
 
-  const fetchStudents = async (pageNum: number) => {
+  const fetchStudents = useCallback(async (name: string, pageNum: number) => {
     try {
       
       if (isConnected || isConnected===null) {
-       
+        if (name.trim().length >= 1) {
           
           if (pageNum === 1) {
             setFetching(true);
@@ -56,8 +63,8 @@ function SimilarStudents({
             setFetchingMore(true);
           }
 
-          const res: any = await axios.get(`${url}/student/similarities/${id}`, {
-            params: { page: pageNum },
+          const res: any = await axios.get(`${url}/student/search`, {
+            params: { name, page: pageNum },
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
@@ -70,13 +77,13 @@ function SimilarStudents({
           page.current = res.data.currentPage+1;
           
           if (pageNum === 1) {
-            
+            totalCount.current = res.data.totalCount
             setResults(res.data.students);
           } else {
             setResults(prev => [...prev, ...res.data.students]);
           }
 
-        
+        }
       } else {
         await openAlert("fail", "Failed!", "No Internet Connection!");
         return;
@@ -107,7 +114,6 @@ function SimilarStudents({
         return;
       } else {
         await openAlert("fail", "Failed!", e.response.data.message);
-        setClick(0);
         return;
       }
     } finally {
@@ -117,24 +123,46 @@ function SimilarStudents({
           setFetchingMore(false);
         }
     }
-  }
+  }, [isConnected, token]);
 
+
+  const debouncedFetch = useMemo(() => debounce((val: string) => {
+  page.current = 1;
+  hasMore.current = true;
+  totalCount.current = 0;
+  fetchStudents(val, 1);
+}, 400), [fetchStudents]);
+
+    /* useEffect(() => {
+    console.log("Fetching updated to:", fetching);
+  }, [fetching]);
+ */
   useEffect(() => {
     
-    if(isConnected || isConnected===null)
+    if(isConnected || isConnected === false)
     {
-      
+      if (value.trim() === "") {
       page.current = 1;
       hasMore.current = true;
-      fetchStudents(page.current);
+      totalCount.current = 0;
+      setResults([]);
+      } else {
+        debouncedFetch(value);
+      }
     } 
-  }, []);
+  
+  return () => {
+    debouncedFetch.cancel(); // clean up on unmount or change
+  };
+
+}, [value, isConnected]);
 
   
 
   const handleEndReached = () => {
     if (hasMore.current && !fetchingMore) {
-      fetchStudents(page.current);
+      
+      fetchStudents(value, page.current);
       return;
     }
   };
@@ -149,12 +177,27 @@ function SimilarStudents({
       >
         
         <View style={{justifyContent:'center'}}>
-          <Back onPress={() => {setClick(0),Vibration.vibrate(20);}} />
+          <Back onPress={() => {setClick(0)}} />
             <View style={{position:'absolute', alignSelf:'center'}}>
-          <Text style={styles.title}>Similar to you</Text>
-          </View>
+              <Text style={styles.title}>Search Results</Text>
+           </View>
         </View>
         <Alert />
+        <View style={styles.searchView}>
+          <TextInput
+            style={styles.search}
+            placeholder="Search your peers"
+            value={value}
+            onChangeText={setValue}
+            inputMode="text"
+            placeholderTextColor="#85878D"
+          />
+          <Pressable onPress={() => { debouncedFetch.cancel(); page.current = 1; 
+          hasMore.current = true; fetchStudents(value, page.current); 
+          }}>
+            <Feather name="search" color="black" size={19} />
+          </Pressable>
+        </View>
 
         
         {isConnected===false ? (
@@ -168,16 +211,15 @@ function SimilarStudents({
                 full_name={item.full_name}
                 picture={item.picture}
                 uni_name={item.uni_name}
-                similarity={item.similarity}
               />
             )}
             keyExtractor={(item, index)=>item?._id ?? ""}
             ItemSeparatorComponent={Seperator}
-            ListHeaderComponent={<Header/>}
+            ListHeaderComponent={<Header text={`Total Results (${totalCount.current})`}/>}
             ListFooterComponent={fetchingMore ? <ActivityIndicator size="small" color="gray" style={{paddingTop:h*15}}/> : <Seperator/>}
             onEndReached={handleEndReached}
             //onEndReachedThreshold={0.01}
-            ListEmptyComponent={<Text style={[styles.notfound, {paddingTop:h*20}]}>No Similar students found</Text>}
+            ListEmptyComponent={<Text style={[styles.notfound, {paddingTop:h*20}]}>No Groups found</Text>}
           />
        }
        
@@ -187,7 +229,7 @@ function SimilarStudents({
   );
 }
 
-export default SimilarStudents;
+export default SearchResult;
 
 const styles = StyleSheet.create({
   container: {
@@ -199,7 +241,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15 * w,
     alignSelf: "center",
     paddingTop: h * 20,
-    rowGap: h*20
   },
 
   title: {
@@ -226,7 +267,7 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_500Medium",
     color: "#85878D",
     fontSize: w * 8.5 + h * 8,
-    //outlineWidth: 0,
+    outlineColor: 'rgba(0,0,0,0)',
   },
 
   friends: {

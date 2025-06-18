@@ -12,8 +12,8 @@ import {h, w} from '../_layout'
 import { useUserStore, useGroupStore } from "@/hooks/useStore";
 import { GroupType } from "@/types";
 import Group from "@/components/Group";
-import CreateGroup from "@/components/CreateGroup";
-import GroupDetails from "@/components/GroupDetails";
+import CreateGroup from "@/components/screens/CreateGroup";
+import GroupDetails from "@/components/screens/GroupDetails";
 import Loader from "@/components/Loader";
 
 function Seperator() {

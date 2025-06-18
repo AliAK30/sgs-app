@@ -10,7 +10,7 @@ import { useAlert } from "@/hooks/useAlert";
 import {h, w} from '../_layout'
 import { useUserStore, useGroupStore } from "@/hooks/useStore";
 import { useState, useEffect, useRef } from "react";
-import GroupDetails from "@/components/GroupDetails";
+import GroupDetails from "@/components/screens/GroupDetails";
 import Group from "@/components/Group";
 
 

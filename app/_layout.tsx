@@ -14,14 +14,13 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
-//import "react-native-reanimated";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
 import { StatusBar,  } from "expo-status-bar";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import * as NavigationBar from "expo-navigation-bar"
+import { useState, useEffect } from "react";
 
 const dims = Dimensions.get("window");
 export const height = dims.height;

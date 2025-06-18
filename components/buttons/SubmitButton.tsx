@@ -2,7 +2,7 @@ import { Text } from "../Themed";
 import { StyleSheet, ActivityIndicator, GestureResponderEvent, TextStyle, StyleProp } from "react-native";
 import AnimatedPressable, {AnimatedPressableProps} from "../AnimatedPressable";
 import { h, w } from "@/app/_layout";
-import * as Haptics from "@/components/Haptics";
+import {triggerHaptic} from '@/utils';
 
 type Props = AnimatedPressableProps & {
   text: string;
@@ -30,10 +30,10 @@ export default function SubmitButton({
 
   const handlePress = (event: GestureResponderEvent) => {
     if (!isValid) {
-      Haptics.triggerHaptic("feedback-warn");
+      triggerHaptic("feedback-warn");
       return;
     } else {
-      Haptics.triggerHaptic("impact-1");
+      triggerHaptic("impact-1");
       onPress(event);
     }
   };

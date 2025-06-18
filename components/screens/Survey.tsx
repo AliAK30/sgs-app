@@ -16,13 +16,13 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import { useUserStore } from "@/hooks/useStore";
 import axios from "axios";
 import Back from "@/components/buttons/Back";
-import {triggerHaptic} from "@/components/Haptics";
+import {triggerHaptic} from "@/utils";
 import useSection from "@/hooks/useSection";
 import { Answer } from "@/types";
 import { getAnimationForQuestion } from "@/constants/Animations";
 import { handleError } from "@/errors";
-import SubmitButton from "./buttons/SubmitButton";
-import AnimatedPressableText from "./AnimatedPressableText";
+import SubmitButton from "../buttons/SubmitButton";
+import AnimatedPressableText from "../AnimatedPressableText";
 
 
 export default function Survey() {

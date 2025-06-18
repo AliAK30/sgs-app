@@ -3,16 +3,16 @@ import { StyleSheet, ScrollView, Pressable, RefreshControl} from "react-native";
 import { useUserStore } from "@/hooks/useStore";
 import { useState, useEffect, } from "react";
 import { Image } from "expo-image";
-import SearchResult from "@/components/SearchResult";
+import SearchResult from "@/components/screens/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import {w, h, OS} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import SimilarStudents from "@/components/SimilarStudents";
+import SimilarStudents from "@/components/screens/SimilarStudents";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { useAlert } from "@/hooks/useAlert";
 import { formatFirstName } from "@/utils";
-import * as Haptics from '@/components/Haptics';
+import {triggerHaptic} from '@/utils';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -129,7 +129,7 @@ export default function Index() {
             <Pressable
             onPress={
                 () => {
-                    Haptics.triggerHaptic('impact-2');
+                    triggerHaptic('impact-2');
                     router.push("/(student)/peers");
                 }
             }>
@@ -142,7 +142,7 @@ export default function Index() {
                 <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
                 <AnimatedPressable
                 onPress ={() => {
-                Haptics.triggerHaptic('impact-2');
+                triggerHaptic('impact-2');
                 setFetching(true);
                 setClick(1);
                 }}
@@ -160,7 +160,7 @@ export default function Index() {
         
         <AnimatedPressable
         onPress={() => {
-            Haptics.triggerHaptic('impact-3');
+            triggerHaptic('impact-3');
             setClick(2);
         }}
 

@@ -14,13 +14,13 @@ import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
 import { h, w, OS } from "@/app/_layout";
-import Back from "./buttons/Back";
+import Back from "../buttons/Back";
 import { useUserStore } from "@/hooks/useStore";
 import RNPickerSelect from "react-native-picker-select";
 import { University } from "@/types";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { WarnIcon } from "./Icons";
+import { WarnIcon } from "../Icons";
 import { User } from "@/types";
 import Preview from "./Preview";
 

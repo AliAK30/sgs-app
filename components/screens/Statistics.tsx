@@ -1,6 +1,6 @@
 import { Text, View } from "@/components/Themed";
 import { StyleSheet } from "react-native";
-import { height } from "../app/_layout";
+import { height } from "../../app/_layout";
 import { useUserStore } from "@/hooks/useStore";
 import LearningStyleComponent from "@/components/LearningStyle";
 
