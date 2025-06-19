@@ -11,7 +11,7 @@ type Props = AnimatedPressableProps & {
   invalidBackgroundColor?: string;
   isSubmitting?: boolean;
   textStyle?: StyleProp<TextStyle> | undefined;
-  Icon?: ()=>JSX.Element | undefined;
+  Icon?: ()=>React.ReactNode | undefined;
 };
 
 export default function SubmitButton({

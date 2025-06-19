@@ -1,7 +1,7 @@
 import { Tabs, Redirect, usePathname } from "expo-router";
-import { StyleSheet,PressableProps, GestureResponderEvent} from "react-native"
+import { StyleSheet} from "react-native"
 import { w, h, height, base_height } from "../_layout";
-import { Feather, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 import { useUserStore } from "@/hooks/useStore";
 import { useEffect, useState } from "react";
 import { useSocket } from "@/hooks/useSocket";
@@ -10,11 +10,6 @@ import { useAppStateSocketSync } from "@/hooks/useAppStateSocketSync";
 const iconSize: number = 24;
 const gap: number = w*5;
 
-
-type TabBarButtonProps = PressableProps & {
-  children: React.ReactNode;
-  onPress?: (e: GestureResponderEvent) => void;
-};
 
 export default function StudentLayout() {
 

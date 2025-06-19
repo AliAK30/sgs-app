@@ -39,7 +39,6 @@ export default function Index() {
     useEffect(()=> {
         
         const callback = addEventListener("user_status_change", (data)=>{  
-            console.log(typeof data.lastSeen);
             openAlert("info", "User Status", `user name: ${data.user.first_name} ${data.user.last_name}\nuser is ${data.isOnline ? "online" : "offline"}\nuser was last seen at ${data.lastSeen}`)
         })
 
@@ -97,6 +96,12 @@ export default function Index() {
         transform: [{ rotate: `${emojiRotation.value}deg` }],
     }));
 
+    const handleSearch = () => {
+        triggerHaptic('impact-2');
+        setFetching(true);
+        setClick(1);
+    }
+
     
     if(click === 1)
         return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
@@ -141,11 +146,7 @@ export default function Index() {
             <View style={styles.searchView}>
                 <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
                 <AnimatedPressable
-                onPress ={() => {
-                triggerHaptic('impact-2');
-                setFetching(true);
-                setClick(1);
-                }}
+                onPress ={handleSearch}
                 hitSlop={15}
                 style={styles.searchIcon}
             >

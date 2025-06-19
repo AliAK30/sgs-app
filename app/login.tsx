@@ -134,6 +134,8 @@ export default function Login() {
                 placeholder="johndoe@xyz.com"
                 error={errors.email}
                 inputMode="text"
+                enterKeyHint="next"
+                returnKeyType="next"
                 placeholderTextColor="rgba(0, 0, 0, 0.30)"
               />
             )}
@@ -150,6 +152,8 @@ export default function Login() {
                 onBlur={onBlur}
                 error={errors.password}
                 inputMode="text"
+                enterKeyHint="done"
+                returnKeyType="done"
                 onSubmitEditing={handleSubmit(onSubmit)}
               />
             )}

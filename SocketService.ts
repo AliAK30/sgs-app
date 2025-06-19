@@ -65,6 +65,7 @@ class SocketService {
   private socket: Socket | null = null;
   private isConnected: boolean | null = null;
   private userId: string | null = null;
+  private userRole: string | null = null;
   private initialized: boolean = false;
   private initializing: boolean = false;
   private listeners: Map<Events, Set<SocketEventListener<Events>>> = new Map();
@@ -89,7 +90,7 @@ class SocketService {
   }
 
   // Initialize socket connection
-  async initialize(userId: string, authToken: string, setIsConnected: (value: boolean | null) => void): Promise<Socket> {
+  async initialize(userId: string, authToken: string, role: string, setIsConnected: (value: boolean | null) => void): Promise<Socket> {
     try {
       
       this.initializing = true;
@@ -106,7 +107,7 @@ class SocketService {
 
       this.userId = userId;
       this.setIsConnected = setIsConnected;    
-
+      this.userRole = role;
       // Socket.IO configuration
       const socketConfig: Partial<ManagerOptions & SocketOptions> = {
         transports: ["websocket", "polling"] as const, // Fallback to polling if websocket fails
@@ -119,6 +120,7 @@ class SocketService {
         auth: {
           token: authToken, // Send auth token for server verification
           userId: userId,
+          role: role,
         },
       };
 

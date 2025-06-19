@@ -18,7 +18,7 @@ export const useSocket = () => {
     }
     
     try {
-      await socketService.initialize(user?._id, token, setIsConnected);
+      await socketService.initialize(user?._id, token, user?.role??"student", setIsConnected);
       console.log('Socket initialized successfully');
     } catch (error) {
       console.error('Failed to initialize socket:', error);
