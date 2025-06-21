@@ -1,7 +1,11 @@
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function UnsafeArea() {
+type Props= {
+bottom?: boolean;
+};
+
+export default function UnsafeArea({bottom=false}:Props) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -9,7 +13,7 @@ export default function UnsafeArea() {
       style={{
         backgroundColor: "#ffffff",
         width: "100%",
-        height: insets.top,
+        height: bottom ? insets.bottom-10 : insets.top,
        
       }}
     ></View>

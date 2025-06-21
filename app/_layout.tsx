@@ -17,10 +17,10 @@ import * as SplashScreen from "expo-splash-screen";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
-import { StatusBar,  } from "expo-status-bar";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
-import * as NavigationBar from "expo-navigation-bar"
 import { useState, useEffect } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SystemBars } from "react-native-edge-to-edge";
 
 const dims = Dimensions.get("window");
 
@@ -61,11 +61,10 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 //Hide navigation bar on android
-OS==='android' && NavigationBar.setBehaviorAsync('overlay-swipe');
+//OS==='android' && NavigationBar.setStyle('inverted');
 
 export default function RootLayout() {
 
-  const visibility = NavigationBar.useVisibility();
   
   const [loaded, error] = useFonts({
     Inter_400Regular,
@@ -86,18 +85,13 @@ export default function RootLayout() {
   } = useUserStore();
 
   const {setSectionsCount} = useSurveyStore();
+  const insets = useSafeAreaInsets();
+  
+        console.log(`top insets: ${insets.top}`)
+    console.log(`bottom insets: ${insets.bottom}`)
 
 
-  useEffect(() => {
-    if (OS === 'android') {
-      
-    if (visibility === 'visible') {
-      setTimeout(() => {
-        NavigationBar.setVisibilityAsync('hidden');
-      }, 2000);
-    }
-    }
-  }, [visibility]);
+  
 
   useEffect(() => {
     
@@ -152,7 +146,8 @@ export default function RootLayout() {
     <View style={styles.container}>
       <UnsafeArea />
       <Slot />
-      <StatusBar style={"dark"} />
+      <SystemBars style={{statusBar:"dark", navigationBar:'dark'}} />
+      <UnsafeArea bottom={true}/>
     </View>
   );
 }
@@ -163,6 +158,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     width: width,
     alignSelf: 'center',
-    
   },
 });

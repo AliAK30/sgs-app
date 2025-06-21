@@ -17,6 +17,7 @@ export default function StudentLayout() {
     const [focusedTab, setFocusedTab] = useState<string>("index");
     const {isConnected} = useSocket();
     const pathname = usePathname();
+    
 
     useAppStateSocketSync();
 
@@ -109,7 +110,8 @@ const styles = StyleSheet.create({
 
   tab: {
     backgroundColor: "#FFFFFF",
-    height: height < 640 ? (65*h)+(640-height)*((640-height)/base_height):65*h,
+    height: height < 640 ? (65*h)+(640-height)*((640-height)/base_height)
+    :65*h,
     alignItems:'center',
     borderTopWidth:0,
   },
@@ -118,6 +120,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_400Regular",
     fontSize: 12*h,
     width:63,
+     height:63,
     
   },
   tabBarIcon: {

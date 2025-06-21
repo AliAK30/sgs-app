@@ -143,12 +143,14 @@ const styles = StyleSheet.create({
         : 65 * h,
     alignItems: "center",
     borderTopWidth: 0,
+    
   },
 
   tabBarLabel: {
     fontFamily: "Poppins_400Regular",
     fontSize: 12 * h,
     width: 63,
+    height:63,
   },
   tabBarIcon: {
     marginTop: 0,
