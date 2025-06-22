@@ -7,6 +7,7 @@ import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import { useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useAlert } from "@/hooks/useAlert";
+import * as Haptics from '@/components/Haptics';
 
 
 export default function Settings() {
@@ -37,10 +38,19 @@ export default function Settings() {
 
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
+        
+        
         <View style={styles.container}>
           <Alert/>
           <Text style={styles.title}>Settings</Text>
-          <Pressable style={styles.signout} onPress={logout}><Feather name="log-out" size={styles.signoutText.fontSize} color={styles.signoutText.color}/>
+          <Pressable style={styles.button} onPress={
+                          () => {
+                              Haptics.triggerHaptic('impact-2');
+                              router.push("/about");
+                          }
+                      }><Feather name="help-circle" size={styles.text.fontSize} color={styles.text.color}/>
+          <Text style={styles.text}>About Project</Text></Pressable>
+          <Pressable style={styles.button} onPress={logout}><Feather name="log-out" size={styles.signoutText.fontSize} color={styles.signoutText.color}/>
           <Text style={styles.signoutText}>Sign Out</Text></Pressable>
         </View>
       </View>
@@ -66,15 +76,21 @@ const styles = StyleSheet.create({
       marginBottom: h*15,
     },
 
-    signout: {
+    button: {
       backgroundColor: '#ffffff',
       boxShadow: "0px 30px 40px 0px rgba(0, 0, 0, 0.15)",
       borderRadius: 16,
       paddingHorizontal: w*15,
       paddingVertical: h*10,
+      marginTop: h*10,
       flexDirection:'row',
       columnGap:w*7,
       alignItems:'center',
+    },
+    text: {
+      fontFamily: 'Inter_500Medium',
+      fontSize: 8*h+8*w,
+      color: '#565555'
     },
     signoutText: {
       fontFamily: 'Inter_500Medium',

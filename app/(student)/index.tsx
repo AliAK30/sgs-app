@@ -166,7 +166,7 @@ export default function Index() {
             <View style={{ justifyContent: 'flex-end', rowGap: h }}>
               <Image source={imgSource2} style={{ width: 130 * w, height: 67 * h }} />
             </View>
-            <View style={{ justifyContent: 'center', rowGap: h }}>
+            <View style={{ justifyContent: 'center', rowGap: h, width: '60%' }}>
               <Text style={styles.findTwin}>Find your Study Twin</Text>
               <Text style={styles.findTwinSubText}>and learn together like never before!</Text>
             </View>
