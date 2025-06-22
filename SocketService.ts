@@ -1,7 +1,8 @@
-import io, { Socket } from "socket.io-client";
+import io, { Socket, ManagerOptions, SocketOptions } from "socket.io-client";
 import { OS } from "@/app/_layout";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { url } from "./constants/Server";
+import { User } from "./types";
 
 export type FriendRequestData = {
   requester: {
@@ -23,9 +24,9 @@ export type FriendRequestResponseData = {
 };
 
 export type UserStatusData = {
-  userId: string;
+  user: User;
   isOnline: boolean;
-  lastSeen?: string;
+  lastSeen: Date;
 };
 
 export type NotificationData = {
@@ -35,6 +36,10 @@ export type NotificationData = {
   timestamp: string;
   read: boolean;
 };
+
+export type ConnectionData = {
+  data: any|undefined;
+}
 
 export type Events =
   | "friend_request_received"
@@ -58,29 +63,64 @@ export type SocketEventListener<T> = (data: EventData<T>) => void;
 
 class SocketService {
   private socket: Socket | null = null;
-  private isConnected: boolean = false;
+  private isConnected: boolean | null = null;
   private userId: string | null = null;
+  private userRole: string | null = null;
+  private initialized: boolean = false;
+  private initializing: boolean = false;
   private listeners: Map<Events, Set<SocketEventListener<Events>>> = new Map();
+  private setIsConnected: null | ((value: boolean | null) => void) = null;
+  private static instance: SocketService;
+
+  
+
+  public isInitialized(): boolean {
+    return this.initialized;
+  }
+
+   public isInitializing(): boolean {
+    return this.initializing;
+  }
+
+  public static getInstance(): SocketService {
+    if (!SocketService.instance) {
+      SocketService.instance = new SocketService();
+    }
+    return SocketService.instance;
+  }
 
   // Initialize socket connection
-  async initialize(userId: string, authToken: string): Promise<Socket> {
+  async initialize(userId: string, authToken: string, role: string, setIsConnected: (value: boolean | null) => void): Promise<Socket> {
     try {
-      this.userId = userId;
+      
+      this.initializing = true;
+      // Skip if already connected for same user
+      if (this.socket?.connected && this.userId === userId) {
+        this.initializing = false;
+        return Promise.resolve(this.socket);
+      }
 
+      // Disconnect existing connection if different user
+      if (this.userId && this.userId !== userId) {
+        this.disconnect();
+      }
+
+      this.userId = userId;
+      this.setIsConnected = setIsConnected;    
+      this.userRole = role;
       // Socket.IO configuration
-      const socketConfig: any = {
+      const socketConfig: Partial<ManagerOptions & SocketOptions> = {
         transports: ["websocket", "polling"] as const, // Fallback to polling if websocket fails
         upgrade: true,
         rememberUpgrade: true,
         timeout: 20000,
-        forceNew: true,
         reconnection: true,
         reconnectionDelay: 1000,
         reconnectionAttempts: 5,
-        maxReconnectionAttempts: 5,
         auth: {
           token: authToken, // Send auth token for server verification
           userId: userId,
+          role: role,
         },
       };
 
@@ -94,6 +134,9 @@ class SocketService {
       // Create socket connection
       this.socket = io(SERVER_URL, socketConfig);
 
+      // 🧼 Clear previous listeners before setting up new ones
+      this.clearSocketListeners();
+
       // Setup connection event handlers
       this.setupConnectionHandlers();
 
@@ -102,12 +145,19 @@ class SocketService {
 
       return new Promise((resolve, reject) => {
         const timeout = setTimeout(() => {
+          this.isConnected = false;
+          setIsConnected(this.isConnected);
+          this.initialized = false;
+          this.initializing = false;
           reject(new Error("Socket connection timeout"));
         }, 10000);
 
         this.socket?.on("connect", () => {
           clearTimeout(timeout);
           this.isConnected = true;
+          setIsConnected(this.isConnected);
+          this.initialized = true;
+          this.initializing = false;
           console.log("✅ Socket connected:", this.socket?.id);
 
           // Join user's personal room
@@ -119,6 +169,10 @@ class SocketService {
         this.socket?.on("connect_error", (error) => {
           clearTimeout(timeout);
           console.error("❌ Socket connection error:", error);
+          this.isConnected = false;
+          this.initialized = false;
+          this.initializing = false;
+          setIsConnected(this.isConnected);
           reject(error);
         });
       });
@@ -128,6 +182,14 @@ class SocketService {
     }
   }
 
+
+  //for clearing all socket listeners
+  private clearSocketListeners(): void {
+  if (this.socket) {
+    this.socket.removeAllListeners();
+  }
+}
+
   // Setup connection-related event handlers
   private setupConnectionHandlers(): void {
     if (!this.socket) return;
@@ -135,7 +197,7 @@ class SocketService {
     this.socket.on("disconnect", (reason: string) => {
       console.log("🔌 Socket disconnected:", reason);
       this.isConnected = false;
-
+      this.setIsConnected && this.setIsConnected(this.isConnected);
       // Handle different disconnect reasons
       if (reason === "io server disconnect") {
         // Server disconnected, try to reconnect
@@ -146,7 +208,7 @@ class SocketService {
     this.socket.on("reconnect", (attemptNumber: number) => {
       console.log("🔄 Socket reconnected after", attemptNumber, "attempts");
       this.isConnected = true;
-
+      this.setIsConnected && this.setIsConnected(this.isConnected);
       // Rejoin user room after reconnection
       if (this.userId) {
         this.socket?.emit("join_user_room", this.userId);
@@ -154,12 +216,15 @@ class SocketService {
     });
 
     this.socket.on("reconnect_error", (error: Error) => {
+      this.isConnected = false;
+      this.setIsConnected && this.setIsConnected(this.isConnected);
       console.error("🔄❌ Socket reconnection error:", error);
     });
 
     this.socket.on("reconnect_failed", () => {
       console.error("🔄💀 Socket reconnection failed");
       this.isConnected = false;
+      this.setIsConnected && this.setIsConnected(this.isConnected);
     });
   }
 
@@ -173,10 +238,10 @@ class SocketService {
       this.emitToListeners("friend_request_received", data);
 
       // Show local notification
-      this.showNotification(
+      /* this.showNotification(
         "Friend Request",
         `${data.requester.first_name} ${data.requester.last_name} sent you a friend request`
-      );
+      ); */
     });
 
     // Friend request accepted
@@ -186,10 +251,10 @@ class SocketService {
         console.log("✅ Friend request accepted:", data);
         this.emitToListeners("friend_request_accepted", data);
 
-        this.showNotification(
+        /* this.showNotification(
           "Friend Request Accepted",
           `${data.friend.first_name} ${data.friend.last_name} accepted your friend request`
-        );
+        ); */
       }
     );
 
@@ -222,28 +287,23 @@ class SocketService {
   }
 
   // Add event listener
-  addEventListener(
-    event: Events,
-    callback: SocketEventListener<typeof event>
-  ): void {
+  addEventListener<T extends Events>(event: T, callback: SocketEventListener<T>): SocketEventListener<T> {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set<SocketEventListener<typeof event>>());
     }
     this.listeners.get(event)?.add(callback);
+    return callback;
   }
 
   // Remove event listener
-  removeEventListener(
-    event: Events,
-    callback: SocketEventListener<typeof event>
-  ): void {
+  removeEventListener<T extends Events>(event: T, callback: SocketEventListener<T>): void {
     if (this.listeners.has(event)) {
       this.listeners.get(event)?.delete(callback);
     }
   }
 
   // Emit to all registered listeners
-  private emitToListeners(event: Events, data: EventData<typeof event>): void {
+  private emitToListeners<T extends Events>(event: T, data: EventData<T>): void {
     if (this.listeners.has(event)) {
       this.listeners.get(event)?.forEach((callback) => {
         try {
@@ -270,7 +330,7 @@ class SocketService {
   }
 
   // Show notification (platform-specific)
-  async showNotification(title: string, body: string): Promise<void> {
+  /* async showNotification(title: string, body: string): Promise<void> {
     try {
       if (OS === "web") {
         // Web notifications
@@ -303,12 +363,7 @@ class SocketService {
     } catch (error) {
       console.error("Error showing notification:", error);
     }
-  }
-
-  // Get connection status
-  isSocketConnected(): boolean {
-    return this.isConnected && !!this.socket && this.socket.connected;
-  }
+  } */
 
   // Disconnect socket
   disconnect(): void {
@@ -325,10 +380,15 @@ class SocketService {
       this.socket.disconnect();
       this.socket = null;
       this.isConnected = false;
+      this.initialized = false;
       this.userId = null;
-
-      console.log("🔌 Socket disconnected manually");
+      this.setIsConnected && this.setIsConnected(this.isConnected);
+      console.log("Socket disconnected manually");
     }
+  }
+
+  isSocketConnected(): boolean|null {
+    return this.isConnected;
   }
 
   // Get socket instance (for direct access if needed)
@@ -338,5 +398,5 @@ class SocketService {
 }
 
 // Create singleton instance
-const socketService = new SocketService();
+const socketService = SocketService.getInstance();
 export default socketService;

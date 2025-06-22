@@ -3,21 +3,23 @@ import { StyleSheet, ScrollView, Pressable, RefreshControl} from "react-native";
 import { useUserStore } from "@/hooks/useStore";
 import { useState, useEffect, } from "react";
 import { Image } from "expo-image";
-import SearchResult from "@/components/SearchResult";
+import SearchResult from "@/components/screens/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import {w, h, OS} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import SimilarStudents from "@/components/SimilarStudents";
+import SimilarStudents from "@/components/screens/SimilarStudents";
 import AnimatedPressable from "@/components/AnimatedPressable";
+import { useAlert } from "@/hooks/useAlert";
 import { formatFirstName } from "@/utils";
-import * as Haptics from '@/components/Haptics';
+import {triggerHaptic} from '@/utils';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withTiming,
     withSequence,
     } from 'react-native-reanimated';
+import { useSocket } from "@/hooks/useSocket";
 
 
 const imgSource2 = require("@/assets/images/bino.svg");
@@ -27,10 +29,21 @@ export default function Index() {
     const [click, setClick] = useState<number>(0);
     const [fetching, setFetching] = useState<boolean>(false)
     const router = useRouter();
-    const {user} = useUserStore();
+    const {user, token} = useUserStore();
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
     const [refreshing, setRefreshing] = useState(false);
+    const {Alert, openAlert} = useAlert();
+    const {addEventListener, removeEventListener}= useSocket();
+
+    useEffect(()=> {
+        
+        const callback = addEventListener("user_status_change", (data)=>{  
+            openAlert("info", "User Status", `user name: ${data.user.first_name} ${data.user.last_name}\nuser is ${data.isOnline ? "online" : "offline"}\nuser was last seen at ${data.lastSeen}`)
+        })
+
+        return ()=> removeEventListener("user_status_change", callback);
+    }, [])
     
 
     const onRefresh = async () => {
@@ -83,6 +96,12 @@ export default function Index() {
         transform: [{ rotate: `${emojiRotation.value}deg` }],
     }));
 
+    const handleSearch = () => {
+        triggerHaptic('impact-2');
+        setFetching(true);
+        setClick(1);
+    }
+
     
     if(click === 1)
         return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
@@ -99,6 +118,7 @@ export default function Index() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         >
+            <Alert/>
         <View style={{flexDirection:'row', justifyContent:'space-between'}}>
             <View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -114,7 +134,7 @@ export default function Index() {
             <Pressable
             onPress={
                 () => {
-                    Haptics.triggerHaptic('impact-2');
+                    triggerHaptic('impact-2');
                     router.push("/(student)/peers");
                 }
             }>
@@ -126,11 +146,7 @@ export default function Index() {
             <View style={styles.searchView}>
                 <TextInput style={styles.search} placeholder="Find peers by name.." inputMode="text" value={value} onChangeText={setValue} placeholderTextColor="#85878D"/>
                 <AnimatedPressable
-                onPress ={() => {
-                Haptics.triggerHaptic('impact-2');
-                setFetching(true);
-                setClick(1);
-                }}
+                onPress ={handleSearch}
                 hitSlop={15}
                 style={styles.searchIcon}
             >
@@ -145,7 +161,7 @@ export default function Index() {
         
         <AnimatedPressable
         onPress={() => {
-            Haptics.triggerHaptic('impact-3');
+            triggerHaptic('impact-3');
             setClick(2);
         }}
 

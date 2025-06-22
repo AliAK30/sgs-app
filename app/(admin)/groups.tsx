@@ -12,8 +12,8 @@ import {h, w} from '../_layout'
 import { useUserStore, useGroupStore } from "@/hooks/useStore";
 import { GroupType } from "@/types";
 import Group from "@/components/Group";
-import CreateGroup from "@/components/CreateGroup";
-import GroupDetails from "@/components/GroupDetails";
+import CreateGroup from "@/components/screens/CreateGroup";
+import GroupDetails from "@/components/screens/GroupDetails";
 import Loader from "@/components/Loader";
 
 function Seperator() {
@@ -32,7 +32,7 @@ export default function Groups() {
   const [click, setClick] = useState<number>(0);
   const indexRef = useRef<number>(0);
   const { isConnected } = useNetInfo();
-  const { token } = useUserStore();
+  const { token, user } = useUserStore();
 
   useEffect(()=> {
       if(isConnected || isConnected===null)
@@ -53,6 +53,7 @@ export default function Groups() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });

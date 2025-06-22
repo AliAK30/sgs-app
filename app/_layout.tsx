@@ -14,16 +14,16 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
-//import "react-native-reanimated";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
-import { StatusBar,  } from "expo-status-bar";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
-import * as NavigationBar from "expo-navigation-bar"
+import { useState, useEffect } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SystemBars } from "react-native-edge-to-edge";
 
 const dims = Dimensions.get("window");
+
 export const height = dims.height;
 export const width = dims.width>480 ? 480 : dims.width
 export const fontScale = dims.fontScale;
@@ -35,6 +35,7 @@ export const {OS} = Platform
 //export const width = dims.width>dims.height?dims.height:dims.width
 export const h = height/base_height;
 export const w = width/base_width;
+
 if(OS==='web') require("@/assets/global.css");
 
 
@@ -60,11 +61,10 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 //Hide navigation bar on android
-OS==='android' && NavigationBar.setBehaviorAsync('overlay-swipe');
+//OS==='android' && NavigationBar.setStyle('inverted');
 
 export default function RootLayout() {
 
-  const visibility = NavigationBar.useVisibility();
   
   const [loaded, error] = useFonts({
     Inter_400Regular,
@@ -85,18 +85,13 @@ export default function RootLayout() {
   } = useUserStore();
 
   const {setSectionsCount} = useSurveyStore();
+  const insets = useSafeAreaInsets();
+  
+        console.log(`top insets: ${insets.top}`)
+    console.log(`bottom insets: ${insets.bottom}`)
 
 
-  useEffect(() => {
-    if (OS === 'android') {
-      
-    if (visibility === 'visible') {
-      setTimeout(() => {
-        NavigationBar.setVisibilityAsync('hidden');
-      }, 2000);
-    }
-    }
-  }, [visibility]);
+  
 
   useEffect(() => {
     
@@ -151,7 +146,8 @@ export default function RootLayout() {
     <View style={styles.container}>
       <UnsafeArea />
       <Slot />
-      <StatusBar style={"dark"} />
+      <SystemBars style={{statusBar:"dark", navigationBar:'dark'}} />
+      <UnsafeArea bottom={true}/>
     </View>
   );
 }
@@ -162,6 +158,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     width: width,
     alignSelf: 'center',
-    
   },
 });

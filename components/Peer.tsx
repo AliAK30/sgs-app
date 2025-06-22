@@ -2,7 +2,7 @@ import { Text, View, TextInput } from "@/components/Themed";
 import { Image } from "expo-image";
 import { Pressable, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Profile from "./Profile";
+import Profile from "./screens/Profile";
 import { useState, useEffect } from "react";
 import { Redirect, useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";

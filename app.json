@@ -1,16 +1,13 @@
 {
   "expo": {
-    "name": "sgs-app",
-    "slug": "sgs-app",
-    "version": "1.0.0",
+    "name": "EduMatch",
+    "slug": "edumatch",
+    "version": "0.6.0",
     "orientation": "portrait",
     "icon": "./assets/images/adaptive-icon.png",
-    "scheme": "myapp",
+    "scheme": "edumatch",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "androidStatusBar": {
-      "translucent": true
-    },
     "ios": {
       "supportsTablet": true
     },
@@ -19,9 +16,9 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.aliak30.sgsapp",
-      "edgeToEdgeEnabled": false,
-      "softwareKeyboardLayoutMode": "adjustNothing"
+      "package": "com.fyp.edumatch",
+      "softwareKeyboardLayoutMode": "pan",
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "bundler": "metro",
@@ -36,10 +33,20 @@
           "backgroundColor": "#ffffff",
           "image": "./assets/images/splash-icon-light.png",
           "resizeMode": "contain",
-          "imageWidth":200
+          "imageWidth": 200
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-web-browser",
+      [
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "parentTheme": "Default",
+            "enforceNavigationBarContrast": false
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

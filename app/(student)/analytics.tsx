@@ -1,7 +1,7 @@
 import { View } from "@/components/Themed";
 import { useUserStore} from "@/hooks/useStore";
-import Statistics from "@/components/Statistics";
-import Sections from "@/components/Sections";
+import Statistics from "@/components/screens/Statistics";
+import Sections from "@/components/screens/Sections";
 
 
 

@@ -13,7 +13,7 @@ import { FieldError } from "react-hook-form";
 
 export type StyledInputProps = {
   error?: FieldError | undefined;
-  Icon?: ()=>JSX.Element | undefined;
+  Icon?: ()=>React.ReactNode | undefined;
   iconRenderingCondition?: any | undefined;
   errorClone?: string;
 } & TextInputProps;
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "#ffffff",
     paddingHorizontal: w * 14,
-    paddingVertical: h * 9,
+    paddingVertical: h*9,
     borderRadius: 10,
     borderWidth: 1,
     marginBottom: h * 1.5,

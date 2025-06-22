@@ -4,12 +4,14 @@ import { useRouter, Redirect } from "expo-router";
 import { useState, useRef } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import DashedProgress from "@/components/DashedProgress";
-import NextButton from "@/components/NextButton";
 import LottieView from "lottie-react-native";
 import { useUserStore } from "@/hooks/useStore";
 import { w, h, width, height} from "../app/_layout";
 import { url } from "@/constants/Server";
 import axios from "axios";
+import Feather from "@expo/vector-icons/Feather"
+import SubmitButton from "@/components/buttons/SubmitButton";
+
 
 
 const onboardingData = [
@@ -74,10 +76,11 @@ export default function onboarding() {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+          "userid": user?._id
         },
         timeout: 1000 * 15,
       });
-
+      console.log(res.data.newUser);
       setUser({...user, newUser: res.data.newUser});
     } catch (e:any) {}
   }
@@ -137,7 +140,13 @@ export default function onboarding() {
               <Text style={styles.skipText}>Skip intro</Text>
             </Pressable>
 
-            <NextButton onPress={handleNext} />
+            <SubmitButton 
+            onPress={handleNext} 
+            android_ripple={{ color: 'rgba(255, 255, 255, 0.2)' }} 
+            text="" 
+            style={styles.nextButton}
+            Icon={()=>Icon}
+            />
           </View>
         </View>
       </LinearGradient>
@@ -225,4 +234,30 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     fontSize: 16,
   },
+
+  nextButton: {
+    width: height * 0.06,
+    height: height * 0.06,
+    borderRadius: height * 0.03,
+    backgroundColor: '#007BFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+
+  arrowContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 })
+
+const Icon = <View style={styles.arrowContainer}>
+        <Feather size={28} name="chevron-right" color='white' />
+      </View>

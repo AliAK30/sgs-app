@@ -1,7 +1,7 @@
 import { View, Text } from "@/components/Themed";
 import Modal from "react-native-modal";
 import { StyleSheet, Pressable, ScrollView } from "react-native";
-import { height, width, h, w, base_height, scale, fontScale } from "../app/_layout";
+import { height, width, h, w, base_height, scale, fontScale } from "../../app/_layout";
 
 type Props = {
     isVisible: boolean,

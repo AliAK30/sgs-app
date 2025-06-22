@@ -1,25 +1,39 @@
-import { Tabs, Redirect } from "expo-router";
-import { View } from "@/components/Themed";
-import UnsafeArea from "@/components/UnsafeArea";
-import { StyleSheet, Pressable, PressableProps, GestureResponderEvent, Vibration } from "react-native"
-import { w, h, width,height, base_height } from "../_layout";
-import { Feather, MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Tabs, Redirect, usePathname } from "expo-router";
+import { StyleSheet} from "react-native"
+import { w, h, height, base_height } from "../_layout";
+import Feather from "@expo/vector-icons/Feather";
 import { useUserStore } from "@/hooks/useStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSocket } from "@/hooks/useSocket";
+import { useAppStateSocketSync } from "@/hooks/useAppStateSocketSync";
 
 const iconSize: number = 24;
 const gap: number = w*5;
 
 
-type TabBarButtonProps = PressableProps & {
-  children: React.ReactNode;
-  onPress?: (e: GestureResponderEvent) => void;
-};
-
 export default function StudentLayout() {
 
     const {token, user} = useUserStore();
-    const [focusedTab, setFocusedTab] = useState<string>("index")
+    const [focusedTab, setFocusedTab] = useState<string>("index");
+    const {isConnected} = useSocket();
+    const pathname = usePathname();
+    
+
+    useAppStateSocketSync();
+
+    useEffect(()=> {
+      console.log("STATUS: ", isConnected);
+    }, [isConnected]);
+
+    
+
+    useEffect(() => {
+      // Extracting tab name from path, assuming tabs are directly under root
+      const pathParts = pathname.split("/").filter(Boolean); //filter(Boolean) removes falsy values
+      const currentTab = pathParts[0] || "index";
+      setFocusedTab(currentTab);
+    }, [pathname]);
+
 
     if(!token) return <Redirect href="/login"/>
     if(user?.role === "admin") return <Redirect href="/(admin)"/>
@@ -27,19 +41,7 @@ export default function StudentLayout() {
     return (
         
         <Tabs
-        screenOptions={({route}) => ({
-        tabBarButton: (props: TabBarButtonProps)=> (
-          <Pressable
-            {...props}
-            
-            onPress={(e) => {
-                e.preventDefault();
-              setFocusedTab(route.name)
-              props.onPress?.(e);
-              Vibration.vibrate(10);
-            }}
-          />
-        ),
+        screenOptions={{
         tabBarStyle: styles.tab,
         headerShown: false,
         tabBarLabelPosition: "below-icon", 
@@ -47,7 +49,7 @@ export default function StudentLayout() {
         tabBarActiveTintColor: "#539DF3",
         tabBarInactiveTintColor: "#000000",
         tabBarIconStyle: styles.tabBarIcon,
-      })}
+        }}
       >
         <Tabs.Screen
           name="index"
@@ -108,7 +110,8 @@ const styles = StyleSheet.create({
 
   tab: {
     backgroundColor: "#FFFFFF",
-    height: height < 640 ? (65*h)+(640-height)*((640-height)/base_height):65*h,
+    height: height < 640 ? (65*h)+(640-height)*((640-height)/base_height)
+    :65*h,
     alignItems:'center',
     borderTopWidth:0,
   },
@@ -117,6 +120,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_400Regular",
     fontSize: 12*h,
     width:63,
+     height:63,
     
   },
   tabBarIcon: {

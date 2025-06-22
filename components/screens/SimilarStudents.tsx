@@ -1,7 +1,7 @@
 import { Text, View, TextInput } from "@/components/Themed";
 import { FlatList, Pressable, StyleSheet, ActivityIndicator, Vibration } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Back from "./buttons/Back";
+import Back from "../buttons/Back";
 import { useState, useEffect, useRef,} from "react";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
@@ -10,8 +10,8 @@ import { useAlert } from "@/hooks/useAlert";
 import { useUserStore } from "@/hooks/useStore";
 import { h, w } from "@/app/_layout";
 import { User } from "@/types";
-import Loader from "./Loader";
-import Peer from "./Peer";
+import Loader from "../Loader";
+import Peer from "../Peer";
 
 type Props = {
   fetching: boolean;
@@ -40,7 +40,7 @@ function SimilarStudents({
   const [fetchingMore, setFetchingMore] = useState<boolean>(false);
   const { Alert, openAlert } = useAlert();
   const { isConnected } = useNetInfo();
-  const { token } = useUserStore();
+  const { token, user } = useUserStore();
   const page = useRef<number>(1);
   const hasMore = useRef<boolean>(true);
 
@@ -61,6 +61,7 @@ function SimilarStudents({
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
+              "userid": user?._id
             },
             timeout: 1000 * 25,
           });

@@ -3,7 +3,7 @@ import { StyleSheet, ScrollView, Pressable, ActivityIndicator } from "react-nati
 import { useUserStore } from "@/hooks/useStore";
 import { useState, useRef, useEffect } from "react";
 import { Image } from "expo-image";
-import SearchResult from "@/components/SearchResult";
+import SearchResult from "@/components/screens/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { w, h, OS } from "../_layout";
 import { url } from "@/constants/Server";
@@ -12,7 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { formatFirstName } from "@/utils";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useAlert } from "@/hooks/useAlert";
-import CreateGroup from "@/components/CreateGroup";
+import CreateGroup from "@/components/screens/CreateGroup";
 import axios from "axios";
 
 
@@ -50,6 +50,7 @@ export default function Index() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });
@@ -61,6 +62,7 @@ export default function Index() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });
@@ -72,6 +74,7 @@ export default function Index() {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         timeout: 1000 * 25,
         });

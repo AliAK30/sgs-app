@@ -3,7 +3,7 @@
  * https://docs.expo.io/guides/color-schemes/
  */
 
-import { Text as DefaultText, View as DefaultView, TextInput as DefaultTextInput, ScrollView as DefaultScrollView } from 'react-native';
+import { Text as DefaultText, View as DefaultView, TextInput as DefaultTextInput, ScrollView as DefaultScrollView, PressableProps } from 'react-native';
 
 /* import Colors from '@/constants/Colors';
 import { useColorScheme } from './useColorScheme';
@@ -44,6 +44,10 @@ export function View(props: ViewProps) {
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
 } */
 
+export const Pressable = (Props: PressableProps) => {
+  return <Pressable {...Props}/>
+}
+
 export const Text = (Props: DefaultText['props']) => {
   return <DefaultText {...Props}/>
 }
@@ -53,7 +57,8 @@ export const View = (Props: DefaultView['props']) => {
 }
 
 export const TextInput = (Props: DefaultTextInput['props']) => {
-  return <DefaultTextInput {...Props}/>
+
+  return <DefaultTextInput {...Props} style={[Props.style, {padding:0}]}/>
 }
 
 export const ScrollView = (Props: DefaultScrollView['props']) => {

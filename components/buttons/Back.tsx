@@ -1,13 +1,13 @@
 import { StyleSheet } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 import { h, w } from "@/app/_layout"
-import * as Haptics from '@/components/Haptics';
+import {triggerHaptic} from '@/utils';
 import AnimatedPressable from "../AnimatedPressable";
     
 export default function Back({onPress}: any) {
 
   const handlePress = () => {
-    Haptics.triggerHaptic('impact-1');
+    triggerHaptic('impact-1');
     onPress();
   };
 

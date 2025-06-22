@@ -13,10 +13,10 @@ import axios from "axios";
 import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
 import { h, w } from "@/app/_layout";
-import Back from "./buttons/Back";
+import Back from "../buttons/Back";
 import { useUserStore, useGroupStore } from "@/hooks/useStore";
 import { GroupType, User } from "@/types";
-import Student from "./Student";
+import Student from "../Student";
 
 type Props = {
     setShowGD: React.Dispatch<React.SetStateAction<number>>;
@@ -66,6 +66,7 @@ export default function GroupDetails({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         });
         //console.log(2)
@@ -122,6 +123,7 @@ export default function GroupDetails({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
+            "userid": user?._id
         },
         });
 
