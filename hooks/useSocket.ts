@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback} from 'react';
 import { useUserStore, useSocketStore } from './useStore';
 import socketService from '@/SocketService';
 import { Events, SocketEventListener } from '@/SocketService'; // Assuming these types are exported from your SocketService file

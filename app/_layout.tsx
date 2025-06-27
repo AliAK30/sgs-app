@@ -19,7 +19,6 @@ import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import { useState, useEffect } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SystemBars } from "react-native-edge-to-edge";
 
 const dims = Dimensions.get("window");
@@ -85,12 +84,6 @@ export default function RootLayout() {
   } = useUserStore();
 
   const {setSectionsCount} = useSurveyStore();
-  const insets = useSafeAreaInsets();
-  
-        console.log(`top insets: ${insets.top}`)
-    console.log(`bottom insets: ${insets.bottom}`)
-
-
   
 
   useEffect(() => {
