@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import DashedProgress from "@/components/DashedProgress";
 import LottieView from "lottie-react-native";
 import { useUserStore } from "@/hooks/useStore";
-import { width, height} from "../app/_layout";
+import { width, height} from "./_layout";
 import { url } from "@/constants/Server";
 import axios from "axios";
 import Feather from "@expo/vector-icons/Feather"
@@ -35,7 +35,7 @@ const onboardingData = [
   }
 ];
 
-export default function onboarding() {
+export default function Onboarding() {
   
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
@@ -44,6 +44,7 @@ export default function onboarding() {
  
 
   const handleNext = () => {
+    
    
     if (currentPage < onboardingData.length - 1) {
       const nextPage = currentPage + 1;
@@ -59,14 +60,15 @@ export default function onboarding() {
   };
 
   const handleSkip = () => {
+   
     updateUserNewStatus();
-    if(!user?.isSurveyCompleted) router.replace('/analytics')
+    if(!user?.isSurveyCompleted) router.replace('/(student)/analytics')
     else router.replace("/(student)");
     
   };
 
   const handleScroll = (event: any) => {
-
+     
       const contentOffsetX = event.nativeEvent.contentOffset.x;
       setCurrentPage(Math.ceil(contentOffsetX/width));
   };
@@ -81,18 +83,19 @@ export default function onboarding() {
         },
         timeout: 1000 * 15,
       });
-      console.log(res.data.newUser);
       setUser({...user, newUser: res.data.newUser});
     } catch (e:any) {}
   }
 
+  
   //redirect back to index if user has not selected a role
-  if (!user?.role) return <Redirect href="/" />;
+  if (!user?.role) return <Redirect href="/" />
   //redirect back to login if user is not authenticated
-  else if (!token) return <Redirect href="/login" />;
+  else if (!token) return <Redirect href="/login" />
   //redirect to student or admin if not a new user
   else if (!user?.newUser) return <Redirect href={user.role === 'student' ? "/(student)" : "/(admin)"}/>
 
+  
   return (
   
       

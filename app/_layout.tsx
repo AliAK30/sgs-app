@@ -13,13 +13,13 @@ import {
 
 import { loadAsync } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Slot } from "expo-router";
+import { Slot, } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { View } from "@/components/Themed";
 import UnsafeArea from "@/components/UnsafeArea";
 import { StyleSheet, Dimensions, Platform } from "react-native";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { SystemBars } from "react-native-edge-to-edge";
 import Loader from "@/components/Loader";
 
@@ -53,7 +53,7 @@ export const unstable_settings = {
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+const RootLayout = memo(()=> {
 
   const [ready, setReady] = useState<boolean>(false);
 
@@ -80,7 +80,7 @@ export default function RootLayout() {
       }
     };
 
-    console.log("layout rerendered")
+    
 
     const load = async () => {
       try {
@@ -112,6 +112,8 @@ export default function RootLayout() {
     };
   }, []);
 
+  console.log("layout rerendered")
+
   if (!ready) return <Loader color="blue" size="large" />;
 
   return (
@@ -122,7 +124,10 @@ export default function RootLayout() {
       <UnsafeArea bottom={true} />
     </View>
   );
-}
+})
+
+export default RootLayout;
+
 
 const styles = StyleSheet.create({
   container: {

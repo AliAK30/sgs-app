@@ -71,7 +71,7 @@ export default function Login() {
         setSectionsCount();
 
         user?.role === "student"
-          ? router.replace("/onboarding")
+          ? router.push("/onboarding")
           : router.replace("/(admin)");
       } else {
         openAlert("fail", "Failed!", "No Internet Connection!");
