@@ -3,7 +3,7 @@ import { StyleSheet, Pressable } from "react-native";
 import  Feather  from "@expo/vector-icons/Feather";
 import {h, w} from "@/app/_layout"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useUserStore, useSurveyStore, useGroupStore } from "@/hooks/useStore";
+import { useUserStore,useGroupStore } from "@/hooks/useStore";
 import { useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useAlert } from "@/hooks/useAlert";

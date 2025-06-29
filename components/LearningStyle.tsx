@@ -2,7 +2,7 @@ import { RadarChart } from "react-native-gifted-charts";
 import { height, width, base_height, base_width } from "@/app/_layout";
 import { User, LearningStyle } from "@/types";
 import { View, Text } from "./Themed";
-import {StyleSheet, Pressable, } from "react-native";
+import {StyleSheet} from "react-native";
 import { useState } from "react";
 import DimensionInfo from "@/components/DimensionInfo";
 import { Label } from "@/types";

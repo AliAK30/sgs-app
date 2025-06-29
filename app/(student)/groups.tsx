@@ -2,7 +2,6 @@ import { Text, View, TextInput } from "@/components/Themed";
 import { Pressable, StyleSheet, FlatList, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
-import { Redirect, useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";

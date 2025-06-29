@@ -1,5 +1,4 @@
 import {
-  useFonts,
   Inter_400Regular,
   Inter_600SemiBold,
   Inter_500Medium,
@@ -11,6 +10,8 @@ import {
   Poppins_600SemiBold,
   Poppins_400Regular,
 } from "@expo-google-fonts/poppins";
+
+import { loadAsync } from "expo-font";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -20,31 +21,23 @@ import { StyleSheet, Dimensions, Platform } from "react-native";
 import { useUserStore, useSurveyStore } from "@/hooks/useStore";
 import { useState, useEffect } from "react";
 import { SystemBars } from "react-native-edge-to-edge";
+import Loader from "@/components/Loader";
 
 const dims = Dimensions.get("window");
 
 export const height = dims.height;
-export const width = dims.width>480 ? 480 : dims.width
+export const width = dims.width > 480 ? 480 : dims.width;
 export const fontScale = dims.fontScale;
-export const scale = dims.scale
-export const base_height = 817
-export const base_width = 412
-export const {OS} = Platform
+export const scale = dims.scale;
+export const base_height = 817;
+export const base_width = 412;
+export const { OS } = Platform;
 //export const height = dims.width>dims.height?dims.width:dims.height
 //export const width = dims.width>dims.height?dims.height:dims.width
-export const h = height/base_height;
-export const w = width/base_width;
+export const h = height / base_height;
+export const w = width / base_width;
 
-if(OS==='web') require("@/assets/global.css");
-
-
-/* if(width>height){
-  let temp = height;
-  height = width;
-  width = temp;
-}
-
-export {width, height}; */
+if (OS === "web") require("@/assets/global.css");
 
 // Expo Router uses Error Boundaries to catch errors in the navigation tree.
 export {
@@ -59,65 +52,24 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-//Hide navigation bar on android
-//OS==='android' && NavigationBar.setStyle('inverted');
 
 export default function RootLayout() {
 
-  
-  const [loaded, error] = useFonts({
-    Inter_400Regular,
-    Inter_600SemiBold,
-    Poppins_700Bold,
-    Poppins_600SemiBold,
-    Poppins_400Regular,
-    Inter_500Medium,
-    Inter_700Bold,
-  });
+  const [ready, setReady] = useState<boolean>(false);
 
-  const [isUserLoaded, setIsUserLoaded] = useState<boolean>(false)
+  const { initializeUser, setUser, setToken } = useUserStore();
 
-  const {
-    initializeUser,
-    setUser,
-    setToken
-  } = useUserStore();
-
-  const {setSectionsCount} = useSurveyStore();
-  
+  const { setSectionsCount } = useSurveyStore();
 
   useEffect(() => {
-    
-    initialize();
 
-    return () => {
-      setUser(null);
-      setToken(null);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded && isUserLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, isUserLoaded]);
-
-
-  const initialize = async () => {
-    
-    try {
-      
+    const initialize = async () => {
       //check if user is stored in local storage
       const newUser = await AsyncStorage.getItem("user");
       if (newUser && newUser !== "null") {
         //if yes then check if user is logged in
         const tok = await AsyncStorage.getItem("token");
-        if(tok)
-        {
+        if (tok) {
           //if yes initialize the rest of the app
           await initializeUser(JSON.parse(newUser), tok);
           setSectionsCount();
@@ -125,22 +77,49 @@ export default function RootLayout() {
           //if user is not logged in then only set user
           setUser(JSON.parse(newUser));
         }
-        
-      } 
-    } catch (e: any) {
-      console.log(e.message);
-    } finally {
-      setIsUserLoaded(true);
-    }
-  };
+      }
+    };
 
+    console.log("layout rerendered")
+
+    const load = async () => {
+      try {
+        await Promise.all([
+          loadAsync({
+            Inter_400Regular,
+            Inter_600SemiBold,
+            Poppins_700Bold,
+            Poppins_600SemiBold,
+            Poppins_400Regular,
+            Inter_500Medium,
+            Inter_700Bold,
+          }),
+          initialize()
+        ]);
+      } catch (e:any) {
+        console.error(e);
+      } finally {
+        setReady(true);
+        SplashScreen.hideAsync();
+      }
+    };
+    load();
+    
+
+    return () => {
+      setUser(null);
+      setToken(null);
+    };
+  }, []);
+
+  if (!ready) return <Loader color="blue" size="large" />;
 
   return (
     <View style={styles.container}>
       <UnsafeArea />
       <Slot />
-      <SystemBars style={{statusBar:"dark", navigationBar:'dark'}} />
-      <UnsafeArea bottom={true}/>
+      <SystemBars style={{ statusBar: "dark", navigationBar: "dark" }} />
+      <UnsafeArea bottom={true} />
     </View>
   );
 }
@@ -150,6 +129,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFFFFF",
     width: width,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
 });

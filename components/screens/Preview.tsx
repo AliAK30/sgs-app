@@ -6,8 +6,7 @@ import {
   FlatList,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useRef, useState } from "react";
-import * as yup from "yup";
+import { useRef, useState } from "react";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";

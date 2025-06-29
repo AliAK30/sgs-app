@@ -1,5 +1,5 @@
-import { Text, View, TextInput } from "@/components/Themed";
-import { FlatList, Pressable, StyleSheet, ActivityIndicator, Vibration } from "react-native";
+import { Text, View } from "@/components/Themed";
+import { FlatList, StyleSheet, ActivityIndicator, Vibration } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Back from "../buttons/Back";
 import { useState, useEffect, useRef,} from "react";

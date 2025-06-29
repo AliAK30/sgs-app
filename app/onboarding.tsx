@@ -6,7 +6,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import DashedProgress from "@/components/DashedProgress";
 import LottieView from "lottie-react-native";
 import { useUserStore } from "@/hooks/useStore";
-import { w, h, width, height} from "../app/_layout";
+import { width, height} from "../app/_layout";
 import { url } from "@/constants/Server";
 import axios from "axios";
 import Feather from "@expo/vector-icons/Feather"
@@ -54,14 +54,15 @@ export default function onboarding() {
       
       
     } else {
-      updateUserNewStatus();
-      router.replace("/(student)");
+      handleSkip();
     }
   };
 
   const handleSkip = () => {
     updateUserNewStatus();
-    router.replace("/(student)");
+    if(!user?.isSurveyCompleted) router.replace('/analytics')
+    else router.replace("/(student)");
+    
   };
 
   const handleScroll = (event: any) => {

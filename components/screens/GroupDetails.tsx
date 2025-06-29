@@ -7,7 +7,6 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect, useRef, useState } from "react";
-import * as yup from "yup";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";
@@ -15,7 +14,7 @@ import { useAlert } from "@/hooks/useAlert";
 import { h, w } from "@/app/_layout";
 import Back from "../buttons/Back";
 import { useUserStore, useGroupStore } from "@/hooks/useStore";
-import { GroupType, User } from "@/types";
+import { User } from "@/types";
 import Student from "../Student";
 
 type Props = {

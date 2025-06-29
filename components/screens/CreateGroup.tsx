@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import * as yup from "yup";
 import { useNetInfo } from "@react-native-community/netinfo";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
@@ -17,7 +17,6 @@ import { h, w, OS } from "@/app/_layout";
 import Back from "../buttons/Back";
 import { useUserStore } from "@/hooks/useStore";
 import RNPickerSelect from "react-native-picker-select";
-import { University } from "@/types";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { WarnIcon } from "../Icons";

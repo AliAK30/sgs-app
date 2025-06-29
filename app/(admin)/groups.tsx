@@ -10,7 +10,6 @@ import { url } from "@/constants/Server";
 import { useAlert } from "@/hooks/useAlert";
 import {h, w} from '../_layout'
 import { useUserStore, useGroupStore } from "@/hooks/useStore";
-import { GroupType } from "@/types";
 import Group from "@/components/Group";
 import CreateGroup from "@/components/screens/CreateGroup";
 import GroupDetails from "@/components/screens/GroupDetails";

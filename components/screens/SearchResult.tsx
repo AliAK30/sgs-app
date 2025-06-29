@@ -1,10 +1,9 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { FlatList, Pressable, StyleSheet, ActivityIndicator, Vibration } from "react-native";
+import { FlatList, Pressable, StyleSheet, ActivityIndicator} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
 import Back from "../buttons/Back";
 import { useState, useEffect,useMemo, useRef, useCallback } from "react";
-import { useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import axios from "axios";
 import { url } from "@/constants/Server";

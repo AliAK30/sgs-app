@@ -1,9 +1,7 @@
 import { h, w, OS } from "@/app/_layout"
 import { View, Text } from "./Themed"
-import { Link, Href, useRouter } from "expo-router"
+import {Href, useRouter } from "expo-router"
 import { StyleSheet } from "react-native"
-
-type Link = Href
 
 type Props = {
     footerText: string;

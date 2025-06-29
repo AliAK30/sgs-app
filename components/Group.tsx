@@ -1,15 +1,6 @@
-import { Text, View, TextInput } from "@/components/Themed";
-import { Image } from "expo-image";
-import { Pressable, StyleSheet } from "react-native";
+import { Text, View, } from "@/components/Themed";
+import {  StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import GroupDetails from "./screens/GroupDetails";
-import { useState, useEffect } from "react";
-import { Redirect, useRouter } from "expo-router";
-import { useNetInfo } from "@react-native-community/netinfo";
-import axios from "axios";
-import { url } from "@/constants/Server";
-import { useAlert } from "@/hooks/useAlert";
-import { useUserStore } from "@/hooks/useStore";
 import { h, w } from "@/app/_layout";
 
 type Props = {

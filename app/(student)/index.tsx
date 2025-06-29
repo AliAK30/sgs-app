@@ -5,7 +5,7 @@ import { useState, useEffect, } from "react";
 import { Image } from "expo-image";
 import SearchResult from "@/components/screens/SearchResult";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import {w, h, OS} from "../_layout"
+import {w, h} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/screens/SimilarStudents";
