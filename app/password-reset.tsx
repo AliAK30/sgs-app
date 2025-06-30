@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import * as yup from "yup";
 import axios from "axios";
 import { useAlert } from "@/hooks/useAlert";
-import { useBanner } from "@/hooks/useBanner";
+import { useBanner } from "@/hooks/useStore";
 import { url } from "@/constants/Server";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,6 +16,7 @@ import { useUserStore } from "@/hooks/useStore";
 import { Redirect } from "expo-router";
 import { handleError } from "@/errors";
 import { formatTime } from "@/utils";
+import Banner from "@/components/Banner";
 import StyledInput from "@/components/inputs/StyledInput";
 import StyledPasswordInput from "@/components/inputs/StyledPasswordInput";
 import SubmitButton from "@/components/buttons/SubmitButton";
@@ -65,7 +66,7 @@ export default function PasswordReset() {
 
   const {user, token} = useUserStore();
   const { openAlert, Alert } = useAlert();
-  const { openBanner, Banner } = useBanner();
+  const { openBanner } = useBanner();
   const {isConnected } = useNetInfo();
   const router = useRouter();
   const [email, setEmail] = useState<string>("");

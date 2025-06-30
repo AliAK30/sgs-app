@@ -1,26 +1,16 @@
 import io, { Socket, ManagerOptions, SocketOptions } from "socket.io-client";
 import { OS } from "@/app/_layout";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { url } from "./constants/Server";
-import { User } from "./types";
+import { User, Friend } from "./types";
 
 export type FriendRequestData = {
-  requester: {
-    first_name: string;
-    last_name: string;
-    id: string;
-  };
+  requester: User;
   recipientId: string;
 };
 
 export type FriendRequestResponseData = {
-  userId: string;
-  friend: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    picture: string;
-  };
+  requesterId: string;
+  recipient: Friend;
 };
 
 export type UserStatusData = {
@@ -37,25 +27,16 @@ export type NotificationData = {
   read: boolean;
 };
 
-export type ConnectionData = {
-  data: any|undefined;
-}
 
 export type Events =
   | "friend_request_received"
   | "friend_request_accepted"
-  | "friend_request_declined"
-  | "friendship_removed"
-  | "user_blocked"
   | "user_status_change";
 
 export type EventData<T> = T extends "friend_request_received"
   ? FriendRequestData
   : T extends
       | "friend_request_accepted"
-      | "friend_request_declined"
-      | "friendship_removed"
-      | "user_blocked"
   ? FriendRequestResponseData
   : UserStatusData;
 
@@ -250,38 +231,13 @@ class SocketService {
       (data: FriendRequestResponseData) => {
         console.log("✅ Friend request accepted:", data);
         this.emitToListeners("friend_request_accepted", data);
-
-        /* this.showNotification(
-          "Friend Request Accepted",
-          `${data.friend.first_name} ${data.friend.last_name} accepted your friend request`
-        ); */
       }
     );
 
-    // Friend request declined
-    this.socket.on(
-      "friend_request_declined",
-      (data: FriendRequestResponseData) => {
-        console.log("❌ Friend request declined:", data);
-        this.emitToListeners("friend_request_declined", data);
-      }
-    );
-
-    // Friendship removed
-    this.socket.on("friendship_removed", (data: FriendRequestResponseData) => {
-      console.log("💔 Friendship removed:", data);
-      this.emitToListeners("friendship_removed", data);
-    });
-
-    // User blocked
-    this.socket.on("user_blocked", (data: FriendRequestResponseData) => {
-      console.log("🚫 User blocked:", data);
-      this.emitToListeners("user_blocked", data);
-    });
+   
 
     // User status changes (online/offline)
     this.socket.on("user_status_change", (data: UserStatusData) => {
-      console.log("👤 User status change:", data);
       this.emitToListeners("user_status_change", data);
     });
   }
@@ -304,7 +260,9 @@ class SocketService {
 
   // Emit to all registered listeners
   private emitToListeners<T extends Events>(event: T, data: EventData<T>): void {
+    //console.log("emitTolisteners")
     if (this.listeners.has(event)) {
+      console.log("emitTolisteners")
       this.listeners.get(event)?.forEach((callback) => {
         try {
           callback(data);
@@ -369,9 +327,9 @@ class SocketService {
   disconnect(): void {
     if (this.socket) {
       // Set user offline before disconnecting
-      if (this.userId) {
+      /* if (this.userId) {
         this.setUserOffline(this.userId);
-      }
+      } */
 
       // Clear all listeners
       this.listeners.clear();

@@ -78,3 +78,31 @@ export type GroupType = {
   dim4: Dimension;
   createdAt?: Date;
 }
+
+export type Friend = {
+  _id: string;
+  first_name: string;
+  last_name: string;
+  uni_name: string;
+  picture:string;
+  isFavourite: boolean;
+}
+
+type Payload = {recipientId: string;
+   requester: Friend & {friendshipId: string};
+  }
+
+type NotificationBase<T, L> = {
+  _id: string;
+  recipient: string;
+  payload: L;
+  type: T;
+  createdAt: Date;
+};
+
+type FriendRequest = NotificationBase<"fr", Payload>;
+type FriendRequestAccepted = NotificationBase<"fr_accepted", string>;
+type GroupAdded = NotificationBase<"group_added", string>;
+
+export type NotificationType = FriendRequest |  FriendRequestAccepted | GroupAdded;
+

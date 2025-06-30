@@ -112,7 +112,7 @@ const RootLayout = memo(()=> {
     };
   }, []);
 
-  console.log("layout rerendered")
+  
 
   if (!ready) return <Loader color="blue" size="large" />;
 

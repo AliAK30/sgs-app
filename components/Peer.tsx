@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import Profile from "./screens/Profile";
 import { useState} from "react";
 import { h, w } from "@/app/_layout";
+import { nameWithInitials } from "@/utils";
 
 type Props = {
   id?:string;
@@ -12,36 +13,11 @@ type Props = {
   uni_name?: string;
   picture?: string;
   similarity?: number;
+  friend?: boolean;
+  isFavourite?: boolean;
 };
 
-function formatName(fullName: string): string {
-  if (!fullName || typeof fullName !== 'string') {
-    return fullName;
-  }
-
-  // Trim and split the name into parts
-  const nameParts = fullName.trim().split(' ');
-  // split by one or more spaces use split(/\s+/) 
-  
-  // If there are less than 3 parts, return as-is
-  if (nameParts.length < 3) {
-    return fullName;
-  }
-
-  // Process all parts
-  const formattedParts = nameParts.map((part, index) => {
-    // Abbreviate all except last two names
-    if (index < nameParts.length - 2) {
-      return `${part.charAt(0).toUpperCase()}.`;
-    }
-    return part;
-  });
-
-  return formattedParts.join(' ');
-}
-
-
-export default function Peer({ id, full_name, uni_name, picture, similarity=-1 }: Props) {
+export default function Peer({ id, full_name, uni_name, picture, similarity=-1, friend=false, isFavourite=false }: Props) {
 
     const [openProfile, setOpenProfile] = useState<boolean>(false);
     const imgSource = picture ?? require("@/assets/images/no-dp.svg");
@@ -58,7 +34,7 @@ export default function Peer({ id, full_name, uni_name, picture, similarity=-1 }
         <View style={{rowGap:h*6, flex:1}}>
           <View style={{flexDirection:'row',}}>
             <View style={{flex:2*w}}>
-            <Text style={styles.name}>{formatName(full_name)}</Text>
+            <Text style={styles.name}>{nameWithInitials(full_name)}</Text>
             <Text style={styles.uni_name}>{uni_name}</Text>
             </View>
               <View style={{flex:0.9*w, alignItems:'center'}}>
@@ -70,9 +46,7 @@ export default function Peer({ id, full_name, uni_name, picture, similarity=-1 }
         
               </View>
             </View>
-        <Pressable style={styles.addFriendButton}>
-            <Text style={styles.add}>Add to Peers</Text>
-        </Pressable>
+        
         </View>
         
     </LinearGradient>
@@ -102,17 +76,5 @@ const styles = StyleSheet.create({
     alignSelf:'flex-start',
     paddingBottom:h*3,
   },
-  addFriendButton: {
-    backgroundColor: "#539DF3",
-    borderRadius:5,
-    alignSelf:'flex-end',
-    paddingHorizontal:7*w,
-    paddingVertical:4*h,
-    //justifyContent:'flex-end'
-  },
-  add: {
-    fontFamily:'Inter_500Medium',
-    fontSize:h*6+w*6,
-    color:'#FFFFFF',
-  }
+  
 });

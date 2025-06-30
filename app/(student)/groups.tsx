@@ -3,12 +3,9 @@ import { Pressable, StyleSheet, FlatList, ActivityIndicator } from "react-native
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
 import { useNetInfo } from "@react-native-community/netinfo";
-import axios from "axios";
-import { url } from "@/constants/Server";
-import { useAlert } from "@/hooks/useAlert";
 import {h, w} from '../_layout'
-import { useUserStore, useGroupStore } from "@/hooks/useStore";
-import { useState, useEffect, useRef } from "react";
+import { useGroupStore } from "@/hooks/useStore";
+import { useState,useRef } from "react";
 import GroupDetails from "@/components/screens/GroupDetails";
 import Group from "@/components/Group";
 
@@ -23,78 +20,11 @@ function Header({text}: any) {
 
 export default function Groups() {
   
-  const {Alert, openAlert} = useAlert()
 
-  const {groups, setGroups} = useGroupStore();
-    const [fetching, setFetching] = useState<boolean>(false);
+  const {groups} = useGroupStore();
     const [click, setClick] = useState<number>(0);
     const indexRef = useRef<number>(0);
     const { isConnected } = useNetInfo();
-    const { token, user } = useUserStore();
-
-    useEffect(()=> {
-      if(isConnected || isConnected===null)
-      {
-          fetchGroups();
-      }
-    }, [isConnected])
-
-    
-  const fetchGroups = async () => {
-    try {
-      
-      if (isConnected || isConnected===null) {
-       
-        setFetching(true);
-        //FETCH GROUPS
-        let res: any = await axios.get(`${url}/student/${user?._id}/groups`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "userid": user?._id
-        },
-        timeout: 1000 * 25,
-        });
-
-        setGroups(res.data)
-        
-      } else {
-        await openAlert("fail", "Failed!", "No Internet Connection!");
-        return;
-      }
-    } catch (e: any) {
-      
-      if (!e.status) {
-        switch (e.code) {
-          case "ECONNABORTED":
-            await openAlert(
-              "fail",
-              "Failed!",
-              "Request TImed out\nPlease try again later!"
-            );
-            return;
-
-          case "ERR_NETWORK":
-            await openAlert(
-              "fail",
-              "Failed!",
-              "Server is not Responding\nPlease try again later!"
-            );
-            return;
-        }
-      }
-
-      if (e.status >= 500) {
-        await openAlert("fail", "Failed!", e.message);
-        return;
-      } else {
-        await openAlert("fail", "Failed!", e.response.data.message);
-        return;
-      }
-    } finally {
-      setFetching(false)
-    }
-  }
 
   
   if (click === 1)
@@ -116,14 +46,14 @@ export default function Groups() {
 
   
   return (
-    <View style={{ flex: 1, backgroundColor: "white" }}>
+    
     <LinearGradient
       // Background Linear Gradient
       colors={["#ADD8E6", "#EAF5F8"]}
       locations={[0.15, 0.35]}
       style={styles.container}
     >
-      <Alert/>
+      
       <Text style={styles.title}>Your Groups</Text>
       <View style={styles.searchView}>
         <TextInput style={styles.search} placeholder="Search your groups" inputMode="text" placeholderTextColor="#85878D"/>
@@ -133,7 +63,7 @@ export default function Groups() {
 
     {isConnected===false ? (
                   <Text style={styles.notfound}>No Internet Connection</Text>
-                ) : fetching ? <View style={{flex:1, justifyContent:'center'}}><ActivityIndicator size="large" color="grey"/></View> : 
+                ) :  
                   <FlatList
                   
                     data={groups}
@@ -155,13 +85,11 @@ export default function Groups() {
                     ItemSeparatorComponent={Seperator}
                     ListHeaderComponent={<Header text={`Total Groups (${groups.length})`}/>}
                     ListFooterComponent={<Seperator/>}
-                    
-                    //onEndReachedThreshold={0.01}
                     ListEmptyComponent={<Text style={[styles.notfound, {paddingTop:h*20}]}>No Groups found</Text>}
                   />
                }
     </LinearGradient>
-    </View>
+    
   );
 }
 

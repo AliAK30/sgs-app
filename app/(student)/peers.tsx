@@ -1,21 +1,27 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
-import { Redirect, useRouter } from "expo-router";
+import { useFriendsStore } from "@/hooks/useStore";
 import { useNetInfo } from "@react-native-community/netinfo";
-import axios from "axios";
-import { url } from "@/constants/Server";
+import Peer from "@/components/Peer";
 import { useAlert } from "@/hooks/useAlert";
 import {h, w} from '../_layout'
 
 
+function Seperator() {
+  return <View style={{paddingVertical:h*6}}></View>
+}
+
+function Header({text}: any) {
+  return <Text style={styles.friends}>{text}</Text>
+}
+
 export default function Peers() {
   
   const {Alert} = useAlert()
-  const router = useRouter();
-  
-  const friends = 1;
+  const {isConnected} = useNetInfo();
+  const {friends} = useFriendsStore();
 
   
   return (
@@ -30,11 +36,31 @@ export default function Peers() {
       <Text style={styles.title}>Your Peers</Text>
       <View style={styles.searchView}>
         <TextInput style={styles.search} placeholder="Search your peers" inputMode="text" placeholderTextColor="#85878D"/>
-        <Feather name="search" color="black" size={19}/>
         <Pressable><Feather name="search" color="black" size={19}/></Pressable>
     </View>
 
-    <Text style={styles.friends}>Total Friends ({friends})</Text>
+    {isConnected===false ? (
+              <Text style={styles.notfound}>No Internet Connection</Text>
+            ) : 
+              <FlatList
+                data={friends}
+                renderItem={({ item }) => (
+                  <Peer
+                    id={item._id}
+                    full_name={`${item.first_name} ${item.last_name}`}
+                    picture={item.picture}
+                    uni_name={item.uni_name}
+                    friend={true}
+                    isFavourite={item.isFavourite}
+                  />
+                )}
+                keyExtractor={(item, index)=>item?._id ?? ""}
+                ItemSeparatorComponent={Seperator}
+                ListHeaderComponent={<Header text={`Total Friends (${friends.length})`}/>}
+                ListFooterComponent={<Seperator/>}
+                ListEmptyComponent={<Text style={[styles.notfound, {paddingTop:h*20}]}>No Friends Added</Text>}
+              />
+           }
     </LinearGradient>
     </View>
   );
@@ -82,5 +108,12 @@ const styles = StyleSheet.create({
     fontSize: h *8+w*8,
     paddingLeft:w*4
   },
+
+  notfound: {
+    fontFamily: "Inter_700Bold",
+    color: "#565555",
+    fontSize: h * 8 + w * 8,
+    textAlign:'center'
+  }
 });
 

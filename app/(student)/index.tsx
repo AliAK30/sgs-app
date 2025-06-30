@@ -9,6 +9,7 @@ import {w, h} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import SimilarStudents from "@/components/screens/SimilarStudents";
+import Notifications from "@/components/screens/Notifications";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { useAlert } from "@/hooks/useAlert";
 import { formatFirstName } from "@/utils";
@@ -19,8 +20,7 @@ import Animated, {
     withTiming,
     withSequence,
     } from 'react-native-reanimated';
-import { useSocket } from "@/hooks/useSocket";
-
+import { useNotificationsStore } from "@/hooks/useStore";
 
 const imgSource2 = require("@/assets/images/bino.svg");
 
@@ -33,18 +33,9 @@ export default function Index() {
     const [value, setValue] = useState<string>("")
     const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
     const [refreshing, setRefreshing] = useState(false);
+    const {notifications} = useNotificationsStore();
     const {Alert, openAlert} = useAlert();
-    const {addEventListener, removeEventListener}= useSocket();
 
-    useEffect(()=> {
-        
-        const callback = addEventListener("user_status_change", (data)=>{  
-            openAlert("info", "User Status", `user name: ${data.user.first_name} ${data.user.last_name}\nuser is ${data.isOnline ? "online" : "offline"}\nuser was last seen at ${data.lastSeen}`)
-        })
-
-        return ()=> removeEventListener("user_status_change", callback);
-    }, [])
-    
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -108,6 +99,10 @@ export default function Index() {
 
     if(click === 2)
         return (<SimilarStudents id={user?._id ?? ""} fetching={fetching} setFetching={setFetching} setClick={setClick}/>)
+
+    if(click === 3)
+        return (<Notifications goBack={()=>setClick(0)}/>)
+
   return (
     <ScrollView 
     automaticallyAdjustKeyboardInsets={true}
@@ -154,7 +149,8 @@ export default function Index() {
           </AnimatedPressable>
             </View>
             <View style={styles.bell}>
-                <Ionicons name="notifications-outline" color="black" size={19} />
+                {notifications.length > 0 && <View style={styles.badgeView}><Text style={styles.badge}>{notifications.length}</Text></View>}
+                <Ionicons name="notifications-outline" color="black" size={19} onPress={()=>setClick(3)}/>
             </View>
         </View>
         
@@ -245,6 +241,7 @@ const styles = StyleSheet.create({
         paddingHorizontal:w*10,
         alignItems: "center",
         justifyContent:'center',
+        position:'relative',
     },
     search: {
         flex:1,
@@ -264,6 +261,26 @@ const styles = StyleSheet.create({
         color: "#FFFEFE",
         fontFamily:'Inter_400Regular',
         fontSize:4.75*h+4.75*w,
+    },
+
+    badgeView: {
+        
+    position: 'absolute',
+    backgroundColor: 'red',
+    borderRadius: 50,
+    height:19,
+    width:19,
+    justifyContent: 'center',
+    alignItems: 'center',
+    right:0,
+    top:0,
+    },
+
+    badge: {
+        fontSize:w*5+h*5,
+        fontFamily:'Inter_400Regular',
+        color:'white',
+        textAlign:'center'
     }
 });
 

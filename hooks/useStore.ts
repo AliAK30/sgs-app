@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { User, GroupType } from "@/types";
+import { User, GroupType, NotificationType, Friend } from "@/types";
 import useAnswers from "./useAnswers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useSection from "./useSection";
@@ -135,8 +135,9 @@ export const useUserStore = create<UserState>()((set, get) => ({
 
 }))
 
+//SOCKET STATE
 
-interface SocketState {
+type SocketState = {
   isConnected: boolean | null;
   setIsConnected: (value: boolean | null) => void;
   resetSocketState: ()=>void;
@@ -147,3 +148,62 @@ export const useSocketStore = create<SocketState>((set) => ({
   setIsConnected: (value) => set({ isConnected: value }),
   resetSocketState: () => set({isConnected:null})
 }));
+
+//NOTIFICATION STATE
+
+type NotificationsState = {
+  notifications: NotificationType[];
+  setNotifications: (notifications: NotificationType[])=>void;
+  reset: () => void;
+}
+
+export const useNotificationsStore = create<NotificationsState>()((set, get) => ({
+  notifications: [],
+  setNotifications: (notifications: NotificationType[]) => set(() => ({ notifications:notifications })),
+  reset: () => set(() => ({notifications:[]}))
+}))
+
+
+//BANNER STATE
+
+type BannerState = {
+  isVisible: boolean;
+  // Message to be displayed, can be any string
+  message: string;
+
+  //Title to be displayed
+  title: string;
+  // Type can be either "success" or "error" or "info"
+  type: "success" | "fail" | "info";
+  openBanner: (type: BannerState['type'], title: string, message?: string) => void
+
+};
+
+const initialBannerState = {
+    isVisible: false,
+    type: "success",
+    message: "",
+    title: "",
+} as BannerState;
+
+export const useBanner = create<BannerState>()((set, get) => ({
+  ...initialBannerState,
+  openBanner: (type: BannerState['type'], title: string, message?: string) => {
+    setTimeout(()=> {set((initialstate)=>({...initialstate, isVisible:false}))}, 2500);
+
+      set(()=>({ isVisible: true, type, title, message }));
+  }
+}))
+
+
+type FriendsState = {
+  friends: Friend[];
+  setFriends: (friends: Friend[])=>void;
+  reset: () => void;
+}
+
+export const useFriendsStore = create<FriendsState>()((set, get) => ({
+  friends: [],
+  setFriends: (friends: Friend[]) => set(() => ({ friends:friends })),
+  reset: () => set(() => ({friends:[]}))
+}))

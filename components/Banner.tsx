@@ -1,49 +1,11 @@
-import { useState } from "react";
 import { View, Text } from "@/components/Themed";
 import Modal from "react-native-modal";
 import { StyleSheet, Pressable } from "react-native";
 import { height } from "../app/_layout";
-import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
+import { useBanner } from "@/hooks/useStore";
 
-type stateObj = {
-  isVisible: boolean;
-  // Message to be displayed, can be any string
-  message: string;
-
-  //Title to be displayed
-  title: string;
-  // Type can be either "success" or "error" or "info"
-  type: "success" | "fail" | "info";
-
-};
-
-export function useBanner() {
-  const [state, setState] = useState<stateObj>({
-    isVisible: false,
-    type: "success",
-    message: "",
-    title: "",
-  });
-
-  const openBanner = (
-    type: stateObj["type"],
-    title: string,
-    message: string = "" //default argument
-  ) => {
-
-    setTimeout(()=> {setState({ ...state, isVisible: false })}, 2500);
-
-      setState({
-        isVisible: true,
-        type,
-        title,
-        message,
-      });
-  };
-
-
-  function Banner() {
-    const { isVisible, type, message, title } = state;
+export default function Banner() {
+    const { isVisible, type, message, title } = useBanner();
 
     let color;
     if (type === "info") {
@@ -61,6 +23,7 @@ export function useBanner() {
       }
 
     return (
+      <View>
       <Modal
         isVisible={isVisible}
         hasBackdrop={true}
@@ -81,11 +44,9 @@ export function useBanner() {
           
         </View>
       </Modal>
+      </View>
     );
   }
-
-  return { ...state, openBanner, Banner};
-}
 
 const styles = StyleSheet.create({
   container: {

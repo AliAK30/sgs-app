@@ -26,6 +26,7 @@ export async function handleError(
           
       }
     } else {
+      console.log(e)
       return openAlert(
         "fail",
         "Failed!",

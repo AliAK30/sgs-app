@@ -15,6 +15,8 @@ import { h, w , width, height} from "@/app/_layout";
 import { User } from "@/types";
 import { PieChart, pieDataItem } from "react-native-gifted-charts";
 import { ImageBackground } from "expo-image";
+import { handleError } from "@/errors";
+import SubmitButton from "../buttons/SubmitButton";
 
 type Props = {
     openProfile: boolean;
@@ -58,7 +60,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
 
     const {Alert, openAlert} = useAlert();
     const [fetching, setFetching] = useState<boolean>(false);
-    
+    const [friendStatus, setFriendStatus] = useState<"pending"|"accepted"|"blocked"| "">("");
     const [checkingLS, setCheckingLS] = useState<number>(similarity===-1 ? 0 : 2);
     const { isConnected } = useNetInfo();
     const user = useRef<ExtendedUser>({});
@@ -66,19 +68,80 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
     const pieDatas = [ {value: similarity === -1 ? 70 : similarity, color: '#50BFAF', gradientCenterColor: '#0A594E'}, {value: similarity === -1 ? 30 : 100-similarity, color: '#F8F8F8'},];
     const pieData = useRef<pieDataItem[]|null>(pieDatas);
 
+    const color = friendStatus === "accepted" ? '#B3261E' : friendStatus === 'pending' ? '#565555' : '#007BFF';
+    const text = friendStatus === "accepted" ? 'Unfriend' : friendStatus === 'pending' ? 'Pending' : 'Add friend';
+
     useEffect(()=> {
+      getFriendStatus(id);
         fetchUser(id)
         //user.current.print = user.current.gender + (user.current?.age ? ` | Age ${user.current.age} years` : "") + (user.current?.gpa ? ` | CGPA ${user.current.gpa} `: "");
-    }, [id]);
+    }, []);
 
     
 
     const imgSource = user.current.picture ?? require("@/assets/images/no-dp.svg");
 
+    const handlePress = async () => {
+      if(friendStatus === "" || friendStatus === 'blocked') addFriend(id);
+    }
+
+    const getFriendStatus = async (id:string) => {
+      try {
+      if (isConnected === null || isConnected) {
+            
+          const res: any = await axios.get(`${url}/student/friend-request/${id}`, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userStore.token}`,
+              "userid": userStore.user?._id
+            },
+            timeout: 1000 * 25,
+          });
+          
+          if(res.data) {
+            setFriendStatus(res.data.status);
+          } 
+        
+      } else {
+        openAlert("fail", "Failed!", "No Internet Connection!");
+        return;
+      }
+    } catch (e: any) {
+      handleError(e, openAlert);
+    } 
+  };
+
+    const addFriend = async (id:string) => {
+      try {
+      if (isConnected === null || isConnected) {
+            
+          const res: any = await axios.post(`${url}/student/friend-request`, {recipientId: id}, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userStore.token}`,
+              "userid": userStore.user?._id
+            },
+            timeout: 1000 * 25,
+          });
+          
+          if(res.data) {
+            setFriendStatus(res.data.status);
+          }
+        
+      } else {
+        openAlert("fail", "Failed!", "No Internet Connection!");
+        return;
+      }
+    } catch (e: any) {
+      handleError(e, openAlert);
+    } 
+    }
+    
+
     const fetchUser = async (id: string) => {
     try {
       if (isConnected === null || isConnected) {
-            //console.log("HERE")
+           
           setFetching(true);
           const res: any = await axios.get(`${url}/student/${id}`, {
             headers: {
@@ -97,33 +160,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
         return;
       }
     } catch (e: any) {
-      if (!e.status) {
-        switch (e.code) {
-          case "ECONNABORTED":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Request TImed out\nPlease try again later!"
-            );
-            return;
-
-          case "ERR_NETWORK":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Server is not Responding\nPlease try again later!"
-            );
-            return;
-        }
-      }
-
-      if (e.status >= 500) {
-        openAlert("fail", "Failed!", e.message);
-        return;
-      } else {
-        openAlert("fail", "Failed!", e.response.data.message);
-        return;
-      }
+      handleError(e, openAlert);
     } finally {
       setFetching(false)
     }
@@ -157,34 +194,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
 
     } catch (e:any) {
 
-        if (!e.status) {
-        switch (e.code) {
-          case "ECONNABORTED":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Request TImed out\nPlease try again later!"
-            );
-            return;
-
-          case "ERR_NETWORK":
-            openAlert(
-              "fail",
-              "Failed!",
-              "Server is not Responding\nPlease try again later!"
-            );
-            return;
-        }
-      }
-
-      if (e.status >= 500) {
-        openAlert("fail", "Failed!", e.message);
-        return;
-      } else {
-        openAlert("fail", "Failed!", e.response.data.message);
-        pieData.current = null;
-        return;
-      }
+        handleError(e, openAlert, 'NO_LEARNING_STYLE', ()=>{pieData.current =null});
 
     } finally {
         setCheckingLS(2);
@@ -192,6 +202,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
   }
 
     return(
+      <View>
         <Modal
         isVisible={openProfile}
         hasBackdrop={true}
@@ -220,7 +231,8 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                         <Text style={styles.uni}>{user.current.print}</Text>
                         
                     </View>   
-                    <Pressable style={styles.addFriend}><Text style={styles.addFriendText}>Add Friend</Text></Pressable>
+                    {friendStatus !== 'blocked' && <SubmitButton style={[styles.addFriend, {borderColor: color }]} textStyle={[styles.addFriendText, {color:color}]} text={text} onPress={handlePress}/>}
+                    {/* <Pressable style={[styles.addFriend, {borderColor: color }]}><Text style={[styles.addFriendText, {color:color}]}>{text}</Text></Pressable> */}
                 </View>
                 <View style={{ marginTop:h*15, justifyContent:'center'}}>
                 <View style={[styles.details, {alignItems:'center', paddingVertical:h*20}]}>
@@ -280,6 +292,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                 
             </View>
         </Modal>
+        </View>
     );
 }
 
@@ -362,7 +375,7 @@ const styles = StyleSheet.create({
         boxShadow: "0px 1px 4px 0px rgba(0, 0, 0, 0.25)",
         paddingHorizontal:w*14,
         paddingVertical:4*h,
-        
+        borderWidth:1.5,
         position:'absolute',
         alignSelf:'center',
         marginBottom:10*h,

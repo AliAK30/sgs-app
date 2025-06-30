@@ -119,7 +119,7 @@ export default function Survey() {
     try {
       if (isConnected) {
         
-        await axios.patch(`${url}/student/update/questions`, {answers: oneAnswer, isSurveyCompleted: false}, {
+        await axios.patch(`${url}/student/questions`, {answers: oneAnswer, isSurveyCompleted: false}, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -139,7 +139,7 @@ export default function Survey() {
         {
           if(section.one+section.two+section.three+section.four === 44)
           {
-              await axios.patch(`${url}/student/update/questions`, {answers: answers.current, isSurveyCompleted: true}, {
+              await axios.patch(`${url}/student/questions`, {answers: answers.current, isSurveyCompleted: true}, {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
@@ -147,8 +147,8 @@ export default function Survey() {
               },
               timeout: 1000 * 15,
             });
-            const res: any = await axios.get(
-            `${url}/student/identify/learningstyle`,
+            const res: any = await axios.post(
+            `${url}/student/learning-style`,
             {
               headers: { Authorization: `Bearer ${token}` },
               timeout: 1000 * 60,

@@ -75,7 +75,7 @@ export default function Onboarding() {
 
   const updateUserNewStatus = async () => {
     try {
-      const res = await axios.patch(`${url}/student/update/self`, {newUser: false}, {
+      const res = await axios.patch(`${url}/student/profile`, {newUser: false}, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
