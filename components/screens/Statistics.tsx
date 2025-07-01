@@ -18,7 +18,7 @@ export default function Statistics() {
       <View style={styles.main}>
         <View style={styles.learningStyle}>
           
-          <LearningStyleComponent user={user} />
+          <LearningStyleComponent user={user}/>
         </View>
       </View>
     </View>

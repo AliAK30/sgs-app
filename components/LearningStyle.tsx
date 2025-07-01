@@ -82,6 +82,7 @@ const radius = center * 0.8;
           chartSize={chartSize}
           polygonConfig={polygonConfig}
         />
+        
         {figmaLabels.map((category, index) => {
 
             const angle = index * angleStep;
@@ -111,6 +112,7 @@ const radius = center * 0.8;
               </AnimatedPressableText>
             );
           })}
+         
       </View>
     </View>
   );
@@ -135,7 +137,9 @@ const styles = StyleSheet.create({
   lsContainer: { 
     paddingTop: width*0.1116,
     paddingHorizontal: width*0.2257, 
-    paddingBottom: width*0.05
+    paddingBottom: width*0.05,
+    
+    
   },
 });
 

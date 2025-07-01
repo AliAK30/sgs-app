@@ -123,7 +123,7 @@ export default function Survey() {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-          "userId": user?._id,
+          "userid": user?._id,
         },
         timeout: 1000 * 15,
         });
@@ -143,14 +143,16 @@ export default function Survey() {
               headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
-                "userId": user?._id,
+                "userid": user?._id,
               },
               timeout: 1000 * 15,
             });
-            const res: any = await axios.post(
-            `${url}/student/learning-style`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
+            const res: any = await axios.post(`${url}/student/learning-style`,{},{
+              headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        userid: user?._id,
+      },
               timeout: 1000 * 60,
             }
           );

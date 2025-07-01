@@ -1,10 +1,10 @@
 import { View, Text, TextInput } from "@/components/Themed";
-import { StyleSheet, ScrollView, Pressable, RefreshControl} from "react-native";
-import { useUserStore } from "@/hooks/useStore";
+import { StyleSheet, ScrollView, Pressable, RefreshControl, FlatList} from "react-native";
+import { useUserStore, useGroupStore, useFriendsStore } from "@/hooks/useStore";
 import { useState, useEffect, } from "react";
 import { Image } from "expo-image";
 import SearchResult from "@/components/screens/SearchResult";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons} from "@expo/vector-icons";
 import {w, h} from "../_layout"
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -12,8 +12,7 @@ import SimilarStudents from "@/components/screens/SimilarStudents";
 import Notifications from "@/components/screens/Notifications";
 import AnimatedPressable from "@/components/AnimatedPressable";
 import { useAlert } from "@/hooks/useAlert";
-import { formatFirstName } from "@/utils";
-import {triggerHaptic} from '@/utils';
+import {triggerHaptic, formatFirstName} from '@/utils';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -21,8 +20,20 @@ import Animated, {
     withSequence,
     } from 'react-native-reanimated';
 import { useNotificationsStore } from "@/hooks/useStore";
+import { useNetInfo } from "@react-native-community/netinfo";
+import StyledGroup from "@/components/StyledGroup";
 
 const imgSource2 = require("@/assets/images/bino.svg");
+
+const defaultImageSrc = require("@/assets/images/no-dp.svg");
+
+function Seperator() {
+  return <View style={{ paddingHorizontal: w * 6 }}></View>;
+}
+
+function Header({text}:any) {
+  return <Text style={styles.friends}>{text}</Text>;
+}
 
 export default function Index() {
 
@@ -30,11 +41,14 @@ export default function Index() {
     const [fetching, setFetching] = useState<boolean>(false)
     const router = useRouter();
     const {user, token} = useUserStore();
+    const {groups} = useGroupStore();
+    const {friends} = useFriendsStore();
     const [value, setValue] = useState<string>("")
-    const imgSource = user?.picture ?? require("@/assets/images/no-dp.svg");
+    const imgSource = user?.picture ?? defaultImageSrc;
     const [refreshing, setRefreshing] = useState(false);
     const {notifications} = useNotificationsStore();
     const {Alert, openAlert} = useAlert();
+    const {isConnected} = useNetInfo();
 
 
     const onRefresh = async () => {
@@ -92,7 +106,6 @@ export default function Index() {
         setFetching(true);
         setClick(1);
     }
-
     
     if(click === 1)
         return (<SearchResult value={value} fetching={fetching} setFetching={setFetching} setValue={setValue} setClick={setClick}/>);
@@ -184,6 +197,42 @@ export default function Index() {
             </View>
           </LinearGradient>
       </AnimatedPressable>
+
+      <View>
+        <Header text="Your Groups"/>
+        <View style={{flexDirection:'row'}}>
+      {isConnected === false ? (
+                <Text style={styles.notfound}>No Internet Connection</Text>
+              ) : groups.length>0 ?
+                <FlatList
+                  data={groups.slice(0, 3)}
+                  renderItem={({ item,index }) => <StyledGroup {...item} index={index}/>}
+                  keyExtractor={(item, index) => item?._id ?? ""}
+                  ItemSeparatorComponent={Seperator}
+                  horizontal={true}
+                  ListFooterComponent={<Seperator />}
+                  showsHorizontalScrollIndicator={false}
+                /> : <Text style={styles.notfound}>No Groups</Text>
+              }
+         </View>
+        </View>
+
+              <View>
+                <Header text="Your Favourite Peers"/>
+                <View style={{flexDirection:'row', columnGap:w*5}}>
+                    {friends.length> 0 ? ( friends.slice(0, 7).map((friend)=>{
+                        const src = friend?.picture ?? defaultImageSrc;
+                        return (<View key={friend._id} style={{alignItems:'center', rowGap:h*2}}>
+                            <Image  source={src} style={{width:h*26+w*26, height:h*26+w*26, borderRadius:50}}/>
+                            <Text style={styles.peerName}>{formatFirstName(friend.first_name)}</Text>
+                            </View>);        
+                    })) :
+                    <Text style={styles.notfound}>No Peers Added</Text>
+                    }
+
+                </View>
+              </View>
+
 
 
     </ScrollView>
@@ -281,6 +330,28 @@ const styles = StyleSheet.create({
         fontFamily:'Inter_400Regular',
         color:'white',
         textAlign:'center'
-    }
+    },
+
+    friends: {
+    fontFamily: "Inter_700Bold",
+    color: "#565555",
+    fontSize: h * 8 + w * 8,
+    paddingLeft: w * 4,
+    marginTop: h * 5,
+    marginBottom: h * 15,
+  },
+  notfound: {
+    fontFamily: "Inter_700Bold",
+    color: "#565555",
+    fontSize: h * 8 + w * 8,
+    textAlign: "center",
+    flex:1,
+  },
+
+  peerName: {
+        fontFamily: 'Inter_600SemiBold',
+        color:'#565555',
+        fontSize: w*5+h*5,
+    },
 });
 

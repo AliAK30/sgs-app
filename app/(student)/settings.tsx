@@ -3,7 +3,7 @@ import { StyleSheet, Pressable } from "react-native";
 import  Feather  from "@expo/vector-icons/Feather";
 import {h, w} from "@/app/_layout"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useUserStore, useSurveyStore, useNotificationsStore, useFriendsStore } from "@/hooks/useStore";
+import { useUserStore, useSurveyStore, useNotificationsStore, useFriendsStore, useGroupStore } from "@/hooks/useStore";
 import { useRouter } from "expo-router";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useAlert } from "@/hooks/useAlert";
@@ -16,6 +16,7 @@ export default function Settings() {
   const router = useRouter();
   const {isConnected} = useNetInfo();
   const notiStore = useNotificationsStore();
+  const groupStore = useGroupStore();
   const {setFriends} = useFriendsStore();
   const {Alert, openAlert} = useAlert();
 
@@ -28,6 +29,7 @@ export default function Settings() {
               reset();
               resetUserState();
               notiStore.reset();
+              groupStore.reset();
               setFriends([]);
 
           } else {

@@ -71,7 +71,7 @@ export type GroupType = {
   uni_name: string;
   uni_id: string;
   gender: string;
-  totalStudents: Number;
+  totalStudents: number;
   students?: string[];
   dim1: Dimension;
   dim2: Dimension;
