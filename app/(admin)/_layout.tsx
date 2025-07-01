@@ -2,10 +2,12 @@ import { Tabs, Redirect, usePathname } from "expo-router";
 import {StyleSheet} from "react-native";
 import { w, h, height, base_height } from "../_layout";
 import Feather from "@expo/vector-icons/Feather";
-import { useUserStore } from "@/hooks/useStore";
+import { useUserStore, useGroupStore,useAdminsStore } from "@/hooks/useStore";
 import { useState, useEffect } from "react";
 import { useSocket } from "@/hooks/useSocket";
 import { useAppStateSocketSync } from "@/hooks/useAppStateSocketSync";
+import axios from "axios";
+import { url } from "@/constants/Server";
 
 const iconSize: number = 24;
 const gap: number = w * 5;
@@ -13,6 +15,8 @@ const gap: number = w * 5;
 
 export default function AdminLayout() {
   const { token, user } = useUserStore();
+  const {setGroups} = useGroupStore();
+  const {setAdmins} = useAdminsStore();
   const [focusedTab, setFocusedTab] = useState<string>("index");
   const { isConnected } = useSocket();
   const pathname = usePathname();
@@ -20,8 +24,39 @@ export default function AdminLayout() {
   useAppStateSocketSync();
 
   useEffect(() => {
-    console.log("STATUS: ", isConnected);
-  }, [isConnected]);
+    const fetchGroups = async () => {
+            //FETCH GROUPS
+            let res: any = await axios.get(`${url}/admin/groups`, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+                "userid": user?._id
+            },
+            timeout: 1000 * 25,
+            });
+    
+            setGroups(res.data)
+            
+    } 
+
+    const fetchAdmins = async () => {
+            //FETCH ADMINS
+            let res: any = await axios.get(`${url}/admin`, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+                "userid": user?._id
+            },
+            timeout: 1000 * 25,
+            });
+    
+            setAdmins(res.data)
+            
+    } 
+
+    fetchGroups();
+    fetchAdmins();
+  }, []);
 
   useEffect(() => {
     // Extracting tab name from path, assuming tabs are directly under root

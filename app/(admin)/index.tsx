@@ -5,7 +5,7 @@ import { useUserStore } from "@/hooks/useStore";
 import { useState, useRef, useEffect } from "react";
 import { Image } from "expo-image";
 import SearchResult from "@/components/screens/SearchResult";
-import { Feather, Ionicons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 import { w, h,} from "../_layout";
 import { url } from "@/constants/Server";
 import { LinearGradient } from "expo-linear-gradient";

@@ -207,3 +207,16 @@ export const useFriendsStore = create<FriendsState>()((set, get) => ({
   setFriends: (friends: Friend[]) => set(() => ({ friends:friends })),
   reset: () => set(() => ({friends:[]}))
 }))
+
+
+type AdminsState = {
+  admins: User[];
+  setAdmins: (admins: User[])=>void;
+  reset: () => void;
+}
+
+export const useAdminsStore = create<AdminsState>()((set, get) => ({
+  admins: [],
+  setAdmins: (admins: User[]) => set(() => ({ admins:admins })),
+  reset: () => set(() => ({admins:[]}))
+}))

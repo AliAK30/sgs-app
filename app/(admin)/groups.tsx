@@ -1,19 +1,16 @@
 import { Text, View, TextInput } from "@/components/Themed";
 import { Pressable, StyleSheet, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useNetInfo } from "@react-native-community/netinfo";
-import axios from "axios";
-import { url } from "@/constants/Server";
-import { useAlert } from "@/hooks/useAlert";
 import {h, w} from '../_layout'
-import { useUserStore, useGroupStore } from "@/hooks/useStore";
+import { useGroupStore } from "@/hooks/useStore";
 import Group from "@/components/Group";
 import CreateGroup from "@/components/screens/CreateGroup";
 import GroupDetails from "@/components/screens/GroupDetails";
-import Loader from "@/components/Loader";
+
 
 function Seperator() {
   return <View style={{paddingVertical:h*6}}></View>
@@ -25,77 +22,10 @@ function Header({text}: any) {
 
 export default function Groups() {
   
-  const {Alert, openAlert} = useAlert()
-  const {groups, setGroups} = useGroupStore();
-  const [fetching, setFetching] = useState<boolean>(false);
+  const { isConnected } = useNetInfo();
   const [click, setClick] = useState<number>(0);
   const indexRef = useRef<number>(0);
-  const { isConnected } = useNetInfo();
-  const { token, user } = useUserStore();
-
-  useEffect(()=> {
-      if(isConnected || isConnected===null)
-      {
-          fetchGroups();
-      }
-    }, [isConnected])
-
-    
-  const fetchGroups = async () => {
-    try {
-      
-      if (isConnected || isConnected===null) {
-       
-        setFetching(true);
-        //FETCH GROUPS
-        let res: any = await axios.get(`${url}/admin/groups`, {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "userid": user?._id
-        },
-        timeout: 1000 * 25,
-        });
-
-        setGroups(res.data)
-        
-      } else {
-        await openAlert("fail", "Failed!", "No Internet Connection!");
-        return;
-      }
-    } catch (e: any) {
-      
-      if (!e.status) {
-        switch (e.code) {
-          case "ECONNABORTED":
-            await openAlert(
-              "fail",
-              "Failed!",
-              "Request TImed out\nPlease try again later!"
-            );
-            return;
-
-          case "ERR_NETWORK":
-            await openAlert(
-              "fail",
-              "Failed!",
-              "Server is not Responding\nPlease try again later!"
-            );
-            return;
-        }
-      }
-
-      if (e.status >= 500) {
-        await openAlert("fail", "Failed!", e.message);
-        return;
-      } else {
-        await openAlert("fail", "Failed!", e.response.data.message);
-        return;
-      }
-    } finally {
-      setFetching(false)
-    }
-  }
+  const {groups} = useGroupStore();
 
   
   
@@ -127,7 +57,7 @@ export default function Groups() {
           locations={[0.11, 1]}
           style={styles.container}
         >
-      <Alert/>
+      
       <Text style={styles.title}>Groups</Text>
       <View style={styles.searchView}>
         <TextInput style={styles.search} placeholder="Search groups by name" inputMode="text" placeholderTextColor="#85878D"/>
@@ -137,7 +67,7 @@ export default function Groups() {
 
     {isConnected===false ? (
               <Text style={styles.notfound}>No Internet Connection</Text>
-            ) : fetching ? <Loader size="large" color="grey"/> : 
+            ) :
               <FlatList
               
                 data={groups}

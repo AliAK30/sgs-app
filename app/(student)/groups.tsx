@@ -1,5 +1,5 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { Pressable, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { Pressable, StyleSheet, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
 import { useNetInfo } from "@react-native-community/netinfo";

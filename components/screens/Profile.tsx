@@ -1,4 +1,4 @@
-import { Text, View, TextInput } from "@/components/Themed";
+import { Text, View} from "@/components/Themed";
 import { Image } from "expo-image";
 import { Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import Modal from "react-native-modal";
@@ -274,10 +274,12 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
 
                 </View> : 
                 
+                <View style={{paddingTop:h*10}}>
                 <LearningStyleComponent user={user.current} self={false} />
+                </View>
                 }
                 <View style={{flexDirection:'row', justifyContent:'center', columnGap:w*10, flex:1, alignItems:'center'}}>
-                    {user.current.phone_number &&
+                    {(user.current.phone_number && userStore.user?.role === 'student') &&
                     <Link href={`tel:${user.current.phone_number}`} asChild>
                     <Pressable style={styles.call}>
                         <Ionicons name="call-outline" size={styles.callText.fontSize} color={styles.callText.color}/>
@@ -285,7 +287,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                     </Pressable>
                     </Link> }
                     
-                    {user.current.email && 
+                    {(user.current.email && userStore.user?.role === 'student') && 
                     <Link href={`mailto:${user.current.email}`} asChild>
                     <Pressable style={styles.email}>
                         <Octicons name="paper-airplane" size={styles.emailText.fontSize} color={styles.emailText.color}/>

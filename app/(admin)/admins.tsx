@@ -1,18 +1,28 @@
 import { Text, View, TextInput } from "@/components/Themed";
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable, StyleSheet, FlatList } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Feather from "@expo/vector-icons/Feather";
-import { useRouter } from "expo-router";
+import { useAdminsStore } from "@/hooks/useStore";
 import { useAlert } from "@/hooks/useAlert";
+import { useNetInfo } from "@react-native-community/netinfo";
 import {h, w} from '../_layout'
+import Admin from "@/components/Admin";
+
+
+function Seperator() {
+  return <View style={{paddingVertical:h*6}}></View>
+}
+
+function Header({text}: any) {
+  return <Text style={styles.friends}>{text}</Text>
+}
 
 
 export default function Admins() {
   
-  const {Alert} = useAlert()
-  const router = useRouter();
-  
-  const admins = 1;
+  const {Alert} = useAlert();
+  const {isConnected} = useNetInfo();
+  const {admins} = useAdminsStore();
 
   
   return (
@@ -26,12 +36,30 @@ export default function Admins() {
       <Alert/>
       <Text style={styles.title}>Admins</Text>
       <View style={styles.searchView}>
-        <TextInput style={styles.search} placeholder="Search groups" inputMode="text" placeholderTextColor="#85878D"/>
-        <Feather name="search" color="black" size={19}/>
+        <TextInput style={styles.search} placeholder="Search admins" inputMode="text" placeholderTextColor="#85878D"/>
         <Pressable><Feather name="search" color="black" size={19}/></Pressable>
     </View>
 
-    <Text style={styles.friends}>Total Admins ({admins})</Text>
+    {isConnected===false ? (
+                  <Text style={styles.notfound}>No Internet Connection</Text>
+                ) : 
+                  <FlatList
+                    data={admins}
+                    renderItem={({ item }) => (
+                      <Admin
+                        id={item._id}
+                        full_name={`${item.first_name} ${item.last_name}`}
+                        picture={item.picture}
+                        uni_name={item.uni_name}
+                      />
+                    )}
+                    keyExtractor={(item, index)=>item?._id ?? ""}
+                    ItemSeparatorComponent={Seperator}
+                    ListHeaderComponent={<Header text={`Total Admins (${admins.length})`}/>}
+                    ListFooterComponent={<Seperator/>}
+                    ListEmptyComponent={<Text style={[styles.notfound, {paddingTop:h*20}]}>No Friends Added</Text>}
+                  />
+               }
     </LinearGradient>
     </View>
   );
@@ -80,6 +108,12 @@ const styles = StyleSheet.create({
     color: "#565555",
     fontSize: h *8+w*8,
     paddingLeft:w*4
+  },
+  notfound: {
+    fontFamily: "Inter_700Bold",
+    color: "#565555",
+    fontSize: h * 8 + w * 8,
+    textAlign:'center'
   },
 });
 
