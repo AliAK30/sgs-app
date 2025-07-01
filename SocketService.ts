@@ -1,17 +1,13 @@
 import io, { Socket, ManagerOptions, SocketOptions } from "socket.io-client";
 import { OS } from "@/app/_layout";
 import { url } from "./constants/Server";
-import { User, Friend } from "./types";
+import { User, Friend, FriendRequestPayload, GroupType } from "./types";
 
-export type FriendRequestData = {
-  requester: User;
-  recipientId: string;
-};
+export type FriendRequestData = FriendRequestPayload;
 
-export type FriendRequestResponseData = {
-  requesterId: string;
-  recipient: Friend;
-};
+export type FriendRequestResponseData = Friend
+
+export type GroupData = GroupType
 
 export type UserStatusData = {
   user: User;
@@ -19,25 +15,19 @@ export type UserStatusData = {
   lastSeen: Date;
 };
 
-export type NotificationData = {
-  id: number;
-  title: string;
-  body: string;
-  timestamp: string;
-  read: boolean;
-};
-
 
 export type Events =
   | "friend_request_received"
   | "friend_request_accepted"
+  | "added_in_group"
   | "user_status_change";
 
 export type EventData<T> = T extends "friend_request_received"
   ? FriendRequestData
-  : T extends
-      | "friend_request_accepted"
+  : T extends "friend_request_accepted"
   ? FriendRequestResponseData
+  : T extends "added_in_group"
+  ? GroupData
   : UserStatusData;
 
 export type SocketEventListener<T> = (data: EventData<T>) => void;
@@ -240,6 +230,11 @@ class SocketService {
     this.socket.on("user_status_change", (data: UserStatusData) => {
       this.emitToListeners("user_status_change", data);
     });
+
+    // added_ingroup
+    this.socket.on("added_in_group", (data: GroupData) => {
+      this.emitToListeners("added_in_group", data);
+    });
   }
 
   // Add event listener
@@ -262,7 +257,7 @@ class SocketService {
   private emitToListeners<T extends Events>(event: T, data: EventData<T>): void {
     //console.log("emitTolisteners")
     if (this.listeners.has(event)) {
-      console.log("emitTolisteners")
+      
       this.listeners.get(event)?.forEach((callback) => {
         try {
           callback(data);

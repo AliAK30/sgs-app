@@ -55,7 +55,7 @@ export default function Preview({
   const { isConnected } = useNetInfo();
   const [editable, setEditable] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const { token } = useUserStore();
+  const { token, user } = useUserStore();
   const {groups, setGroups} = useGroupStore();
   const backup = useRef<User[]>(results);
 
@@ -80,9 +80,10 @@ export default function Preview({
         const res = await axios.post(`${url}/admin/groups/create`, groupData, {
           timeout: 1000 * 15,
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-        },
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                  "userid": user?._id
+                },
         });
         setGroups([...groups, res.data]);
         setClick(0);

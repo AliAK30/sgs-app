@@ -31,7 +31,7 @@ export default function StudentLayout() {
   const { token, user } = useUserStore();
   const { setNotifications } = useNotificationsStore();
   const {setFriends, friends} = useFriendsStore();
-  const {setGroups} = useGroupStore();
+  const {setGroups, groups} = useGroupStore();
   const [focusedTab, setFocusedTab] = useState<string>("index");
   const { addEventListener, removeEventListener } = useSocket();
   const { openBanner } = useBanner();
@@ -85,7 +85,7 @@ export default function StudentLayout() {
       "friend_request_received",
       async (data) => {
         fetchNotifications();
-        const message = `${data.requester.first_name} ${data.requester.last_name} has sent you a friend request`;
+        const message = `${data.first_name} ${data.last_name} has sent you a friend request`;
         if (OS === "web") {
           openBanner("info", "Friend Request", message);
         } else {
@@ -104,9 +104,9 @@ export default function StudentLayout() {
     const callback2 = addEventListener(
       "friend_request_accepted",
       async (data) => {
-        setFriends([...friends, data.recipient ]);
+        setFriends([...friends, data ]);
         fetchNotifications();
-        const message = `${data.recipient.first_name} ${data.recipient.last_name} accepted your friend request`;
+        const message = `${data.first_name} ${data.last_name} accepted your friend request`;
         if (OS === "web") {
           openBanner("info", "Friend Request Accepted", message);
         } else {
@@ -122,9 +122,31 @@ export default function StudentLayout() {
       }
     );
 
+    const callback3 = addEventListener(
+      "added_in_group",
+      async (data) => {
+        setGroups([...groups, data ]);
+        fetchNotifications();
+        const message = `You were added in group ${data.name}`;
+        if (OS === "web") {
+          openBanner("info", "Added in group", message);
+        } else {
+          Notifications.scheduleNotificationAsync({
+            content: {
+              title: "Added in group",
+              sound: true,
+              body: message,
+            },
+            trigger: null,
+          });
+        }
+      }
+    );
+
     return () => {
       removeEventListener("friend_request_accepted", callback2)
       removeEventListener("friend_request_received", callback1)
+      removeEventListener("added_in_group", callback3)
     };
   }, []);
 

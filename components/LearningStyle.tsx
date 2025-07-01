@@ -1,5 +1,5 @@
 import { RadarChart } from "react-native-gifted-charts";
-import { height, width, base_height, base_width } from "@/app/_layout";
+import { height, width, base_height, base_width, w } from "@/app/_layout";
 import { User, LearningStyle } from "@/types";
 import { View, Text } from "./Themed";
 import {StyleSheet} from "react-native";
@@ -9,7 +9,9 @@ import { Label } from "@/types";
 import AnimatedPressableText from "./AnimatedPressableText";
 
 type Props = {
-  user: User | null;
+  user: User | null ;
+  self?:boolean;
+  dynamicSize?:number;
 };
 
 
@@ -25,17 +27,14 @@ const figmaLabels: Array<Label> = [
 ];
 
 const maxValue = 12;
-const chartSize = width * 0.5354;
-const labelsContainer = chartSize * 1.5;
-const center = labelsContainer / 2;
-const radius = center * 0.8;
+
 const bw = base_width; //base figma screen width
 const bh = base_height; //base figma screen height
-const labelsPositionXOffset = [-1.5, 16, -5, -20, 5, -19, 6, 9].map((a)=>a/bw*width);
-const labelsPositionYOffset = [-22, 2, -2, 2, -23, -30, -42, -30].map((a)=>a/bw*width);
+const labelsPositionXOffset = [-1.5, 16, -5, -20, 5, -19, 6, 9].map((a)=>a*w);
+const labelsPositionYOffset = [-22, 2, -2, 2, -23, -30, -42, -30].map((a)=>a*w);
 
 
-export default function LearningStyleComponent({ user }: Props) {
+export default function LearningStyleComponent({ user, self=true, dynamicSize=0.5354 }: Props) {
 
 
   const [dimensionInfoVisible, setdimensionInfoVisible] = useState<boolean>(false);
@@ -43,6 +42,10 @@ export default function LearningStyleComponent({ user }: Props) {
   const dataArray = getData(user?.learning_style);
   const noOfSections = 6;
   const angleStep = 360 / 8;
+  const chartSize = width * dynamicSize;
+const labelsContainer = chartSize * 1.5;
+const center = labelsContainer / 2;
+const radius = center * 0.8;
 
   const hideDimensionInfo = () => setdimensionInfoVisible(false);
  
@@ -66,7 +69,7 @@ export default function LearningStyleComponent({ user }: Props) {
   return (
     <View style={{alignItems:"center"}}>
       
-      <Text style={styles.lsHeading}>Your Learning Style</Text>
+      <Text style={styles.lsHeading}>{self ? "Your Learning Style" : `${user?.first_name}'s Learning Style`}</Text>
       <View style={styles.lsContainer}>
         <RadarChart
           noOfSections={noOfSections}
@@ -83,7 +86,7 @@ export default function LearningStyleComponent({ user }: Props) {
 
             const angle = index * angleStep;
 
-            let { x, y } = polarToCartesian(angle, maxValue); 
+            let { x, y } = polarToCartesian(angle, maxValue, center, radius); 
 
             // Offsets for label position
             x += labelsPositionXOffset[index];
@@ -185,7 +188,7 @@ const getData = (learning_style: LearningStyle | undefined) => {
 };
 
 
-const polarToCartesian = (angle: number, value: number) => {
+const polarToCartesian = (angle: number, value: number, center:number, radius:number) => {
   const radians = (Math.PI / 180) * angle;
   return {
     x: center + radius * (value / maxValue) * Math.cos(radians) - (bw/width),

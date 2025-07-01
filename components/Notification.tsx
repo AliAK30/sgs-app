@@ -14,9 +14,20 @@ import { url } from "@/constants/Server";
 import axios from "axios";
 import { handleError } from "@/errors";
 import Banner from "./Banner";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { timeAgo } from "@/utils";
 
+const CheckIcon = () => {
+  return (<View style={styles.accepted}>
+            <FontAwesome5 name="check" size={16} color="white"/>
+        </View>)
+}
 
+const PaperIcon = () => {
+  return (<View style={[styles.accepted, {backgroundColor:"#F4AD4B"}]}>
+            <MaterialCommunityIcons name="newspaper-variant" size={16} color="white"/>
+        </View>)
+}
 export default function Notification(props: NotificationType) {
 
   const [openProfile, setOpenProfile] = useState<boolean>(false);
@@ -34,7 +45,7 @@ export default function Notification(props: NotificationType) {
     try {
           if (isConnected === null || isConnected) {
                 
-              const res: any = await axios.put(`${url}/student/friend-request/${props.payload.requester.friendshipId}/respond`, 
+              const res: any = await axios.put(`${url}/student/friend-request/${props.payload.friendshipId}/respond`, 
                 {action: action},
                 {
                 headers: {
@@ -47,11 +58,11 @@ export default function Notification(props: NotificationType) {
               
               if(action==='accept' && res.data) {
                 const friend = {
-                    _id: props.payload.requester._id,
-                    first_name: props.payload.requester.first_name,
-                    last_name: props.payload.requester.last_name,
-                    uni_name: props.payload.requester.uni_name,
-                    picture: props.payload.requester.picture,
+                    _id: props.payload._id,
+                    first_name: props.payload.first_name,
+                    last_name: props.payload.last_name,
+                    uni_name: props.payload.uni_name,
+                    picture: props.payload.picture,
                     isFavourite: res.data.isFavourite
                 }
                 setFriends([...friends, friend]);
@@ -80,7 +91,7 @@ export default function Notification(props: NotificationType) {
   }
 
     const imgSource =
-      props.payload.requester.picture ?? require("@/assets/images/no-dp.svg");
+      props.payload.picture ?? require("@/assets/images/no-dp.svg");
 
     return (
       <View style={styles.container}>
@@ -90,7 +101,7 @@ export default function Notification(props: NotificationType) {
           <Profile
             openProfile={openProfile}
             setOpenProfile={setOpenProfile}
-            id={props.payload.requester._id ?? "1"}
+            id={props.payload._id ?? "1"}
             similarity={-1}
           />
         )}
@@ -98,7 +109,7 @@ export default function Notification(props: NotificationType) {
           <Image source={imgSource} style={styles.img} />
         </AnimatedPressable>
         <View style={{paddingLeft:w*8}}>
-            <Text style={styles.name}>{`${props.payload.requester.first_name} ${props.payload.requester.last_name}`}</Text>
+            <Text style={styles.name}>{`${props.payload.first_name} ${props.payload.last_name}`}</Text>
             <Text style={styles.para}>sent you a friend request</Text>
         </View>
         <View style={{flexDirection:'row', columnGap:w*4, justifyContent:'flex-end', flex:1}}>
@@ -108,12 +119,15 @@ export default function Notification(props: NotificationType) {
       </View>
     );
   } else {
+    
     return <View style={styles.container}>
-        <View style={styles.accepted}>
-            <FontAwesome5 name="check" size={20} color="white"/>
+        {props.type === 'fr_accepted' ? <CheckIcon/> : <PaperIcon/>}
+        <View style={{paddingLeft:w*8, rowGap:h*2}}>
+            <Text style={styles.name}>{props.type === 'fr_accepted' ? props.payload : props.payload.fullname}</Text>
+            <Text style={styles.para}>{props.type === 'fr_accepted' ? 'accepted your friend request' : `added you in ${props.payload.group_name}`}</Text>
         </View>
-        <View style={{paddingLeft:w*8}}>
-            <Text style={styles.name}>{props.payload}</Text>
+        <View style={{flex:1, alignItems:'flex-end'}}>
+          <Text style={[styles.para, {fontSize:5*h+w*5}]}>{timeAgo(props.createdAt)}</Text>
         </View>
     </View>;
   }

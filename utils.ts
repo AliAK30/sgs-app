@@ -100,3 +100,24 @@ export const triggerHaptic = (type: 'impact-1' | 'impact-2' | 'impact-3'| 'impac
   }
   
 };
+
+
+export const timeAgo = (isoString: string) => {
+  const units = [
+    { name: 'year', secs: 31536000 },
+    { name: 'month', secs: 2592000 },
+    { name: 'day', secs: 86400 },
+    { name: 'hour', secs: 3600 },
+    { name: 'minute', secs: 60 },
+    { name: 'second', secs: 1 },
+  ];
+
+  const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
+
+  for (const { name, secs } of units) {
+    const val = Math.floor(diff / secs);
+    if (val >= 1) return `${val} ${name}${val > 1 ? 's' : ''} ago`;
+  }
+
+  return 'just now';
+}

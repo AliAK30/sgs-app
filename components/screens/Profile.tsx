@@ -16,6 +16,7 @@ import { User } from "@/types";
 import { PieChart, pieDataItem } from "react-native-gifted-charts";
 import { ImageBackground } from "expo-image";
 import { handleError } from "@/errors";
+import LearningStyleComponent from "../LearningStyle";
 import SubmitButton from "../buttons/SubmitButton";
 
 type Props = {
@@ -72,7 +73,7 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
     const text = friendStatus === "accepted" ? 'Unfriend' : friendStatus === 'pending' ? 'Pending' : 'Add friend';
 
     useEffect(()=> {
-      getFriendStatus(id);
+      userStore.user?.role === 'student' && getFriendStatus(id);
         fetchUser(id)
         //user.current.print = user.current.gender + (user.current?.age ? ` | Age ${user.current.age} years` : "") + (user.current?.gpa ? ` | CGPA ${user.current.gpa} `: "");
     }, []);
@@ -143,7 +144,8 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
       if (isConnected === null || isConnected) {
            
           setFetching(true);
-          const res: any = await axios.get(`${url}/student/${id}`, {
+          const path = userStore.user?.role === 'student' ? 'student' : 'admin/student'
+          const res: any = await axios.get(`${url}/${path}/${id}`, {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${userStore.token}`,
@@ -231,10 +233,12 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                         <Text style={styles.uni}>{user.current.print}</Text>
                         
                     </View>   
-                    {friendStatus !== 'blocked' && <SubmitButton style={[styles.addFriend, {borderColor: color }]} textStyle={[styles.addFriendText, {color:color}]} text={text} onPress={handlePress}/>}
+                    {(friendStatus !== 'blocked' && userStore.user?.role === 'student') && <SubmitButton style={[styles.addFriend, {borderColor: color }]} textStyle={[styles.addFriendText, {color:color}]} text={text} onPress={handlePress}/>}
                     {/* <Pressable style={[styles.addFriend, {borderColor: color }]}><Text style={[styles.addFriendText, {color:color}]}>{text}</Text></Pressable> */}
                 </View>
-                <View style={{ marginTop:h*15, justifyContent:'center'}}>
+
+
+                {userStore.user?.role === 'student' ? <View style={{ marginTop:h*15, justifyContent:'center'}}>
                 <View style={[styles.details, {alignItems:'center', paddingVertical:h*20}]}>
                         <PieChart
                         radius={25*h+25*w}
@@ -268,7 +272,10 @@ function Profile({openProfile, setOpenProfile, id, similarity}: Props) {
                 }
 
 
-                </View>
+                </View> : 
+                
+                <LearningStyleComponent user={user.current} self={false} />
+                }
                 <View style={{flexDirection:'row', justifyContent:'center', columnGap:w*10, flex:1, alignItems:'center'}}>
                     {user.current.phone_number &&
                     <Link href={`tel:${user.current.phone_number}`} asChild>

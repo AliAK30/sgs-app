@@ -1,5 +1,6 @@
 import { View, Text, TextInput } from "@/components/Themed";
-import { StyleSheet, ScrollView, Pressable, ActivityIndicator } from "react-native";
+import { StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import AnimatedPressable from "@/components/AnimatedPressable";
 import { useUserStore } from "@/hooks/useStore";
 import { useState, useRef, useEffect } from "react";
 import { Image } from "expo-image";
@@ -11,6 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { formatFirstName } from "@/utils";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { useAlert } from "@/hooks/useAlert";
+import AdminRegistration from "@/components/screens/AdminRegistration";
 import CreateGroup from "@/components/screens/CreateGroup";
 import axios from "axios";
 
@@ -135,6 +137,9 @@ export default function Index() {
   if(click === 2) 
     return (<CreateGroup setClick={setClick}/>)
 
+  if(click === 3)
+    return (<AdminRegistration back={()=>setClick(0)}/>);
+
   return (
     <ScrollView
       automaticallyAdjustKeyboardInsets={true}
@@ -168,7 +173,7 @@ export default function Index() {
             onChangeText={setValue}
             placeholderTextColor="#85878D"
           />
-          <Pressable
+          <AnimatedPressable
             onPress={() => {
               setFetching(true);
               setClick(1);
@@ -176,11 +181,9 @@ export default function Index() {
             hitSlop={15}
           >
             <Feather name="search" color="black" size={19} />
-          </Pressable>
+          </AnimatedPressable>
         </View>
-        <View style={styles.bell}>
-          <Ionicons name="notifications-outline" color="black" size={19} />
-        </View>
+        
       </View>
 
       <Text style={styles.quickInsights}>Quick Insights</Text>
@@ -243,7 +246,7 @@ export default function Index() {
         </View>
       </View>
       <View style={{ flexDirection: "row", columnGap: w * 10 }}>
-        {user?.role === "system_admin" && <Pressable style={styles.lgView}>
+        {user?.role === "system_admin" && <AnimatedPressable style={styles.lgView} onPress={()=>{setClick(3)}}>
           <LinearGradient
             style={styles.linearG}
             colors={[
@@ -260,9 +263,9 @@ export default function Index() {
             <Feather name="plus-circle" size={h * 25 + w * 25} />
             <Text style={styles.create}>Add New Admin</Text>
           </View>
-        </Pressable>
+        </AnimatedPressable>
         }
-        <Pressable style={styles.lgView} onPress={()=>setClick(2)}>
+        <AnimatedPressable style={styles.lgView} onPress={()=>setClick(2)}>
           <LinearGradient
             style={styles.linearG}
             colors={[
@@ -279,7 +282,7 @@ export default function Index() {
             <Feather name="users" size={h * 25 + w * 25} />
             <Text style={styles.create}>Create New Group</Text>
           </View>
-        </Pressable>
+        </AnimatedPressable>
       </View>
     </ScrollView>
   );

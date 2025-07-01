@@ -71,38 +71,41 @@ export type GroupType = {
   uni_name: string;
   uni_id: string;
   gender: string;
+  totalStudents: Number;
   students?: string[];
   dim1: Dimension;
   dim2: Dimension;
   dim3: Dimension;
   dim4: Dimension;
-  createdAt?: Date;
+  createdAt?: string;
 }
 
-export type Friend = {
+type FriendBase = {
   _id: string;
   first_name: string;
   last_name: string;
   uni_name: string;
   picture:string;
-  isFavourite: boolean;
 }
 
-type Payload = {recipientId: string;
-   requester: Friend & {friendshipId: string};
-  }
+export type Friend = FriendBase & {isFavourite: boolean};
+
+export type FriendRequestPayload = FriendBase & {friendshipId: string};
+export type GroupAddedPayload = {fullname: string;
+  group_name: string;
+};
 
 type NotificationBase<T, L> = {
   _id: string;
   recipient: string;
   payload: L;
   type: T;
-  createdAt: Date;
+  createdAt: string;
 };
 
-type FriendRequest = NotificationBase<"fr", Payload>;
+type FriendRequest = NotificationBase<"fr", FriendRequestPayload>;
 type FriendRequestAccepted = NotificationBase<"fr_accepted", string>;
-type GroupAdded = NotificationBase<"group_added", string>;
+type GroupAdded = NotificationBase<"group_added", GroupAddedPayload>;
 
 export type NotificationType = FriendRequest |  FriendRequestAccepted | GroupAdded;
 

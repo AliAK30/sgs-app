@@ -62,7 +62,9 @@ function SearchResult({
             setFetchingMore(true);
           }
 
-          const res: any = await axios.get(`${url}/student/search`, {
+          const path = user?.role === 'student' ? 'student/search' : 'admin/students/search'
+
+          const res: any = await axios.get(`${url}/${path}`, {
             params: { name, page: pageNum },
             headers: {
               "Content-Type": "application/json",
